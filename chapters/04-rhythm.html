@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 4 章 节奏与节拍 · 乐理入门</title>
+<script>try{var t=localStorage.getItem('mt-theme');document.documentElement.setAttribute('data-theme',t?JSON.parse(t):(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))}catch(e){}</script>
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+  .anatomy { width: 100%; max-width: 640px; display: block; margin: 0 auto; color: var(--text); }
+  .anatomy .lbl { font-size: 15px; font-weight: 700; fill: var(--primary-ink); }
+  .anatomy .sub { font-size: 12.5px; fill: var(--text-3); }
+  .anatomy .lead-line { stroke: var(--primary); stroke-width: 1.2; stroke-dasharray: 3 3; fill: none; }
+  .tree-svg { width: 100%; display: block; color: var(--text); }
+  .tree-svg .tree-link { stroke: var(--border-strong); stroke-width: 1.2; }
+  .tree-svg .tree-note { transition: color .06s; }
+  .tree-svg .tree-note.on { color: var(--primary); }
+  .tree-svg .row-label { font-size: 15px; font-weight: 700; fill: var(--text); }
+  .tree-svg .row-beat { font-size: 13px; fill: var(--text-3); }
+  .tree-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin-top: 10px; }
+  .meter-beats { display: flex; justify-content: center; align-items: flex-end; gap: 16px; margin: 22px 0 8px; flex-wrap: wrap; min-height: 96px; }
+  .mb { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 54px; }
+  .mb .dot-wrap { height: 52px; display: flex; align-items: flex-end; }
+  .mb i { display: block; border-radius: 50%; background: var(--bg-sunken); border: 2px solid var(--border-strong); transition: transform .06s, background .06s, border-color .06s; }
+  .mb.s2 i { width: 46px; height: 46px; }
+  .mb.s1 i { width: 34px; height: 34px; }
+  .mb.s0 i { width: 24px; height: 24px; }
+  .mb.on i { background: var(--primary); border-color: var(--primary); transform: scale(1.14); }
+  .mb.s2.on i { background: var(--accent); border-color: var(--accent); }
+  .mb b { font-size: 14px; color: var(--text); }
+  .mb .n { font: 600 12px var(--font-mono); color: var(--text-3); }
+  .meter-desc { text-align: center; color: var(--text-2); font-size: 14.5px; min-height: 2em; margin-top: 6px; }
+  .ex-list { display: grid; gap: 16px; margin: 18px 0; }
+  .ex-card { background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px 10px; box-shadow: var(--shadow-sm); }
+  .ex-card .ex-head { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .ex-card .ex-num { font: 800 13px var(--font-mono); color: var(--primary); letter-spacing: .04em; }
+  .ex-card h4 { margin: 0; font-size: 16px; }
+  .ex-card p { margin: 6px 0 0; font-size: 14px; color: var(--text-2); }
+  .ex-card .staff-box { margin: 6px 0 0; }
+  .vs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .vs-grid .figure { margin: 0; }
+  .vs-grid h4 { margin: 0 0 4px; text-align: center; font-size: 15px; }
+  .ts-grid .figure { margin: 0; }
+  .ts-grid { margin: 18px 0; }
+  @media (max-width: 640px) { .vs-grid { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body data-page="ch04" data-root="..">
+<main class="page">
+<article class="content doc">
+
+<header class="chapter-header">
+  <div class="chapter-kicker">第 4 章</div>
+  <h1>节奏与节拍：音乐的心跳</h1>
+  <p class="lead">前几章我们一直在研究"音有多高"。从这一章开始，我们来研究"音有多长"——也就是音乐的<strong>时间</strong>。拍子、速度、音符的长短、休止、拍号……学完这一章，你就能跟着节拍器，把谱上的节奏准确地拍出来。</p>
+  <div class="chapter-meta"><span>⏱ 预计 30 分钟</span><span>🎯 难度 ★★☆☆☆</span><span>👏 准备好双手，边学边拍</span></div>
+  <div class="goals">
+    <h4>学完本章，你将能够：</h4>
+    <ul>
+      <li>理解什么是<b>拍子</b>和<b>速度（BPM）</b>，认识常见的速度术语；</li>
+      <li>认识全音符到十六分音符、以及对应的<b>休止符</b>，并算出它们各占几拍；</li>
+      <li>读懂<b>附点</b>和<b>延音线</b>；</li>
+      <li>看懂<b>拍号</b>，听出 2/4、3/4、4/4、6/8 拍的强弱规律；</li>
+      <li>认识<b>弱起、切分音、三连音</b>，能跟着节拍器拍出简单的节奏。</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+<h2 id="s4-1">4.1 拍子与速度</h2>
+<p>听歌的时候，你是不是会不由自主地跟着点头、拍腿或者踩脚？你跟着的那个<b>稳定、均匀、一直持续</b>的"咚、咚、咚"，就是<span class="term">拍子</span><span class="en">（beat）</span>，也简称"拍"。它就像音乐的<strong>心跳</strong>。</p>
+<p>拍子有两个特点：</p>
+<ul>
+  <li><b>均匀</b>：每一拍之间的距离一样长，不会忽快忽慢；</li>
+  <li><b>持续</b>：哪怕某一刻没有声音（比如休止），拍子也在心里继续走。</li>
+</ul>
+
+<div class="callout analogy">
+  <div class="callout-title">打个比方：刻度与线段</div>
+  <p>拍子就像尺子上的<b>刻度</b>，均匀地排开；<span class="term">节奏</span>则是你在尺子上画的<b>长长短短的线段</b>。线段可以长、可以短、中间还可以留空，但刻度永远是均匀的。所以我们常说：<b>拍子是"格子"，节奏是往格子里放的东西</b>。</p>
+</div>
+
+<h3>速度：BPM</h3>
+<p>拍子有快有慢。拍子的快慢叫<span class="term">速度</span><span class="en">（tempo）</span>，通常用 <b>BPM</b>（Beats Per Minute，每分钟多少拍）来表示：</p>
+<ul>
+  <li><b>60 BPM</b>：每秒正好 1 拍，和钟表的秒针一样；</li>
+  <li><b>120 BPM</b>：每秒 2 拍，像快步走路；</li>
+  <li>换算公式：<code>每拍的秒数 = 60 ÷ BPM</code>。</li>
+</ul>
+<p>乐谱开头常常写着"♩ = 90"，意思就是"每分钟 90 个四分音符"，即 90 BPM。下面是一个小节拍器，先用 60 BPM 听一听，再拖动滑块，感受速度的变化：</p>
+
+<div data-metronome data-bpm="60" data-beats="4"></div>
+
+<h3>速度术语</h3>
+<p>在古典音乐的乐谱上，速度常用意大利语来写。下面是最常见的几个（数字只是大致范围，不同资料略有出入）：</p>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>术语</th><th>中文</th><th>大约速度（BPM）</th><th>感觉</th></tr></thead>
+  <tbody>
+    <tr><td><b>Grave</b></td><td>庄板</td><td>40 以下</td><td>极慢、庄严、沉重</td></tr>
+    <tr><td><b>Largo</b></td><td>广板</td><td>40～60</td><td>宽广、缓慢</td></tr>
+    <tr><td><b>Larghetto</b></td><td>小广板</td><td>60～66</td><td>比广板稍快一点</td></tr>
+    <tr><td><b>Adagio</b></td><td>柔板</td><td>66～76</td><td>舒缓、从容</td></tr>
+    <tr><td><b>Andante</b></td><td>行板</td><td>76～108</td><td>像散步一样，不紧不慢</td></tr>
+    <tr><td><b>Moderato</b></td><td>中板</td><td>108～120</td><td>中等速度</td></tr>
+    <tr><td><b>Allegro</b></td><td>快板</td><td>120～168</td><td>快速、活泼、愉快</td></tr>
+    <tr><td><b>Presto</b></td><td>急板</td><td>168～200</td><td>非常快</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout example">
+  <div class="callout-title">同一首《小星星》，三种速度</div>
+  <p>速度会彻底改变音乐的情绪。分别点一下，感受同一段旋律"慢下来"和"快起来"的区别：</p>
+  <p>
+    <button data-play="C4:q C4 G4 G4 A4 A4 G4:h F4:q F4 E4 E4 D4 D4 C4:h" data-mode="melody" data-bpm="56">广板 Largo · 56</button>
+    <button data-play="C4:q C4 G4 G4 A4 A4 G4:h F4:q F4 E4 E4 D4 D4 C4:h" data-mode="melody" data-bpm="96">行板 Andante · 96</button>
+    <button data-play="C4:q C4 G4 G4 A4 A4 G4:h F4:q F4 E4 E4 D4 D4 C4:h" data-mode="melody" data-bpm="168">急板 Presto · 168</button>
+  </p>
+</div>
+
+<div class="callout try">
+  <div class="callout-title">动手试试：跟着拍子拍手</div>
+  <p>把上面的小节拍器设为 <b>60 BPM</b>，点"开始"，跟着"嗒"声拍手，同时嘴里数"1、2、3、4"。拍稳了以后，再分别试试 <b>90</b> 和 <b>120</b> BPM。闭上眼睛也能拍准，就说明你已经抓住"拍子"了。</p>
+  <div class="launch-row"><span class="lr-label">也可以在面板里打开完整的节拍器：</span><button data-launch="metronome" data-args="bpm=60&ts=4/4&play=1">60 BPM</button><button data-launch="metronome" data-args="bpm=90&ts=4/4&play=1">90 BPM</button><button data-launch="metronome" data-args="bpm=120&ts=4/4&play=1">120 BPM</button></div>
+</div>
+
+<div class="callout warn">
+  <div class="callout-title">常见误区：越拍越快</div>
+  <p>新手最常见的问题是不知不觉<b>越拍越快</b>（尤其是遇到简单的地方），或者遇到难的地方就<b>停下来等</b>。记住：拍子不等人。练习时一定要开着节拍器，宁可慢一点，也要稳。</p>
+</div>
+</section>
+
+<section>
+<h2 id="s4-2">4.2 音符的时值</h2>
+<p>拍子是"格子"，而<span class="term">音符</span>告诉我们每个音要<b>占几个格子</b>。一个音持续的长短，叫作它的<span class="term">时值</span><span class="en">（duration）</span>——第 1 章讲过，它是乐音的四个属性之一。</p>
+
+<h3>音符长什么样</h3>
+<p>一个音符最多由四部分组成：</p>
+<div class="figure">
+  <svg class="anatomy" viewBox="0 0 640 210" role="img" aria-label="音符的结构：符头、符干、符尾、符杠">
+    <!-- 四分音符 -->
+    <path d="M114.6 151.4A15 10.8 -22 1 0 87.4 162.6A15 10.8 -22 1 0 114.6 151.4Z" fill="currentColor"/>
+    <line x1="113.6" y1="152" x2="113.6" y2="42" stroke="currentColor" stroke-width="3"/>
+    <text class="sub" x="100" y="200" text-anchor="middle">四分音符</text>
+    <!-- 八分音符 -->
+    <path d="M274.6 151.4A15 10.8 -22 1 0 247.4 162.6A15 10.8 -22 1 0 274.6 151.4Z" fill="currentColor"/>
+    <line x1="273.6" y1="152" x2="273.6" y2="42" stroke="currentColor" stroke-width="3"/>
+    <path transform="translate(272.4,42)" d="M0 0C1.4 16.8 15.6 21.6 20.6 36C25 47 23 56.6 17.8 66.2C21.1 54.2 19.7 44.2 12 37C7.7 32.6 1.4 29.8 0 27.4Z" fill="currentColor"/>
+    <text class="sub" x="260" y="200" text-anchor="middle">八分音符</text>
+    <!-- 两个八分音符用符杠连接 -->
+    <path d="M444.6 151.4A15 10.8 -22 1 0 417.4 162.6A15 10.8 -22 1 0 444.6 151.4Z" fill="currentColor"/>
+    <path d="M524.6 151.4A15 10.8 -22 1 0 497.4 162.6A15 10.8 -22 1 0 524.6 151.4Z" fill="currentColor"/>
+    <line x1="443.6" y1="152" x2="443.6" y2="46" stroke="currentColor" stroke-width="3"/>
+    <line x1="523.6" y1="152" x2="523.6" y2="46" stroke="currentColor" stroke-width="3"/>
+    <path d="M442.1 40L525.1 40L525.1 51L442.1 51Z" fill="currentColor"/>
+    <text class="sub" x="483" y="200" text-anchor="middle">两个八分音符连在一起</text>
+    <!-- 标注 -->
+    <path class="lead-line" d="M60 120 L88 150"/><text class="lbl" x="56" y="114" text-anchor="end">符头</text>
+    <path class="lead-line" d="M150 92 L118 92"/><text class="lbl" x="156" y="97">符干</text>
+    <path class="lead-line" d="M322 80 L296 78"/><text class="lbl" x="328" y="85">符尾</text>
+    <path class="lead-line" d="M483 22 L483 36"/><text class="lbl" x="483" y="16" text-anchor="middle">符杠</text>
+  </svg>
+  <div class="caption">符头（实心或空心）+ 符干 + 符尾（小旗子）。几个八分、十六分音符挨在一起时，常用"符杠"代替符尾把它们连起来。</div>
+</div>
+<ul>
+  <li><b>符头</b>：椭圆形的"头"，有空心和实心两种。它在五线谱上的<b>上下位置</b>表示音高（第 3 章），它的<b>样子</b>和符干、符尾一起表示时值。</li>
+  <li><b>符干</b>：竖直的细线。符干朝上时画在符头右边，朝下时画在左边——方向只是为了排版好看，<b>不影响时值</b>。</li>
+  <li><b>符尾</b>：符干末端的小旗子。<b>每多一条符尾，时值就减少一半</b>。</li>
+  <li><b>符杠</b>：几个带符尾的音符挨在一起时，用粗横杠把它们连成一组，通常<b>一拍连一组</b>，让人一眼看出拍子在哪里。</li>
+</ul>
+
+<h3>音符家族树</h3>
+<p>在最常见的情况下，我们<b>以四分音符为一拍</b>。下面这棵"家族树"从上往下看：每往下一层，音符的<b>个数翻一倍</b>，每个音符的<b>时值减一半</b>——就像把一块蛋糕不断地对半切。每一层加起来都是 4 拍。</p>
+<div class="figure">
+  <svg class="tree-svg" id="tree-svg" viewBox="0 0 770 318" role="img" aria-label="音符家族树"></svg>
+  <div class="tree-btns" id="tree-btns">
+    <button type="button" class="play-btn sm" data-row="0"><span class="pi"></span>全音符</button>
+    <button type="button" class="play-btn sm" data-row="1"><span class="pi"></span>二分音符</button>
+    <button type="button" class="play-btn sm" data-row="2"><span class="pi"></span>四分音符</button>
+    <button type="button" class="play-btn sm" data-row="3"><span class="pi"></span>八分音符</button>
+    <button type="button" class="play-btn sm" data-row="4"><span class="pi"></span>十六分音符</button>
+  </div>
+  <div class="caption">点按钮试听每一层（都带节拍器，4 下"嗒"= 4 拍）。注意听：每一层所用的总时间完全一样，只是被切成了不同的份数。</div>
+</div>
+
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>音符</th><th>长什么样</th><th class="c">时值（四分音符为一拍）</th><th>简谱写法</th></tr></thead>
+  <tbody>
+    <tr><td><b>全音符</b></td><td>空心符头，没有符干</td><td class="c">4 拍</td><td><code>1 - - -</code></td></tr>
+    <tr><td><b>二分音符</b></td><td>空心符头 + 符干</td><td class="c">2 拍</td><td><code>1 -</code></td></tr>
+    <tr><td><b>四分音符</b></td><td>实心符头 + 符干</td><td class="c">1 拍</td><td><code>1</code></td></tr>
+    <tr><td><b>八分音符</b></td><td>实心符头 + 符干 + 1 条符尾（或 1 条符杠）</td><td class="c">½ 拍</td><td>数字下面画 1 条横线</td></tr>
+    <tr><td><b>十六分音符</b></td><td>实心符头 + 符干 + 2 条符尾（或 2 条符杠）</td><td class="c">¼ 拍</td><td>数字下面画 2 条横线</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout memory">
+  <div class="callout-title">记忆口诀</div>
+  <p><b>"空心长，实心短；尾巴越多跑得越快。"</b></p>
+  <p>1 个全音符 = 2 个二分音符 = 4 个四分音符 = 8 个八分音符 = 16 个十六分音符。</p>
+</div>
+
+<h3>简谱里的时值</h3>
+<p>简谱用两种短横线表示时值（第 3 章已经见过）：</p>
+<ul>
+  <li><span class="term">增时线</span>：写在数字<b>右边</b>的短横"-"，每一条让前面的音<b>多一拍</b>。<code>1 -</code> 是 2 拍，<code>1 - - -</code> 是 4 拍。</li>
+  <li><span class="term">减时线</span>：写在数字<b>下面</b>的横线，每一条让时值<b>减半</b>。一条是八分音符（½ 拍），两条是十六分音符（¼ 拍）。</li>
+</ul>
+<div class="figure">
+  <div data-jianpu="1 - - - | 1 - 1 - | 1 1 1 1 | 1_ 1_ 1_ 1_ 1_ 1_ 1_ 1_ | 1__ 1__ 1__ 1__ 1__ 1__ 1__ 1__ 1__ 1__ 1__ 1__ 1__ 1__ 1__ 1__ |]" data-key="C" data-time="4/4" data-bpm="72"></div>
+  <div class="caption">和上面的家族树一一对应：全音符、二分音符、四分音符、八分音符、十六分音符，每小节都是 4 拍。</div>
+</div>
+
+<div class="callout example">
+  <div class="callout-title">例子：《两只老虎》里的长短音</div>
+  <p>这首法国民歌用到了四分音符、二分音符和八分音符。先看五线谱，再对照简谱，然后带着节拍器听一遍：</p>
+  <div data-staff="C4:q D4 E4 C4 | C4 D4 E4 C4 | E4 F4 G4:h | E4:q F4 G4:h | G4:8 A4 G4 F4 E4:q C4 | G4:8 A4 G4 F4 E4:q C4 | C4:q G3 C4:h | C4:q G3 C4:h |]" data-time="4/4" data-bpm="100" data-click></div>
+  <div data-jianpu="1 2 3 1 | 1 2 3 1 | 3 4 5 - | 3 4 5 - | 5_ 6_ 5_ 4_ 3 1 | 5_ 6_ 5_ 4_ 3 1 | 1 5, 1 - | 1 5, 1 - |]" data-key="C" data-time="4/4" data-bpm="100"></div>
+</div>
+
+<div class="callout note">
+  <div class="callout-title">"以四分音符为一拍"不是绝对的</div>
+  <p>这是最常见的约定，但并不是唯一的。到底"谁是一拍"，要看乐谱开头的<b>拍号</b>——比如 6/8 拍就是以八分音符为一拍。我们在 4.5 节详细讲。</p>
+</div>
+</section>
+
+<section>
+<h2 id="s4-3">4.3 休止符</h2>
+<p>音乐里的"安静"也是有长度的。表示"这里不发声、要停多久"的记号叫<span class="term">休止符</span><span class="en">（rest）</span>。每一种音符都有一个对应的休止符，<b>时值完全一样</b>，只是不发声。</p>
+
+<div class="figure">
+  <div data-staff="R:w_全休止 | R:h_二分休止 R:q_四分休止 R:8_八分休止 R:16_十六分休止 R:16 |" data-spacing="even" data-note-space="84" data-playable="false"></div>
+  <div class="caption">五种休止符。第二小节加起来正好也是 4 拍：2 + 1 + ½ + ¼ + ¼ = 4。</div>
+</div>
+
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>休止符</th><th>长什么样</th><th class="c">时值</th><th>简谱写法</th></tr></thead>
+  <tbody>
+    <tr><td><b>全休止符</b></td><td>"挂"在第四线下面的小黑块</td><td class="c">4 拍（也常用来表示"整小节休止"）</td><td><code>0 0 0 0</code></td></tr>
+    <tr><td><b>二分休止符</b></td><td>"坐"在第三线上面的小黑块</td><td class="c">2 拍</td><td><code>0 0</code></td></tr>
+    <tr><td><b>四分休止符</b></td><td>像一道弯弯曲曲的闪电</td><td class="c">1 拍</td><td><code>0</code></td></tr>
+    <tr><td><b>八分休止符</b></td><td>一个小圆点 + 一条斜线，像数字"7"</td><td class="c">½ 拍</td><td><code>0</code> 下面 1 条横线</td></tr>
+    <tr><td><b>十六分休止符</b></td><td>两个小圆点 + 斜线</td><td class="c">¼ 拍</td><td><code>0</code> 下面 2 条横线</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout memory">
+  <div class="callout-title">全休止和二分休止怎么分？</div>
+  <p>它们长得几乎一样，区别只在位置：<b>全休止符"挂"在线下</b>，像挂在衣钩上的厚大衣——又重又长（4 拍）；<b>二分休止符"坐"在线上</b>，像放在桌上的帽子——轻一些、短一些（2 拍）。</p>
+</div>
+
+<p>来听一段带休止的旋律。注意：休止的时候节拍器还在"嗒嗒"地走——<b>休止不是停下来，而是安静地数拍</b>。</p>
+<div data-staff="E4:q R:q G4:q R:q | E4:8 F4 R:q G4:q R:q | E4:q D4 C4 R:q | C4:h R:h |]" data-time="4/4" data-bpm="96" data-click data-count-in="1"></div>
+<div data-jianpu="3 0 5 0 | 3_ 4_ 0 5 0 | 3 2 1 0 | 1 - 0 0 |]" data-key="C" data-time="4/4" data-bpm="96"></div>
+
+<div class="callout note">
+  <div class="callout-title">简谱里的休止</div>
+  <p>简谱用 <code>0</code> 表示休止。注意：休止<b>不用增时线</b>延长，休息两拍要写成 <code>0 0</code>，休息四拍写成 <code>0 0 0 0</code>。</p>
+</div>
+
+<div class="callout tip">
+  <div class="callout-title">小贴士</div>
+  <p>遇到休止符时，最容易犯的错是"抢拍"——还没数够就急着进下一个音。可以在休止的地方轻轻点头或者小声数出来，帮自己把拍子数满。</p>
+</div>
+</section>
+
+<section>
+<h2 id="s4-4">4.4 附点与延音线</h2>
+<p>只用上面五种音符，能写出的时值只有 4、2、1、½、¼ 拍。那如果想要一个 3 拍的音、或者 1 拍半的音怎么办？这就需要<b>附点</b>和<b>延音线</b>。</p>
+
+<h3>附点：再加一半</h3>
+<p>写在符头右边的小圆点叫<span class="term">附点</span>。<b>附点让音符的时值增加原来的一半</b>，也就是变成原来的 1.5 倍：</p>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>附点音符</th><th>计算</th><th class="c">时值</th><th>简谱写法</th></tr></thead>
+  <tbody>
+    <tr><td><b>附点二分音符</b></td><td>2 + 1</td><td class="c">3 拍</td><td><code>1 - -</code></td></tr>
+    <tr><td><b>附点四分音符</b></td><td>1 + ½</td><td class="c">1½ 拍</td><td><code>1.</code></td></tr>
+    <tr><td><b>附点八分音符</b></td><td>½ + ¼</td><td class="c">¾ 拍</td><td><code>1.</code> 下面一条横线</td></tr>
+  </tbody>
+</table>
+</div>
+<div data-staff="G4:h._3拍 G4:q_1拍 | G4:q._1½拍 G4:8_½拍 G4:h_2拍 |]" data-time="4/4" data-bpm="80" data-click></div>
+
+<p>最常见的附点组合是<b>"附点四分音符 + 八分音符"</b>，两个加起来正好 2 拍，听起来是"长——短"（哒——哒）。你一定听过：贝多芬《欢乐颂》第一句的结尾就是它（标橙色的两个音）：</p>
+<div data-staff="E4:q E4 F4 G4 | G4 F4 E4 D4 | C4 C4 D4 E4 | E4:q.* D4:8* D4:h |]" data-time="4/4" data-bpm="100" data-click></div>
+<div data-jianpu="3 3 4 5 | 5 4 3 2 | 1 1 2 3 | 3.* 2_* 2 - |]" data-key="C" data-time="4/4" data-bpm="100"></div>
+
+<div class="callout try">
+  <div class="callout-title">动手试试</div>
+  <p>跟着上面的谱子拍手：前三小节每拍拍一下；第四小节"3."拍下去后<b>保持到第 2 拍的一半</b>，再快速拍"2"，然后"2"保持两拍。可以念成"<b>哒——哒 哒——</b>"。</p>
+</div>
+
+<h3>延音线：把两个音连成一个</h3>
+<p><span class="term">延音线</span><span class="en">（tie）</span>是连接<b>两个相同音高</b>音符的弧线。被连起来的音<b>只弹（唱）第一个</b>，第二个不再重新发声，时值直接加到第一个上。</p>
+<p>它主要有两个用处：一是让一个长音<b>跨过小节线</b>；二是写出单个音符写不出来的时值（比如 5 拍 = 全音符 + 四分音符）。对比下面两个例子，最后的 C 有什么不同：</p>
+<div class="figure">
+  <h4 class="center" style="margin:0">① 有延音线：最后的 C 只弹一次，持续 5 拍</h4>
+  <div data-staff="G4:q A4 B4 C5:q~* | C5:w* |]" data-time="4/4" data-bpm="96" data-click></div>
+  <h4 class="center" style="margin:14px 0 0">② 没有延音线：C 在第二小节又弹了一次</h4>
+  <div data-staff="G4:q A4 B4 C5:q* | C5:w* |]" data-time="4/4" data-bpm="96" data-click></div>
+</div>
+
+<h3>延音线 vs. 圆滑线</h3>
+<p>乐谱上还有一种长得很像的弧线，叫<span class="term">圆滑线</span>（slur）。区别很简单：</p>
+<div data-staff="C5:h~_延音线 C5:h | C5:q(_圆滑线 D5 E5 F5) |]" data-time="4/4" data-bpm="96"></div>
+<ul>
+  <li><b>延音线</b>连接的是<b>同一个音高</b>（同一高度的两个音），作用是"时值相加、只弹一次"；</li>
+  <li><b>圆滑线</b>连接的是<b>不同的音高</b>，作用是"连贯地演奏"，每个音都要弹，只是音与音之间不断开（第 9 章详细讲）。</li>
+</ul>
+
+<div class="callout warn">
+  <div class="callout-title">常见误区：附点 ≠ 跳音</div>
+  <p>附点写在符头的<b>右边</b>，表示时值加一半；而写在符头<b>正上方或正下方</b>的小圆点叫"跳音"，意思是弹得短促（第 9 章）。两者位置不同、意思完全不同。</p>
+</div>
+</section>
+
+<section>
+<h2 id="s4-5">4.5 拍号与小节</h2>
+<p>如果一首歌从头到尾都是均匀的"嗒嗒嗒嗒"，读谱的人很容易数乱。所以人们把拍子<b>分组</b>：每几拍为一组，叫作一个<span class="term">小节</span><span class="en">（measure / bar）</span>，小节之间用竖线隔开，这条竖线就是<span class="term">小节线</span>。乐曲结束处用一细一粗的<span class="term">终止线</span>，段落之间常用两条细线的<span class="term">双纵线</span>。</p>
+
+<h3>拍号：上面几拍，下面谁是一拍</h3>
+<p>每小节有几拍、以什么音符为一拍，由写在乐谱开头的<span class="term">拍号</span><span class="en">（time signature）</span>规定。拍号是上下两个数字：</p>
+<ul>
+  <li><b>上面的数字</b>：每小节有<b>几拍</b>；</li>
+  <li><b>下面的数字</b>：以<b>几分音符</b>为一拍（4 表示四分音符，8 表示八分音符，2 表示二分音符）。</li>
+</ul>
+<p>比如 <b>3/4 拍</b>（读作"四三拍"或"四分之三拍"）就是"以四分音符为一拍，每小节 3 拍"。4/4 拍也常写成一个大写的 <b>C</b>，叫"普通拍子"（common time）。</p>
+
+<div class="grid-2 ts-grid">
+  <div class="figure"><div data-staff="X:q X | X:q X |]" data-clef="rhythm" data-time="2/4" data-bpm="96" data-click data-scale="0.8" data-caption="2/4：每小节 2 拍"></div></div>
+  <div class="figure"><div data-staff="X:q X X | X:q X X |]" data-clef="rhythm" data-time="3/4" data-bpm="110" data-click data-scale="0.8" data-caption="3/4：每小节 3 拍"></div></div>
+  <div class="figure"><div data-staff="X:q X X X | X:q X X X |]" data-clef="rhythm" data-time="4/4" data-bpm="100" data-click data-scale="0.8" data-caption="4/4：每小节 4 拍"></div></div>
+  <div class="figure"><div data-staff="X:q X X X | X:q X X X |]" data-clef="rhythm" data-time="C" data-bpm="100" data-click data-scale="0.8" data-caption="C：就是 4/4 拍"></div></div>
+</div>
+
+<div class="callout memory">
+  <div class="callout-title">拍号口诀</div>
+  <p><b>"上面数几拍，下面看谁是一拍。"</b>拍号虽然长得像分数，但<b>不能约分</b>：2/4 和 4/8、3/4 和 6/8 都是不同的拍子。</p>
+</div>
+
+<h3>强弱规律</h3>
+<p>同一小节里的几拍并不一样"重"。第一拍通常最强，叫<span class="term">强拍</span>；其他拍较轻，叫<span class="term">弱拍</span>；有的拍号里还有一个<span class="term">次强拍</span>。这种有规律的轻重循环，就是让我们"感觉到"拍子的秘密。选一个拍号，听听它的强弱：</p>
+
+<div class="figure" id="meter-demo">
+  <div class="btn-row" style="justify-content:center;margin-top:0">
+    <div class="segmented" role="group" aria-label="选择拍号">
+      <button type="button" data-meter="2/4" class="active">2/4</button>
+      <button type="button" data-meter="3/4">3/4</button>
+      <button type="button" data-meter="4/4">4/4</button>
+      <button type="button" data-meter="6/8">6/8</button>
+    </div>
+    <button type="button" class="play-btn" id="meter-play"><span class="pi"></span><span class="lbl">播放强弱</span></button>
+  </div>
+  <div class="meter-beats" id="meter-beats"></div>
+  <div class="meter-desc" id="meter-desc"></div>
+  <div class="caption">大圆 = 强拍（高而响的"嗒"），中圆 = 次强拍，小圆 = 弱拍。</div>
+</div>
+
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>拍号</th><th>含义</th><th>强弱规律</th><th>常见于</th></tr></thead>
+  <tbody>
+    <tr><td><b>2/4</b></td><td>四分音符为一拍，每小节 2 拍</td><td>强 弱</td><td>进行曲、节奏明快的儿歌</td></tr>
+    <tr><td><b>3/4</b></td><td>四分音符为一拍，每小节 3 拍</td><td>强 弱 弱</td><td>圆舞曲（华尔兹）、《生日快乐》</td></tr>
+    <tr><td><b>4/4</b>（C）</td><td>四分音符为一拍，每小节 4 拍</td><td>强 弱 次强 弱</td><td>绝大多数流行歌曲、儿歌</td></tr>
+    <tr><td><b>6/8</b></td><td>八分音符为一拍，每小节 6 拍</td><td>强 弱 弱 次强 弱 弱</td><td>摇篮曲、船歌、抒情歌曲</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>2/4、3/4 每小节只有一个强拍，叫<span class="term">单拍子</span>；4/4、6/8 是由两个单拍子组合起来的，有强拍也有次强拍，叫<span class="term">复拍子</span>。另外还有 5/4、7/8 这样由不同单拍子混合而成的<b>混合拍子</b>，在一些民族音乐和电影音乐里能听到，入门阶段了解即可。</p>
+<div class="launch-row"><span class="lr-label">打开节拍器，跟着重音拍手：</span><button data-launch="metronome" data-args="bpm=90&ts=2/4&play=1">2/4 拍</button><button data-launch="metronome" data-args="bpm=90&ts=3/4&play=1">3/4 拍</button><button data-launch="metronome" data-args="bpm=90&ts=4/4&play=1">4/4 拍</button><button data-launch="metronome" data-args="bpm=120&ts=6/8&play=1">6/8 拍</button></div>
+
+<div class="callout example">
+  <div class="callout-title">3/4 拍：华尔兹的"嘭—嚓—嚓"</div>
+  <p>圆舞曲的伴奏通常是：第一拍弹一个低音（强），后两拍弹两下和弦（弱）。打开节拍器听，是不是有了转圈跳舞的感觉？</p>
+  <div data-staff="grand" data-treble="R:q [E4 G4] [E4 G4] | R:q [F4 A4] [F4 A4] | R:q [F4 B4] [F4 B4] | R:q [E4 G4] [E4 G4] |]" data-bass="C3:q R R | F2:q R R | G2:q R R | C3:q R R |]" data-time="3/4" data-bpm="132" data-click></div>
+</div>
+
+<h3>6/8 拍：三个八分音符一组</h3>
+<p>6/8 拍以八分音符为一拍，每小节 6 拍，但我们通常把它<b>感觉成两大拍</b>：每 3 个八分音符为一组（正好是一个附点四分音符的长度），"<b>强</b>弱弱 <b>次强</b>弱弱"，像摇篮一样左右摇摆。</p>
+<div data-staff="C5:q E5:8 G5:q E5:8 | F5:q D5:8 B4:q. | C5:q E5:8 G5:q E5:8 | C5:h. |]" data-time="6/8" data-bpm="76" data-click></div>
+
+<div class="callout warn">
+  <div class="callout-title">3/4 和 6/8 不一样！</div>
+  <p>3/4 和 6/8 每小节都等于 6 个八分音符的长度，但分组完全不同：3/4 是 <b>3 组 × 2 个</b>（强 弱 弱），6/8 是 <b>2 组 × 3 个</b>（强弱弱 次强弱弱）。看看符杠的连法，再听听节拍器的重音：</p>
+  <div class="vs-grid">
+    <div class="figure"><h4>3/4 拍</h4><div data-staff="X:8 X X X X X | X:8 X X X X X |]" data-clef="rhythm" data-time="3/4" data-bpm="72" data-click data-scale="0.7"></div></div>
+    <div class="figure"><h4>6/8 拍</h4><div data-staff="X:8 X X X X X | X:8 X X X X X |]" data-clef="rhythm" data-time="6/8" data-bpm="72" data-click data-scale="0.7"></div></div>
+  </div>
+</div>
+</section>
+
+<section>
+<h2 id="s4-6">4.6 弱起、切分与三连音</h2>
+<p>掌握了强弱规律，我们就可以来认识三种"打破常规"的节奏了。它们让音乐更有趣、更有动感。</p>
+
+<h3>弱起：从弱拍开始</h3>
+<p>不是所有的歌都从第一拍（强拍）开始。如果乐曲从<b>弱拍</b>开始，第一小节就是不完整的，这样的小节叫<span class="term">弱起小节</span><span class="en">（pickup / anacrusis）</span>。最熟悉的例子就是《生日快乐》——它是 3/4 拍，开头的两个音落在第 3 拍（弱拍）上，后面的"6"才是第一个强拍：</p>
+<div data-staff="G4:8. G4:16 | A4:q G4 C5 | B4:h G4:8. G4:16 | A4:q G4 D5 | C5:h |]" data-time="3/4" data-bpm="100"></div>
+<div data-jianpu="5_. 5__ | 6 5 1' | 7 - 5_. 5__ | 6 5 2' | 1' - |]" data-key="C" data-time="3/4" data-bpm="100"></div>
+<div class="callout note">
+  <div class="callout-title">弱起小节的规矩</div>
+  <p>有弱起的乐曲，<b>最后一小节通常也不完整</b>，而且"弱起小节 + 最后一小节"的拍数正好凑成一个完整的小节。上面的例子里，弱起是 1 拍，最后一小节是 2 拍，加起来正好是 3/4 拍的 3 拍。数小节时，弱起小节不算第 1 小节。</p>
+</div>
+
+<h3>切分音：重音"挪了位置"</h3>
+<p>正常情况下，重音落在强拍上。如果一个音<b>从弱拍（或一拍的后半拍）开始，并一直延续到下一个强位置</b>，原本的强弱关系就被"切开"了，这样的音叫<span class="term">切分音</span><span class="en">（syncopation）</span>。最典型的是"八分—四分—八分"：</p>
+<div class="vs-grid">
+  <div class="figure"><h4>普通节奏</h4><div data-staff="X:8 X X X X X X X |]" data-clef="rhythm" data-time="4/4" data-bpm="84" data-click data-count-in="1"></div></div>
+  <div class="figure"><h4>切分节奏（带 &gt; 的是切分音）</h4><div data-staff="X:8 X:q@a X:8 X:8 X:q@a X:8 |]" data-clef="rhythm" data-time="4/4" data-bpm="84" data-click data-count-in="1"></div></div>
+</div>
+<p>切分音会产生一种"跳跃""往前冲"的动感，流行、爵士、拉丁音乐里到处都是。还有一种常见的切分：用延音线把一拍的后半拍<b>连过小节线</b>，让下一小节的强拍"提前"到来：</p>
+<div data-staff="X:q X X:8 X:q X:8~ | X:q X X:h |]" data-clef="rhythm" data-time="4/4" data-bpm="84" data-click data-count-in="1"></div>
+<p>用在旋律里是这样的（简谱里数字下面带一条横线的是八分音符，"八分—四分—八分"就是一个切分）：</p>
+<div data-staff="E4:8 G4:q G4:8 A4:q G4:q | E4:8 D4:q C4:8 C4:h |]" data-time="4/4" data-bpm="92" data-click></div>
+<div data-jianpu="3_ 5 5_ 6 5 | 3_ 2 1_ 1 - |]" data-key="C" data-time="4/4" data-bpm="92"></div>
+
+<h3>三连音：一拍分成三份</h3>
+<p>正常情况下，一拍只能平均分成 2 份（两个八分音符）或 4 份（四个十六分音符）。如果想把一拍<b>平均分成 3 份</b>，就用<span class="term">三连音</span><span class="en">（triplet）</span>：三个八分音符连在一起，上面（或下面）标一个"3"，三个音合起来占一拍。对比一下"二等分"和"三等分"：</p>
+<div data-staff="X:8_1 X X:8t_2 X X X:8_3 X X:8t_4 X X |]" data-clef="rhythm" data-time="4/4" data-bpm="72" data-click data-count-in="1"></div>
+<p>三连音听起来圆滑、流动，有一种"摇摆"的感觉。在旋律里：</p>
+<div data-staff="C4:q E4 G4:8t A4 G4 E4:q | C4:8t D4 E4 F4:8t G4 A4 G4:h |]" data-time="4/4" data-bpm="84" data-click></div>
+<div class="callout tip">
+  <div class="callout-title">怎么数三连音？</div>
+  <p>可以把每拍念成三个字，比如"<b>草—莓—酱</b>"或"<b>1—哒—哒</b>"，三个字均匀地塞进一拍里。先跟着节拍器念熟，再拍手。</p>
+</div>
+</section>
+
+<section>
+<h2 id="s4-7">4.7 节奏练习</h2>
+<p>节奏是"练"出来的，不是"看"出来的。下面有 8 条由易到难的节奏练习，都写在单线节奏谱上（只关心长短，不关心音高）。建议按这个方法练：</p>
+<ol class="steps">
+  <li><b>先看</b>：数清每小节的拍数，找出每个音落在哪一拍上。下方的数字就是它开始的位置："+"表示前一拍的后半拍，"(2)+"表示第 2 拍被前面的长音占住了、这个音从第 2 拍的后半拍开始。</li>
+  <li><b>念出来</b>：脚轻轻踩拍子，嘴里用"哒"把节奏念出来，长音就拖长。</li>
+  <li><b>拍出来</b>：开着节拍器，用手拍节奏。</li>
+  <li><b>对照</b>：点"播放"听标准答案（会先给一小节预备拍），哪里不一样就回去重练那一小节。</li>
+</ol>
+
+<div class="ex-list">
+  <div class="ex-card">
+    <div class="ex-head"><span class="ex-num">练习 1</span><h4>四分音符与二分音符</h4></div>
+    <div data-staff="X:q_1 X_2 X_3 X_4 | X:h_1 X:h_3 | X:q_1 X_2 X:h_3 | X:w_1 |]" data-clef="rhythm" data-time="4/4" data-bpm="80" data-click data-count-in="1" data-scale="1.05"></div>
+    <p>二分音符拍下去之后，要在心里数满两拍再拍下一个。</p>
+  </div>
+  <div class="ex-card">
+    <div class="ex-head"><span class="ex-num">练习 2</span><h4>加入休止符</h4></div>
+    <div data-staff="X:q_1 X_2 R:q_3 X_4 | X:q_1 R:q_2 X:h_3 | X:q_1 X_2 X_3 R:q_4 | X:h_1 R:h_3 |]" data-clef="rhythm" data-time="4/4" data-bpm="80" data-click data-count-in="1" data-scale="1.05"></div>
+    <p>休止的拍子可以把双手轻轻分开，提醒自己"这一拍不拍"。</p>
+  </div>
+  <div class="ex-card">
+    <div class="ex-head"><span class="ex-num">练习 3</span><h4>八分音符</h4></div>
+    <div data-staff="X:8_1 X_+ X:q_2 X:8_3 X_+ X:q_4 | X:q_1 X:8_2 X_+ X:h_3 | X:8_1 X_+ X_2 X_+ X:q_3 X:q_4 | X:w_1 |]" data-clef="rhythm" data-time="4/4" data-bpm="76" data-click data-count-in="1" data-scale="1.05"></div>
+    <p>两个八分音符占一拍：数成"1 + 2 + 3 + 4 +"，"+"读作"嗒"。</p>
+  </div>
+  <div class="ex-card">
+    <div class="ex-head"><span class="ex-num">练习 4</span><h4>附点四分音符 + 八分音符</h4></div>
+    <div data-staff="X:q._1 X:8_(2)+ X:q_3 X:q_4 | X:q._1 X:8_(2)+ X:h_3 | X:q_1 X:q._2 X:8_(3)+ X:q_4 | X:w_1 |]" data-clef="rhythm" data-time="4/4" data-bpm="76" data-click data-count-in="1" data-scale="1.05"></div>
+    <p>附点四分音符要"压住"下一拍，后面的八分音符落在那一拍的后半拍（"+"）上：念作"哒——哒"。</p>
+  </div>
+  <div class="ex-card">
+    <div class="ex-head"><span class="ex-num">练习 5</span><h4>十六分音符</h4></div>
+    <div data-staff="X:16_1 X X X X:q_2 X:16_3 X X X X:q_4 | X:8_1 X:16 X X:q_2 X:16_3 X X:8 X:q_4 | X:16_1 X X X X:16_2 X X X X:h_3 |]" data-clef="rhythm" data-time="4/4" data-bpm="66" data-click data-count-in="1" data-scale="1.05"></div>
+    <p>四个十六分音符占一拍，可以念成"哒哒哒哒"。先放慢速度，保证四个音均匀。</p>
+  </div>
+  <div class="ex-card">
+    <div class="ex-head"><span class="ex-num">练习 6</span><h4>切分节奏</h4></div>
+    <div data-staff="X:8_1 X:q_+ X:8_(2)+ X:q_3 X:q_4 | X:8_1 X:q_+ X:8_(2)+ X:h_3 | X:q_1 X:8_2 X:q_+ X:8_(3)+ X:q_4 | X:w_1 |]" data-clef="rhythm" data-time="4/4" data-bpm="76" data-click data-count-in="1" data-scale="1.05"></div>
+    <p>中间的四分音符从"+"开始，要跨过下一拍——拍到它时，节拍器的"嗒"正好在这个音的中间响起。</p>
+  </div>
+  <div class="ex-card">
+    <div class="ex-head"><span class="ex-num">练习 7</span><h4>三连音</h4></div>
+    <div data-staff="X:8t_1 X X X:q_2 X:8t_3 X X X:q_4 | X:8t_1 X X X:8t_2 X X X:h_3 |]" data-clef="rhythm" data-time="4/4" data-bpm="72" data-click data-count-in="1" data-scale="1.05"></div>
+    <p>三连音和四分音符交替出现，注意别把三连音拍成"两快一慢"。</p>
+  </div>
+  <div class="ex-card">
+    <div class="ex-head"><span class="ex-num">练习 8</span><h4>综合：6/8 拍</h4></div>
+    <div data-staff="X:q_1 X:8_3 X:q_4 X:8_6 | X:q._1 X:q._4 | X:8_1 X_2 X_3 X:q_4 X:8_6 | X:h._1 |]" data-clef="rhythm" data-time="6/8" data-bpm="80" data-click data-count-in="1" data-scale="1.05"></div>
+    <p>按八分音符数"1 2 3 4 5 6"，重音在 1 和 4。附点四分音符正好占 3 个八分音符。</p>
+  </div>
+</div>
+
+<div class="callout try">
+  <div class="callout-title">更多练习</div>
+  <p>打开 <a href="../tools/rhythm-trainer.html">🥁 节奏练习</a>，它可以随机生成无数条新节奏，还能在你跟着拍的时候<b>给你打分</b>；需要更灵活的节拍器（重音、细分、速度训练），就用 <a href="../tools/metronome.html">⏱️ 节拍器</a>。</p>
+</div>
+</section>
+
+<section>
+<h2 id="s4-summary">本章小结</h2>
+<div class="callout summary">
+  <div class="callout-title">要点回顾</div>
+  <ul>
+    <li><b>拍子</b>是音乐中均匀持续的脉搏；<b>速度</b>用 BPM 表示，60 BPM = 每秒一拍。</li>
+    <li>以四分音符为一拍时：<b>全音符 4 拍、二分 2 拍、四分 1 拍、八分 ½ 拍、十六分 ¼ 拍</b>；每种音符都有时值相同的<b>休止符</b>。</li>
+    <li><b>附点</b>让时值增加一半；<b>延音线</b>连接相同音高，时值相加、只弹一次（不要和圆滑线混淆）。</li>
+    <li><b>拍号</b>：上面数字 = 每小节几拍，下面数字 = 以几分音符为一拍。强弱规律：2/4 强弱、3/4 强弱弱、4/4 强弱次强弱、6/8 强弱弱次强弱弱。</li>
+    <li><b>弱起</b>从弱拍开始；<b>切分音</b>让重音落到弱位置；<b>三连音</b>把一拍平均分成三份。</li>
+  </ul>
+</div>
+
+<h3>小测验</h3>
+<div class="quiz-set">
+  <div class="quiz" data-answer="3">
+    <p class="quiz-q">以四分音符为一拍时，一个全音符等于几拍？</p>
+    <ol class="quiz-opts"><li>1 拍</li><li>2 拍</li><li>4 拍</li><li>8 拍</li></ol>
+    <div class="quiz-explain">全音符 = 2 个二分音符 = 4 个四分音符，所以是 <b>4 拍</b>。</div>
+  </div>
+  <div class="quiz" data-answer="3">
+    <p class="quiz-q">附点二分音符是几拍？</p>
+    <ol class="quiz-opts"><li>2 拍</li><li>2½ 拍</li><li>3 拍</li><li>4 拍</li></ol>
+    <div class="quiz-explain">附点让时值增加原来的一半：二分音符 2 拍 + 一半（1 拍）= <b>3 拍</b>。</div>
+  </div>
+  <div class="quiz" data-answer="1">
+    <p class="quiz-q">拍号 3/4 表示什么？</p>
+    <ol class="quiz-opts"><li>以四分音符为一拍，每小节 3 拍</li><li>以三分音符为一拍，每小节 4 拍</li><li>每小节 3 个四分音符加 4 个八分音符</li><li>速度是每分钟 34 拍</li></ol>
+    <div class="quiz-explain">"上面数几拍，下面看谁是一拍"：上面 3 = 每小节 3 拍，下面 4 = 以<b>四分音符</b>为一拍。</div>
+  </div>
+  <div class="quiz" data-answer="2">
+    <p class="quiz-q">4/4 拍的强弱规律是？</p>
+    <ol class="quiz-opts"><li>强 弱 强 弱</li><li>强 弱 次强 弱</li><li>强 弱 弱 弱</li><li>弱 强 弱 强</li></ol>
+    <div class="quiz-explain">4/4 拍是复拍子，由两个 2/4 组合而成：第 1 拍<b>强</b>，第 3 拍<b>次强</b>，第 2、4 拍<b>弱</b>。</div>
+  </div>
+  <div class="quiz" data-answer="2">
+    <p class="quiz-q">听一听：<button data-play="C5:8 C5 C5:q C5:8 C5 C5:q" data-mode="melody" data-bpm="84" data-click>播放节奏</button> 这段节奏是哪一个？</p>
+    <ol class="quiz-opts"><li>♩ ♩ ♩ ♩（四个四分音符）</li><li>♫ ♩ ♫ ♩（八分八分 四分 八分八分 四分）</li><li>♩. ♪ ♩ ♩（附点四分 八分 四分 四分）</li></ol>
+    <div class="quiz-explain">每一组都是"两个快的 + 一个慢的"：两个八分音符（共 1 拍）+ 一个四分音符（1 拍），重复两次，答案是 <b>♫ ♩ ♫ ♩</b>。</div>
+  </div>
+  <div class="quiz" data-answer="3">
+    <p class="quiz-q">关于延音线，下面哪个说法正确？</p>
+    <ol class="quiz-opts"><li>它连接两个不同的音，表示连贯演奏</li><li>它表示音符的时值增加一半</li><li>它连接两个相同音高的音，时值相加、只弹一次</li><li>它表示这个音要弹得短促</li></ol>
+    <div class="quiz-explain">延音线连接<b>同一个音高</b>，第二个音不重新弹，时值直接加到第一个上。A 说的是圆滑线，B 说的是附点，D 说的是跳音。</div>
+  </div>
+</div>
+
+<div class="callout tip">
+  <div class="callout-title">课后练一练</div>
+  <ul>
+    <li>打开 <a href="../tools/metronome.html">⏱️ 节拍器</a>，分别用 2/4、3/4、4/4、6/8 拍各听一分钟，跟着重音拍手。</li>
+    <li>在 <a href="../tools/rhythm-trainer.html">🥁 节奏练习</a> 里选"入门"或"基础"难度，连续拍对 5 条节奏。</li>
+    <li>用 <a href="../tools/piano.html">🎹 在线钢琴</a> 弹《欢乐颂》的第一句，注意结尾"3. 2_ 2 -"的附点节奏。</li>
+  </ul>
+</div>
+</section>
+
+</article>
+</main>
+
+<script src="../assets/js/theory.js"></script>
+<script src="../assets/js/audio.js"></script>
+<script src="../assets/js/keyboard.js"></script>
+<script src="../assets/js/staff.js"></script>
+<script src="../assets/js/jianpu.js"></script>
+<script src="../assets/js/site.js"></script>
+<script src="../assets/js/services.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script>
+(function () {
+  function f(n) { return Math.round(n * 100) / 100; }
+  function ell(cx, cy, rx, ry, rot) {
+    var r = rot * Math.PI / 180, c = Math.cos(r), s = Math.sin(r);
+    var x1 = cx + rx * c, y1 = cy + rx * s, x2 = cx - rx * c, y2 = cy - rx * s;
+    return 'M' + f(x1) + ' ' + f(y1) + 'A' + rx + ' ' + ry + ' ' + rot + ' 1 0 ' + f(x2) + ' ' + f(y2) + 'A' + rx + ' ' + ry + ' ' + rot + ' 1 0 ' + f(x1) + ' ' + f(y1) + 'Z';
+  }
+
+  /* ---------- 4.2 音符家族树 ---------- */
+  var svg = document.getElementById('tree-svg');
+  var W = 600, X0 = 14, ROWS = [32, 100, 168, 236, 300];
+  var NAMES = ['全音符', '二分音符', '四分音符', '八分音符', '十六分音符'];
+  var BEATS = ['1 个 × 4 拍', '2 个 × 2 拍', '4 个 × 1 拍', '8 个 × ½ 拍', '16 个 × ¼ 拍'];
+  function nx(row, j) { var n = 1 << row; return X0 + (j + 0.5) * W / n; }
+  var out = '';
+  for (var r = 1; r < 5; r++) {
+    for (var j = 0; j < (1 << r); j++) {
+      out += '<line class="tree-link" x1="' + f(nx(r - 1, j >> 1)) + '" y1="' + (ROWS[r - 1] + 9) + '" x2="' + f(nx(r, j)) + '" y2="' + (ROWS[r] - 36) + '"/>';
+    }
+  }
+  for (var row = 0; row < 5; row++) {
+    for (var k = 0; k < (1 << row); k++) {
+      var x = nx(row, k), y = ROWS[row];
+      var g = '<g class="tree-note" data-row="' + row + '" data-j="' + k + '">';
+      if (row === 0) g += '<path d="' + ell(x, y, 9.5, 6.3, 0) + ell(x, y, 5.2, 3.4, -55) + '" fill="currentColor" fill-rule="evenodd"/>';
+      else if (row === 1) g += '<path d="' + ell(x, y, 7.9, 5.7, -22) + ell(x, y, 6.1, 2.6, -30) + '" fill="currentColor" fill-rule="evenodd"/>';
+      else g += '<path d="' + ell(x, y, 7.6, 5.5, -22) + '" fill="currentColor"/>';
+      if (row > 0) g += '<line x1="' + f(x + 7) + '" y1="' + (y - 1) + '" x2="' + f(x + 7) + '" y2="' + (y - 33) + '" stroke="currentColor" stroke-width="1.6"/>';
+      g += '</g>';
+      out += g;
+    }
+  }
+  // 符杠
+  for (var b = 0; b < 8; b += 2) {
+    var xa = nx(3, b) + 7, xb = nx(3, b + 1) + 7, yb = ROWS[3] - 34;
+    out += '<path d="M' + f(xa - 0.8) + ' ' + yb + 'L' + f(xb + 0.8) + ' ' + yb + 'L' + f(xb + 0.8) + ' ' + (yb + 5) + 'L' + f(xa - 0.8) + ' ' + (yb + 5) + 'Z" fill="currentColor"/>';
+  }
+  for (var q = 0; q < 16; q += 4) {
+    var xa2 = nx(4, q) + 7, xb2 = nx(4, q + 3) + 7, yb2 = ROWS[4] - 34;
+    out += '<path d="M' + f(xa2 - 0.8) + ' ' + yb2 + 'L' + f(xb2 + 0.8) + ' ' + yb2 + 'L' + f(xb2 + 0.8) + ' ' + (yb2 + 4.5) + 'L' + f(xa2 - 0.8) + ' ' + (yb2 + 4.5) + 'Z" fill="currentColor"/>';
+    out += '<path d="M' + f(xa2 - 0.8) + ' ' + (yb2 + 7.5) + 'L' + f(xb2 + 0.8) + ' ' + (yb2 + 7.5) + 'L' + f(xb2 + 0.8) + ' ' + (yb2 + 12) + 'L' + f(xa2 - 0.8) + ' ' + (yb2 + 12) + 'Z" fill="currentColor"/>';
+  }
+  for (var l = 0; l < 5; l++) {
+    out += '<text class="row-label" x="640" y="' + (ROWS[l] - 6) + '">' + NAMES[l] + '</text>';
+    out += '<text class="row-beat" x="640" y="' + (ROWS[l] + 13) + '">' + BEATS[l] + '</text>';
+  }
+  svg.innerHTML = out;
+
+  function bindPlay(btn, start) {
+    var h = null;
+    btn.addEventListener('click', function () {
+      if (h) { h.stop(); return; }
+      h = start(function () { h = null; btn.classList.remove('playing'); });
+      if (h) btn.classList.add('playing');
+    });
+  }
+  document.querySelectorAll('#tree-btns [data-row]').forEach(function (btn) {
+    var row = +btn.dataset.row;
+    bindPlay(btn, function (done) {
+      var n = 1 << row, events = [];
+      for (var i = 0; i < n; i++) events.push({ notes: ['C5'], beats: 4 / n, j: i });
+      function clear() { svg.querySelectorAll('.tree-note.on').forEach(function (g) { g.classList.remove('on'); }); }
+      return Sound.playSequence(events, {
+        bpm: 76, click: true, legato: 0.9,
+        onEvent: function (ev) {
+          clear();
+          var g = svg.querySelector('.tree-note[data-row="' + row + '"][data-j="' + ev.j + '"]');
+          if (g) g.classList.add('on');
+        },
+        onEnd: function () { clear(); done(); }
+      });
+    });
+  });
+
+  /* ---------- 4.5 强弱规律演示 ---------- */
+  var METERS = {
+    '2/4': { pat: [2, 0], lab: ['强', '弱'], bpm: 96, desc: '2/4 拍：每小节 2 拍，"强—弱"交替，像士兵走路"左—右—左—右"，常用于进行曲。' },
+    '3/4': { pat: [2, 0, 0], lab: ['强', '弱', '弱'], bpm: 132, desc: '3/4 拍：每小节 3 拍，"强—弱—弱"，像华尔兹舞步"嘭—嚓—嚓"。' },
+    '4/4': { pat: [2, 0, 1, 0], lab: ['强', '弱', '次强', '弱'], bpm: 100, desc: '4/4 拍：每小节 4 拍，"强—弱—次强—弱"，是流行音乐里最常见的拍子。' },
+    '6/8': { pat: [2, 0, 0, 1, 0, 0], lab: ['强', '弱', '弱', '次强', '弱', '弱'], bpm: 168, desc: '6/8 拍：每小节 6 个八分音符，分成两组"强弱弱 + 次强弱弱"，像摇篮在左右摇晃。' }
+  };
+  var current = '2/4', clock = null;
+  var beatsEl = document.getElementById('meter-beats'), descEl = document.getElementById('meter-desc'), playBtn = document.getElementById('meter-play');
+  var meterHandle = { stop: stopMeter };
+  function renderMeter() {
+    var m = METERS[current];
+    beatsEl.innerHTML = m.pat.map(function (s, i) {
+      return '<div class="mb s' + s + '"><div class="dot-wrap"><i></i></div><b>' + m.lab[i] + '</b><span class="n">' + (i + 1) + '</span></div>';
+    }).join('');
+    descEl.textContent = m.desc;
+  }
+  function stopMeter() {
+    if (clock) clock.stop();
+    clock = null;
+    playBtn.classList.remove('playing');
+    playBtn.querySelector('.lbl').textContent = '播放强弱';
+    beatsEl.querySelectorAll('.mb.on').forEach(function (e) { e.classList.remove('on'); });
+    Sound.unclaim(meterHandle);
+  }
+  function startMeter() {
+    var m = METERS[current];
+    Sound.claim(meterHandle, '拍号演示');
+    clock = Sound.createClock({
+      bpm: m.bpm,
+      onTick: function (tick, time) {
+        var i = tick % m.pat.length;
+        Sound.click(time, { accent: m.pat[i], level: m.pat[i] === 0 ? 0.75 : 1 });
+        Sound.at(time, function () {
+          var els = beatsEl.querySelectorAll('.mb');
+          els.forEach(function (e, k) { e.classList.toggle('on', k === i); });
+        });
+      }
+    });
+    clock.start();
+    playBtn.classList.add('playing');
+    playBtn.querySelector('.lbl').textContent = '停止';
+  }
+  playBtn.addEventListener('click', function () { if (clock) stopMeter(); else startMeter(); });
+  document.querySelectorAll('#meter-demo [data-meter]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var wasPlaying = !!clock;
+      if (wasPlaying) stopMeter();
+      current = b.dataset.meter;
+      document.querySelectorAll('#meter-demo [data-meter]').forEach(function (x) { x.classList.toggle('active', x === b); });
+      renderMeter();
+      if (wasPlaying) startMeter();
+    });
+  });
+  renderMeter();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>调音器 · 乐理入门</title>
+<meta name="description" content="在线调音器：用麦克风识别音高，显示音名、频率与音分偏差；支持吉他、尤克里里、小提琴、贝斯预设与参考音发生器。">
+<script>try{var t=localStorage.getItem('mt-theme');document.documentElement.setAttribute('data-theme',t?JSON.parse(t):(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))}catch(e){}</script>
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+  .tuner-wrap { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  .tuner-main { text-align: center; }
+  .gauge { width: 100%; max-width: 420px; height: auto; display: block; margin: 0 auto; }
+  .gauge .tick { stroke: var(--border-strong); }
+  .gauge .tick.major { stroke: var(--text-3); }
+  .gauge .glabel { font: 600 11px var(--font-mono); fill: var(--text-3); }
+  .gauge .zone { fill: var(--green); opacity: .22; }
+  .gauge .needle { transition: transform .08s linear; transform-origin: 150px 160px; }
+  .gauge .needle line { stroke: var(--text-3); }
+  .tuner-main.in-tune .gauge .needle line { stroke: var(--green); }
+  .tuner-main.off .gauge .needle line { stroke: var(--accent); }
+  .note-big { font: 800 76px/1 var(--font); letter-spacing: -.02em; margin-top: -6px; color: var(--text-3); min-height: 76px; }
+  .note-big sub { font-size: .38em; font-weight: 700; vertical-align: baseline; margin-left: 2px; }
+  .note-big .enh { font-size: .32em; font-weight: 600; color: var(--text-3); margin-left: 10px; vertical-align: middle; }
+  .tuner-main.active .note-big { color: var(--text); }
+  .tuner-main.in-tune .note-big { color: var(--green); }
+  .freq { font: 700 18px var(--font-mono); color: var(--text-2); margin-top: 6px; min-height: 26px; }
+  .cents { font: 700 15px var(--font-mono); color: var(--text-3); }
+  .t-status { font-size: 16px; font-weight: 650; margin: 10px 0 4px; min-height: 26px; color: var(--text-2); }
+  .tuner-main.in-tune .t-status { color: var(--green); }
+  .tuner-main.off .t-status { color: var(--accent); }
+  .level { height: 6px; max-width: 280px; margin: 12px auto 4px; border-radius: 99px; background: var(--bg-sunken); overflow: hidden; }
+  .level i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--green), var(--accent)); transition: width .08s; }
+  .level-lbl { font-size: 12px; color: var(--text-3); }
+  .privacy { font-size: 13px; color: var(--text-3); margin: 14px 0 0; }
+  .mic-error { text-align: left; display: none; }
+  .mic-error.show { display: block; }
+  .strings { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; margin-top: 12px; }
+  .string-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 9px 6px; border-radius: 12px;
+    border: 1px solid var(--border-strong); background: var(--bg); transition: border-color .12s, background .12s, box-shadow .12s;
+  }
+  .string-btn:hover { border-color: var(--primary); }
+  .string-btn .sn { font-size: 11.5px; color: var(--text-3); font-weight: 600; }
+  .string-btn .nm { font: 800 22px/1.2 var(--font); }
+  .string-btn .hz { font: 600 11.5px var(--font-mono); color: var(--text-3); }
+  .string-btn.target { border-color: var(--primary); background: var(--primary-soft); box-shadow: 0 0 0 3px var(--primary-soft); }
+  .string-btn.target.ok { border-color: var(--green); background: var(--green-soft); box-shadow: 0 0 0 3px var(--green-soft); }
+  .string-btn.locked .sn::after { content: " 🔒"; }
+  .a4-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 14px; font-size: 14px; color: var(--text-2); }
+  .a4-row .val { font: 800 18px var(--font-mono); min-width: 70px; text-align: center; color: var(--text); }
+  .gen-row { display: flex; flex-wrap: wrap; gap: 10px 12px; align-items: center; margin: 10px 0; }
+  .gen-freq { font: 800 26px var(--font-mono); color: var(--primary); }
+  .kbd-table td:first-child { white-space: nowrap; font-weight: 600; }
+  @media (max-width: 960px) { .tuner-wrap { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) { .note-big { font-size: 60px; min-height: 60px; } }
+</style>
+</head>
+<body data-page="tuner" data-root="..">
+<main class="page">
+<div class="content wide tool-page">
+
+  <div class="tool-header">
+    <div>
+      <h1><span class="tool-icon">🎙️</span>调音器</h1>
+      <p>对着麦克风弹一个音或唱一个音，看看它是什么音、准不准。也可以播放参考音，用耳朵来对音。</p>
+    </div>
+  </div>
+
+  <div class="tuner-wrap">
+    <div class="panel tuner-main" id="tuner-main">
+      <svg class="gauge" id="gauge" viewBox="0 0 300 175" aria-hidden="true"></svg>
+      <div class="note-big" id="t-note">—</div>
+      <div class="freq"><span id="t-freq">-- Hz</span> <span class="cents" id="t-cents"></span></div>
+      <div class="t-status" id="t-status">点击下方按钮，允许使用麦克风后开始调音</div>
+      <div class="level"><i id="t-level"></i></div>
+      <div class="level-lbl">输入音量</div>
+      <div class="btn-row" style="justify-content:center;margin-top:14px">
+        <button class="btn btn-primary btn-lg" id="mic-btn" type="button">🎙️ 开始调音</button>
+      </div>
+      <div class="callout warn mic-error" id="mic-error"><div class="callout-title">无法使用麦克风</div><p id="mic-error-text"></p></div>
+      <p class="privacy">🔒 声音只在你的浏览器里实时分析，不会录音，也不会上传到任何地方。</p>
+    </div>
+
+    <div>
+      <div class="panel">
+        <div class="panel-title">🎸 乐器与琴弦</div>
+        <div class="segmented" id="seg-inst">
+          <button type="button" data-v="guitar">吉他</button><button type="button" data-v="ukulele">尤克里里</button><button type="button" data-v="violin">小提琴</button><button type="button" data-v="bass">贝斯</button><button type="button" data-v="free">自由模式</button>
+        </div>
+        <p class="small muted" id="inst-desc" style="margin:10px 0 0"></p>
+        <div class="strings" id="strings"></div>
+        <div class="btn-row" style="margin-bottom:0">
+          <label class="switch"><input type="checkbox" id="sw-auto" checked>自动识别正在调的弦</label>
+        </div>
+        <div class="a4-row">
+          <span>标准音 A4 =</span>
+          <button class="btn btn-sm" id="a4-minus" type="button">−</button>
+          <span class="val" id="a4-val">440 Hz</span>
+          <button class="btn btn-sm" id="a4-plus" type="button">+</button>
+          <button class="btn btn-sm btn-ghost" id="a4-reset" type="button">恢复 440</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">🔔 参考音发生器</div>
+        <p class="small muted" style="margin:-4px 0 6px">发出一个持续的标准音，适合用耳朵对音、练习唱准音高。</p>
+        <div class="gen-row">
+          <select id="gen-note" aria-label="音名"></select>
+          <select id="gen-oct" aria-label="八度"></select>
+          <div class="segmented" id="seg-wave"><button type="button" data-v="sine">正弦</button><button type="button" data-v="triangle">三角</button><button type="button" data-v="sawtooth">锯齿</button></div>
+        </div>
+        <div class="gen-row">
+          <button class="btn btn-primary" id="gen-btn" type="button">▶ 播放参考音</button>
+          <span class="gen-freq" id="gen-freq">440.00 Hz</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="how-to">
+    <h2 class="toc-anchor" id="how">使用说明</h2>
+    <ol class="steps">
+      <li>点击"开始调音"，浏览器询问时选择<b>允许使用麦克风</b>。</li>
+      <li>选择乐器（吉他、尤克里里、小提琴、贝斯），或用"自由模式"测人声、钢琴、笛子等任何乐器。</li>
+      <li><b>一次只弹一根弦</b>，弹完让它自然延长。指针在中间、变成<b style="color:var(--green)">绿色</b>（误差在 ±5 音分以内）就说明调准了。</li>
+      <li>指针偏<b>左</b> = 音<b>偏低</b>，需要把弦<b>拧紧</b>一点；偏<b>右</b> = 音<b>偏高</b>，把弦<b>放松</b>一点。每次只拧一点点，再弹一次看看。</li>
+    </ol>
+    <div class="table-wrap">
+      <table class="table kbd-table">
+        <thead><tr><th>名词</th><th>解释</th></tr></thead>
+        <tbody>
+          <tr><td>音分（cent）</td><td>比半音更细的单位：一个半音 = 100 音分。人耳通常能分辨 5～10 音分以上的偏差。</td></tr>
+          <tr><td>A4 = 440 Hz</td><td>国际标准音（见 <a href="../chapters/01-sound.html">第 1 章</a>）。有的乐团用 442 Hz，所以这里可以微调。</td></tr>
+          <tr><td>标准调弦</td><td>吉他从粗到细：E2 A2 D3 G3 B3 E4；尤克里里：G4 C4 E4 A4；小提琴：G3 D4 A4 E5；四弦贝斯：E1 A1 D2 G2。</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout tip">
+      <div class="callout-title">调音小贴士</div>
+      <ul>
+        <li>在安静的环境里调音，靠近麦克风，用中等力度拨弦。</li>
+        <li>建议从<b>低于</b>目标的音往上调到准，琴弦会更稳定，不容易跑音。</li>
+        <li>播放参考音时调音器也会"听到"它，这是正常的。</li>
+        <li>麦克风只能在 <code>https://</code> 或 <code>http://localhost</code> 页面中使用；直接双击打开的本地文件在部分浏览器中无法使用麦克风——双击项目里的 <code>start.command</code> 启动本地服务即可；此时参考音功能仍然可用。麦克风打开后会登记在右上角「⚡ 服务」里，页面切到后台 1 分钟会自动关闭。</li>
+      </ul>
+    </div>
+    <p>配合 <a href="../chapters/01-sound.html">第 1 章 声音与音高</a>（频率与音高、标准音）和 <a href="../chapters/02-keyboard.html">第 2 章 音名与键盘</a>（音名与八度编号）学习。</p>
+  </section>
+
+</div>
+</main>
+
+<script src="../assets/js/theory.js"></script>
+<script src="../assets/js/audio.js"></script>
+<script src="../assets/js/keyboard.js"></script>
+<script src="../assets/js/staff.js"></script>
+<script src="../assets/js/jianpu.js"></script>
+<script src="../assets/js/site.js"></script>
+<script src="../assets/js/services.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script>
+(function () {
+  'use strict';
+  function $(s, el) { return (el || document).querySelector(s); }
+  function $$(s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); }
+  var store = MTSite.store, esc = MTSite.esc;
+
+  var cfg = Object.assign({ inst: 'guitar', a4: 440, wave: 'sine', genPc: 9, genOct: 4 }, store.get('mt-tuner', {}));
+  cfg.a4 = Math.max(430, Math.min(450, Math.round(+cfg.a4 || 440)));
+  function save() { store.set('mt-tuner', cfg); }
+
+  var INSTS = {
+    guitar: { zh: '吉他', min: 60, max: 1400, ref: 'guitar', desc: '标准调弦（从 6 弦到 1 弦）：E2 A2 D3 G3 B3 E4。',
+      strings: [['E2', '6 弦'], ['A2', '5 弦'], ['D3', '4 弦'], ['G3', '3 弦'], ['B3', '2 弦'], ['E4', '1 弦']] },
+    ukulele: { zh: '尤克里里', min: 150, max: 1400, ref: 'guitar', desc: '标准调弦（从 4 弦到 1 弦）：G4 C4 E4 A4（4 弦比 3 弦高，这是尤克里里的特点）。',
+      strings: [['G4', '4 弦'], ['C4', '3 弦'], ['E4', '2 弦'], ['A4', '1 弦']] },
+    violin: { zh: '小提琴', min: 150, max: 2200, ref: 'triangle', desc: '标准调弦（从 4 弦到 1 弦）：G3 D4 A4 E5，相邻两弦相差纯五度。',
+      strings: [['G3', '4 弦'], ['D4', '3 弦'], ['A4', '2 弦'], ['E5', '1 弦']] },
+    bass: { zh: '贝斯', min: 35, max: 600, ref: 'guitar', desc: '四弦贝斯标准调弦：E1 A1 D2 G2，比吉他低四根弦低一个八度。',
+      strings: [['E1', '4 弦'], ['A1', '3 弦'], ['D2', '2 弦'], ['G2', '1 弦']] },
+    free: { zh: '自由模式', min: 50, max: 2200, ref: 'triangle', desc: '不限定乐器：唱歌、钢琴、笛子……显示最接近的音名和偏差。', strings: [] }
+  };
+
+  function freqOf(midi) { return cfg.a4 * Math.pow(2, (midi - 69) / 12); }
+
+  /* ================= 音高检测（YIN 算法） ================= */
+  function detectPitch(buf, sr, minF, maxF) {
+    minF = minF || 50; maxF = maxF || 2000;
+    var n = buf.length;
+    var rms = 0;
+    for (var i = 0; i < n; i++) rms += buf[i] * buf[i];
+    rms = Math.sqrt(rms / n);
+    if (rms < 0.006) return { freq: -1, rms: rms, clarity: 0 };
+    var tauMin = Math.max(2, Math.floor(sr / maxF));
+    var tauMax = Math.min(Math.floor(sr / minF), Math.floor(n / 2) - 1);
+    var W = n - tauMax - 1;
+    var d = new Float32Array(tauMax + 2);
+    for (var tau = 1; tau <= tauMax + 1; tau++) {
+      var s = 0;
+      for (var j = 0; j < W; j++) { var diff = buf[j] - buf[j + tau]; s += diff * diff; }
+      d[tau] = s;
+    }
+    var cm = new Float32Array(tauMax + 2);
+    cm[0] = 1;
+    var run = 0;
+    for (tau = 1; tau <= tauMax + 1; tau++) { run += d[tau]; cm[tau] = run > 0 ? d[tau] * tau / run : 1; }
+    var est = -1, TH = 0.12;
+    for (tau = tauMin; tau <= tauMax; tau++) {
+      if (cm[tau] < TH) {
+        while (tau + 1 <= tauMax && cm[tau + 1] < cm[tau]) tau++;
+        est = tau; break;
+      }
+    }
+    if (est < 0) {
+      var best = Infinity;
+      for (tau = tauMin; tau <= tauMax; tau++) if (cm[tau] < best) { best = cm[tau]; est = tau; }
+      if (best > 0.3) return { freq: -1, rms: rms, clarity: 1 - best };
+    }
+    // 抛物线插值（在原始差分函数上）
+    var better = est;
+    if (est > 1 && est < tauMax + 1) {
+      var a = d[est - 1], b = d[est], c = d[est + 1];
+      var den = a - 2 * b + c;
+      if (den !== 0) better = est + 0.5 * (a - c) / den;
+    }
+    return { freq: sr / better, rms: rms, clarity: 1 - cm[est] };
+  }
+
+  /* ================= 表盘 ================= */
+  var gauge = $('#gauge');
+  (function drawGauge() {
+    var cx = 150, cy = 160, R = 130, s = '';
+    function pt(deg, r) { var a = (deg - 90) * Math.PI / 180; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; }
+    // 绿色区域（±5 音分 = ±6°）
+    var z1 = pt(-6, R + 6), z2 = pt(6, R + 6), z3 = pt(6, R - 26), z4 = pt(-6, R - 26);
+    s += '<path class="zone" d="M' + z1[0] + ' ' + z1[1] + ' A' + (R + 6) + ' ' + (R + 6) + ' 0 0 1 ' + z2[0] + ' ' + z2[1] + ' L' + z3[0] + ' ' + z3[1] + ' A' + (R - 26) + ' ' + (R - 26) + ' 0 0 0 ' + z4[0] + ' ' + z4[1] + 'Z"/>';
+    for (var c = -50; c <= 50; c += 5) {
+      var deg = c * 1.2, major = c % 25 === 0;
+      var p1 = pt(deg, R), p2 = pt(deg, R - (major ? 18 : c % 10 === 0 ? 11 : 7));
+      s += '<line class="tick' + (major ? ' major' : '') + '" x1="' + p1[0].toFixed(1) + '" y1="' + p1[1].toFixed(1) + '" x2="' + p2[0].toFixed(1) + '" y2="' + p2[1].toFixed(1) + '" stroke-width="' + (major ? 2.2 : 1.4) + '"/>';
+      if (major) { var lp = pt(deg, R + 14); s += '<text class="glabel" x="' + lp[0].toFixed(1) + '" y="' + (lp[1] + 4).toFixed(1) + '" text-anchor="middle">' + (c > 0 ? '+' + c : c) + '</text>'; }
+    }
+    s += '<text class="glabel" x="22" y="172" text-anchor="start">偏低 ♭</text><text class="glabel" x="278" y="172" text-anchor="end">♯ 偏高</text>';
+    s += '<g class="needle" id="needle"><line x1="150" y1="160" x2="150" y2="44" stroke-width="3.2" stroke-linecap="round"/></g>';
+    s += '<circle cx="150" cy="160" r="8" style="fill:var(--text-2)"/>';
+    gauge.innerHTML = s;
+  })();
+  var needle = $('#needle');
+
+  /* ================= 乐器与琴弦 ================= */
+  var stringsEl = $('#strings'), swAuto = $('#sw-auto');
+  var locked = null; // 手动锁定的琴弦 midi
+  function bindSegmented(el, value, onChange) {
+    var btns = $$('button', el);
+    function mark(v) { btns.forEach(function (b) { b.classList.toggle('active', b.dataset.v === String(v)); }); }
+    mark(value);
+    btns.forEach(function (b) { b.addEventListener('click', function () { mark(b.dataset.v); onChange(b.dataset.v); }); });
+  }
+  function renderStrings() {
+    var inst = INSTS[cfg.inst];
+    $('#inst-desc').textContent = inst.desc;
+    stringsEl.innerHTML = '';
+    inst.strings.forEach(function (s) {
+      var n = MT.parseNote(s[0]);
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'string-btn'; b.dataset.midi = n.midi;
+      b.title = '播放 ' + s[1] + '（' + s[0] + '）的参考音，并锁定为调音目标';
+      b.innerHTML = '<span class="sn">' + esc(s[1]) + '</span><span class="nm">' + esc(MT.pcName(n)) + '<sub style="font-size:.5em">' + n.octave + '</sub></span><span class="hz">' + freqOf(n.midi).toFixed(2) + ' Hz</span>';
+      b.addEventListener('click', function () {
+        playRef(n.midi);
+        locked = n.midi; swAuto.checked = false;
+        markStrings(locked, false);
+      });
+      stringsEl.appendChild(b);
+    });
+    swAuto.parentElement.style.display = inst.strings.length ? '' : 'none';
+    markStrings(locked, false);
+  }
+  function markStrings(midi, ok) {
+    $$('.string-btn', stringsEl).forEach(function (b) {
+      var is = +b.dataset.midi === midi;
+      b.classList.toggle('target', is);
+      b.classList.toggle('ok', is && !!ok);
+      b.classList.toggle('locked', is && locked === midi && !swAuto.checked);
+    });
+  }
+  swAuto.addEventListener('change', function () { if (swAuto.checked) locked = null; markStrings(null, false); });
+  bindSegmented($('#seg-inst'), cfg.inst, function (v) { cfg.inst = v; locked = null; swAuto.checked = true; save(); renderStrings(); history = []; });
+
+  function playRef(midi) {
+    var inst = INSTS[cfg.inst];
+    stopGen();
+    Sound.playFrequency(freqOf(midi), { type: inst.ref, duration: inst.ref === 'guitar' ? 3.5 : 2.2, velocity: 0.85 });
+  }
+
+  /* ================= A4 基准 ================= */
+  var a4Val = $('#a4-val');
+  function setA4(v) {
+    cfg.a4 = Math.max(430, Math.min(450, Math.round(v)));
+    a4Val.textContent = cfg.a4 + ' Hz';
+    save(); renderStrings(); renderGen();
+    if (gen) gen.setFrequency(genFreq());
+  }
+  $('#a4-minus').addEventListener('click', function () { setA4(cfg.a4 - 1); });
+  $('#a4-plus').addEventListener('click', function () { setA4(cfg.a4 + 1); });
+  $('#a4-reset').addEventListener('click', function () { setA4(440); });
+
+  /* ================= 参考音发生器 ================= */
+  var genNote = $('#gen-note'), genOct = $('#gen-oct'), genBtn = $('#gen-btn'), genFreqEl = $('#gen-freq');
+  ['C', 'C♯ / D♭', 'D', 'D♯ / E♭', 'E', 'F', 'F♯ / G♭', 'G', 'G♯ / A♭', 'A', 'A♯ / B♭', 'B'].forEach(function (t, i) { var o = document.createElement('option'); o.value = i; o.textContent = t; genNote.appendChild(o); });
+  for (var o = 1; o <= 7; o++) { var op = document.createElement('option'); op.value = o; op.textContent = '第 ' + o + ' 八度'; genOct.appendChild(op); }
+  genNote.value = cfg.genPc; genOct.value = cfg.genOct;
+  var gen = null, genClaim = null;
+  function genMidi() { return (+genOct.value + 1) * 12 + (+genNote.value); }
+  function genFreq() { return freqOf(genMidi()); }
+  function renderGen() {
+    var m = genMidi();
+    genFreqEl.textContent = MT.noteName(MT.fromMidi(m)) + ' = ' + genFreq().toFixed(2) + ' Hz';
+  }
+  function stopGen() {
+    if (!gen) return;
+    gen.stop(); gen = null;
+    genBtn.textContent = '▶ 播放参考音'; genBtn.classList.add('btn-primary');
+    if (genClaim) { Sound.unclaim(genClaim); genClaim = null; }
+  }
+  function startGen() {
+    genClaim = { stop: stopGen };
+    Sound.claim(genClaim, function () { return '参考音 · ' + MT.noteName(MT.fromMidi(genMidi())) + ' = ' + genFreq().toFixed(1) + ' Hz'; });
+    gen = Sound.startTone(genFreq(), { type: cfg.wave, volume: cfg.wave === 'sine' ? 0.25 : 0.12 });
+    genBtn.textContent = '■ 停止'; genBtn.classList.remove('btn-primary');
+  }
+  genBtn.addEventListener('click', function () { if (gen) stopGen(); else startGen(); });
+  [genNote, genOct].forEach(function (el) {
+    el.addEventListener('change', function () { cfg.genPc = +genNote.value; cfg.genOct = +genOct.value; save(); renderGen(); if (gen) gen.setFrequency(genFreq(), 0.01); });
+  });
+  bindSegmented($('#seg-wave'), cfg.wave, function (v) { cfg.wave = v; save(); if (gen) { stopGen(); startGen(); } });
+
+  /* ================= 麦克风 ================= */
+  var main = $('#tuner-main'), micBtn = $('#mic-btn');
+  var noteEl = $('#t-note'), freqEl = $('#t-freq'), centsEl = $('#t-cents'), statusEl = $('#t-status'), levelEl = $('#t-level');
+  var errBox = $('#mic-error'), errText = $('#mic-error-text');
+  var mic = { stream: null, source: null, analyser: null, buf: null, raf: 0, frame: 0 };
+  var history = [], lastValid = 0, needleCents = 0, shownCents = null;
+
+  function showError(kind) {
+    var msg;
+    switch (kind) {
+      case 'insecure':
+        msg = '浏览器只允许在 <b>https://</b> 或 <b>http://localhost</b> 页面中使用麦克风，直接双击打开的本地文件（file://）在部分浏览器中也不行。解决办法：双击项目文件夹里的 <code>start.command</code>（或在终端运行 <code>./start.sh</code>），它会启动本地服务并自动用 <code>http://localhost</code> 打开网站。右侧的参考音功能不受影响，可以照常使用。'; break;
+      case 'NotAllowedError': case 'PermissionDeniedError': case 'SecurityError':
+        msg = '麦克风权限被拒绝了。请点击地址栏左侧的 🔒 或 ⓘ 图标，把"麦克风"改为"允许"，然后刷新页面再试。如果是 macOS，还要在"系统设置 → 隐私与安全性 → 麦克风"里允许浏览器使用麦克风。'; break;
+      case 'NotFoundError': case 'DevicesNotFoundError': case 'OverconstrainedError':
+        msg = '没有找到可用的麦克风。请检查麦克风是否已连接，以及系统设置中是否允许浏览器使用麦克风。'; break;
+      case 'NotReadableError': case 'TrackStartError': case 'AbortError':
+        msg = '麦克风正在被其他程序占用（例如会议软件），请关闭后再试。'; break;
+      default:
+        msg = '无法打开麦克风（' + esc(kind || '未知错误') + '）。可以换用最新版 Chrome、Edge、Safari 或 Firefox 再试。';
+    }
+    errText.innerHTML = msg;
+    errBox.classList.add('show');
+    statusEl.textContent = '麦克风不可用，但参考音仍然可以使用';
+  }
+
+  function startMic() {
+    errBox.classList.remove('show');
+    if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showError('insecure'); return; }
+    var ctx = Sound.ctx;
+    statusEl.textContent = '正在请求麦克风权限…';
+    navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } }).then(function (stream) {
+      mic.stream = stream;
+      mic.source = ctx.createMediaStreamSource(stream);
+      mic.analyser = ctx.createAnalyser();
+      mic.analyser.fftSize = 4096;
+      mic.analyser.smoothingTimeConstant = 0;
+      // 注意：只连接到分析器，不连接到扬声器，避免啸叫（回授）
+      mic.source.connect(mic.analyser);
+      mic.buf = new Float32Array(mic.analyser.fftSize);
+      // 麦克风分析需要音频引擎一直运行：申请 hold，并登记成「服务」，方便在服务管理里看到和关闭
+      mic.release = Sound.hold('麦克风');
+      mic.svc = window.MTServices ? MTServices.register({
+        id: 'mic', name: '麦克风（调音器）', icon: '🎙️', kind: 'mic',
+        detail: function () { return '正在聆听 · 页面切到后台会自动关闭'; },
+        stop: function () { stopMic(); }
+      }) : null;
+      history = []; lastValid = 0;
+      main.classList.add('active');
+      micBtn.textContent = '■ 停止调音'; micBtn.classList.remove('btn-primary');
+      statusEl.textContent = '正在聆听…请弹一个音或唱一个音';
+      loop();
+    }).catch(function (e) { showError(e && e.name); });
+  }
+
+  function stopMic() {
+    cancelAnimationFrame(mic.raf);
+    if (mic.source) try { mic.source.disconnect(); } catch (e) { /* */ }
+    if (mic.stream) mic.stream.getTracks().forEach(function (t) { t.stop(); });
+    if (mic.release) mic.release();
+    if (mic.svc) mic.svc.done();
+    mic = { stream: null, source: null, analyser: null, buf: null, raf: 0, frame: 0 };
+    main.classList.remove('active', 'in-tune', 'off');
+    micBtn.textContent = '🎙️ 开始调音'; micBtn.classList.add('btn-primary');
+    statusEl.textContent = '已停止。点击按钮重新开始调音';
+    levelEl.style.width = '0';
+    needle.style.transform = 'rotate(0deg)';
+    markStrings(locked, false);
+  }
+  micBtn.addEventListener('click', function () { if (mic.stream) stopMic(); else startMic(); });
+  window.addEventListener('pagehide', function () { if (mic.stream) stopMic(); stopGen(); });
+
+  function median(arr) { var a = arr.slice().sort(function (x, y) { return x - y; }); return a[Math.floor(a.length / 2)]; }
+
+  function loop() {
+    mic.raf = requestAnimationFrame(loop);
+    mic.frame++;
+    if (mic.frame % 2) return; // 约 30 次/秒
+    mic.analyser.getFloatTimeDomainData(mic.buf);
+    var inst = INSTS[cfg.inst];
+    var r = detectPitch(mic.buf, Sound.ctx.sampleRate, inst.min, inst.max);
+    var lvl = Math.min(1, Math.max(0, (20 * Math.log10(r.rms + 1e-9) + 60) / 50));
+    levelEl.style.width = (lvl * 100).toFixed(0) + '%';
+    var now = performance.now();
+    if (r.freq > 0 && r.clarity > 0.75) {
+      if (history.length) {
+        var med = median(history);
+        if (Math.abs(1200 * Math.log2(r.freq / med)) > 80) history = [];
+      }
+      history.push(r.freq);
+      if (history.length > 5) history.shift();
+      lastValid = now;
+      show(median(history));
+    } else if (now - lastValid > 1200) {
+      if (lastValid) {
+        main.classList.remove('in-tune', 'off');
+        statusEl.textContent = '正在聆听…请弹一个音或唱一个音';
+        noteEl.style.opacity = '.45';
+        markStrings(locked, false);
+      }
+      needleCents *= 0.85;
+      needle.style.transform = 'rotate(' + (needleCents * 1.2).toFixed(2) + 'deg)';
+    }
+  }
+
+  function show(f) {
+    var inst = INSTS[cfg.inst];
+    var midiF = 69 + 12 * Math.log2(f / cfg.a4);
+    var nearest = Math.round(midiF);
+    var target = nearest, targetLabel = null, stringMidi = null;
+    if (inst.strings.length) {
+      if (!swAuto.checked && locked != null) stringMidi = locked;
+      else {
+        var best = Infinity;
+        inst.strings.forEach(function (s) { var m = MT.parseNote(s[0]).midi; var dc = Math.abs(midiF - m); if (dc < best) { best = dc; stringMidi = m; } });
+      }
+      target = stringMidi;
+      inst.strings.forEach(function (s) { if (MT.parseNote(s[0]).midi === stringMidi) targetLabel = s[1] + ' ' + s[0]; });
+    }
+    var cents = (midiF - target) * 100;
+    var n = MT.fromMidi(nearest);
+    noteEl.style.opacity = '1';
+    noteEl.innerHTML = esc(MT.pcName(n)) + '<sub>' + n.octave + '</sub>' + (MT.isBlack(nearest) ? '<span class="enh">' + esc(MT.pcName(MT.fromMidi(nearest, true))) + '</span>' : '');
+    freqEl.textContent = f.toFixed(1) + ' Hz';
+    var nc = (midiF - nearest) * 100;
+    centsEl.textContent = '（' + (nc >= 0 ? '+' : '') + nc.toFixed(0) + ' 音分）';
+    needleCents += (Math.max(-50, Math.min(50, cents)) - needleCents) * 0.45;
+    needle.style.transform = 'rotate(' + (needleCents * 1.2).toFixed(2) + 'deg)';
+    var ok = Math.abs(cents) <= 5;
+    main.classList.toggle('in-tune', ok);
+    main.classList.toggle('off', !ok);
+    var msg;
+    if (Math.abs(cents) > 100) {
+      var semis = Math.round(Math.abs(cents) / 100);
+      msg = (targetLabel ? '离 ' + targetLabel + ' ' : '') + (cents < 0 ? '低了' : '高了') + '约 ' + semis + ' 个半音' + (targetLabel ? (cents < 0 ? '，把弦拧紧' : '，把弦放松') : '');
+    } else if (ok) msg = '✓ 音准！' + (targetLabel ? '（' + targetLabel + '）' : '');
+    else if (targetLabel) msg = (cents < 0 ? '偏低 ' : '偏高 ') + Math.abs(cents).toFixed(0) + ' 音分：' + (cents < 0 ? '把弦稍微拧紧一点' : '把弦稍微放松一点') + '（' + targetLabel + '）';
+    else msg = (cents < 0 ? '偏低 ' : '偏高 ') + Math.abs(cents).toFixed(0) + ' 音分';
+    statusEl.textContent = msg;
+    if (stringMidi != null) markStrings(stringMidi, ok);
+  }
+
+  a4Val.textContent = cfg.a4 + ' Hz';
+  renderStrings();
+  renderGen();
+
+  // 测试/调试用
+  window.MTTuner = { detectPitch: detectPitch, show: show, cfg: cfg, showError: showError };
+})();
+</script>
+</body>
+</html>

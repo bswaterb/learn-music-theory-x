@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>服务管理 · 乐理入门</title>
+<meta name="description" content="查看和停止所有标签页里正在运行的工具、麦克风、音频引擎与本地服务器；设置自动休眠，避免一直占用电脑资源。">
+<script>try{var t=localStorage.getItem('mt-theme');document.documentElement.setAttribute('data-theme',t?JSON.parse(t):(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))}catch(e){}</script>
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+  .svc-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; align-items: start; margin-top: 16px; }
+  .overview .stat .v { font-size: 22px; }
+  .overview .stat .v small { font-size: 13px; font-weight: 600; color: var(--text-3); margin-left: 4px; }
+  .tab-block { border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px 6px; margin-bottom: 12px; background: var(--bg); }
+  .tab-block.self { border-color: color-mix(in srgb, var(--primary) 35%, var(--border)); }
+  .tab-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; font-size: 14px; }
+  .tab-head b { font-weight: 650; }
+  .tab-head .tag { font-size: 11.5px; font-weight: 600; padding: 1px 8px; border-radius: 99px; background: var(--bg-sunken); color: var(--text-3); }
+  .tab-head .tag.me { background: var(--primary-soft); color: var(--primary-ink); }
+  .tab-head .spacer { flex: 1; }
+  .tab-head a { font-size: 12.5px; }
+  .set-item { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding: 11px 0; border-bottom: 1px dashed var(--border); }
+  .set-item:last-child { border-bottom: 0; }
+  .set-item .si-txt { flex: 1 1 220px; min-width: 0; }
+  .set-item .si-name { font-weight: 650; font-size: 14.5px; }
+  .set-item .si-desc { font-size: 12.5px; color: var(--text-3); line-height: 1.5; margin-top: 2px; }
+  .set-item select { flex: none; min-width: 132px; margin-left: auto; }
+  .set-item.disabled { opacity: .55; }
+  .clients { margin: 10px 0 0; padding: 0; list-style: none; font-size: 13.5px; }
+  .clients li { display: flex; gap: 8px; align-items: center; padding: 5px 0; border-bottom: 1px dashed var(--border); color: var(--text-2); }
+  .clients li:last-child { border-bottom: 0; }
+  .clients .c-vis { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--border-strong); }
+  .clients .c-vis.on { background: var(--green); }
+  .clients .c-meta { margin-left: auto; font-size: 12px; color: var(--text-3); white-space: nowrap; }
+  .cmd-list { margin: 12px 0 0; font-size: 13.5px; color: var(--text-2); }
+  .cmd-list code { font-size: 12.5px; }
+  .srv-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+  #launch-grid .svc-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+  #launch-grid .svc-gbtn { padding: 12px 6px 10px; font-size: 13px; }
+  #launch-grid .svc-gbtn span { font-size: 24px; }
+  @media (max-width: 1280px) { .svc-layout { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body data-page="services" data-root="..">
+<main class="page">
+<div class="content wide tool-page">
+
+  <div class="tool-header">
+    <div>
+      <h1><span class="tool-icon">⚡</span>服务管理</h1>
+      <p>所有标签页里正在运行的工具、麦克风、音频引擎和本地服务器都在这里，可以一键停止；下面还能设置自动休眠，避免一直占用电脑资源。</p>
+    </div>
+    <div class="btn-row" style="margin:0">
+      <button class="btn" id="refresh-btn" type="button">↻ 刷新</button>
+      <button class="btn btn-primary" type="button" data-svc-stopall>■ 全部停止</button>
+    </div>
+  </div>
+
+  <div class="stat-row overview">
+    <div class="stat"><div class="v" id="ov-running">0</div><div class="k">正在运行的服务（所有标签页）</div></div>
+    <div class="stat"><div class="v" id="ov-tabs">1</div><div class="k">打开的页面</div></div>
+    <div class="stat"><div class="v" id="ov-engine">0</div><div class="k">音频引擎在运行（其余已休眠或未启动）</div></div>
+    <div class="stat"><div class="v" id="ov-server">—</div><div class="k">本地服务器</div></div>
+  </div>
+
+  <div class="svc-layout">
+    <div>
+      <div class="panel" id="svc-panel">
+        <div class="panel-title">🧩 正在运行的服务</div>
+        <div id="svc-list"></div>
+        <p class="small muted" style="margin:6px 0 0">「停止」只停掉那一项；「全部停止」会停止所有标签页里的声音、麦克风和面板，并让音频引擎休眠。</p>
+      </div>
+      <div class="panel">
+        <div class="panel-title">⚡ 在面板里临时打开</div>
+        <p class="small muted" style="margin-top:0">工具会在右下角的浮动面板里打开，不用离开当前页面；用完点面板上的 ✕，它占用的资源会被浏览器全部回收。</p>
+        <div id="launch-grid"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <div class="panel-title">🖥️ 本地服务器</div>
+        <div id="srv-box"></div>
+        <div class="set-item" id="srv-idle-row">
+          <div class="si-txt"><div class="si-name">没有页面打开多久后自动退出</div><div class="si-desc">关掉所有页面后，服务器等这么久再退出（期间重新打开页面就不会退出）。会记住，下次启动也按这个来。</div></div>
+          <select id="srv-idle" aria-label="服务器自动退出时间">
+            <option value="5">5 分钟</option><option value="10">10 分钟（推荐）</option><option value="30">30 分钟</option><option value="60">1 小时</option><option value="0">从不</option>
+          </select>
+        </div>
+        <ul class="clients" id="clients"></ul>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">🔋 省资源设置 <span class="small muted" style="font-weight:500">（所有标签页共用）</span></div>
+        <div class="set-item">
+          <div class="si-txt"><div class="si-name">音频引擎静默多久后休眠</div><div class="si-desc">休眠后不占 CPU，下次播放时自动唤醒（第一声可能晚几十毫秒）。</div></div>
+          <select id="set-sleep" aria-label="音频引擎自动休眠时间">
+            <option value="10">10 秒</option><option value="30">30 秒（推荐）</option><option value="60">1 分钟</option><option value="300">5 分钟</option><option value="0">从不</option>
+          </select>
+        </div>
+        <div class="set-item">
+          <div class="si-txt"><div class="si-name">多久没有操作就停止所有服务</div><div class="si-desc">防止忘了关：页面上超过这么久没有点击、按键或滚动，就停止节拍器、麦克风、面板等。</div></div>
+          <select id="set-idle" aria-label="无操作自动停止时间">
+            <option value="10">10 分钟</option><option value="30">30 分钟（推荐）</option><option value="60">1 小时</option><option value="0">从不</option>
+          </select>
+        </div>
+        <div class="set-item">
+          <div class="si-txt"><div class="si-name">页面切到后台多久后关闭麦克风</div><div class="si-desc">保护隐私、省电：调音器所在的页面不在前台时自动关麦克风。</div></div>
+          <select id="set-mic" aria-label="后台关闭麦克风时间">
+            <option value="1">1 分钟（推荐）</option><option value="5">5 分钟</option><option value="15">15 分钟</option><option value="0">从不</option>
+          </select>
+        </div>
+        <div class="set-item">
+          <div class="si-txt"><div class="si-name">正文里显示「⚡ 临时打开」小按钮</div><div class="si-desc">教程正文中指向工具的链接后面那个小按钮。刷新页面后生效。</div></div>
+          <label class="switch"><input type="checkbox" id="set-chips"></label>
+        </div>
+        <div class="btn-row" style="margin-bottom:0"><button class="btn btn-sm btn-ghost" id="reset-btn" type="button">恢复推荐设置</button></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="how-to doc" style="max-width:var(--content-w)">
+    <h2 class="toc-anchor" id="start">一键启动脚本</h2>
+    <p>项目根目录里有两个启动脚本，都只依赖 macOS 自带的 Python 3。服务只监听本机（127.0.0.1），别的电脑访问不到。</p>
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th>想做什么</th><th>在「访达」里</th><th>在终端里（项目目录下）</th></tr></thead>
+      <tbody>
+        <tr><td>启动并打开网站</td><td>双击 <code>start.command</code></td><td><code>./start.sh</code></td></tr>
+        <tr><td>后台启动，不占终端窗口</td><td>—</td><td><code>./start.sh --bg</code></td></tr>
+        <tr><td>停止</td><td>关掉那个终端窗口，或本页「关闭服务器」</td><td><code>./start.sh stop</code></td></tr>
+        <tr><td>查看状态、打开了哪些页面</td><td>本页</td><td><code>./start.sh status</code></td></tr>
+        <tr><td>直接打开某一页</td><td>—</td><td><code>./start.sh --page tools/metronome.html</code></td></tr>
+        <tr><td>改自动退出时间</td><td>本页「本地服务器」设置</td><td><code>./start.sh --idle 30</code>（0 = 不自动退出）</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small muted">已经在运行时再次启动，不会开第二个，而是直接打开浏览器；默认端口 8765 被别的程序占用时会自动换一个。Windows 可以运行 <code>python scripts\serve.py</code>。</p>
+
+    <h2 class="toc-anchor" id="what">这些"服务"分别占用什么</h2>
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th>服务</th><th>占用</th><th>什么时候自动停</th></tr></thead>
+      <tbody>
+        <tr><td>🖥️ 本地服务器</td><td>一个很小的 Python 进程，空闲时几乎不占 CPU</td><td>所有页面关闭后，等设定的时间（默认 10 分钟）自动退出</td></tr>
+        <tr><td>🔊 音频引擎</td><td>浏览器的音频线程，运行时一直占一点 CPU</td><td>没有声音 30 秒后自动休眠，播放时自动唤醒</td></tr>
+        <tr><td>▶️ 正在播放</td><td>节拍器、伴奏、乐谱播放等，持续调度声音</td><td>你点停止；或 30 分钟没有任何操作</td></tr>
+        <tr><td>🎙️ 麦克风</td><td>麦克风 + 每秒约 30 次音高分析</td><td>页面切到后台 1 分钟；或 30 分钟没有任何操作</td></tr>
+        <tr><td>🧩 面板里的工具</td><td>一个嵌入的工具页（有自己的脚本和音频）</td><td>点 ✕ 立即释放；最多同时开 3 个，再开会自动关掉最久没用的空闲面板</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small muted">所有工具都在浏览器里运行，真正的后台进程只有本地服务器一个；而上面这些自动停止规则，保证不用时不会一直占着电脑。</p>
+
+    <h2 class="toc-anchor" id="faq">常见问题</h2>
+    <p><b>不启动服务器能用吗？</b>能。直接双击 <code>index.html</code> 也可以学习，只是部分浏览器里麦克风（调音器）不可用，也没法在这里管理服务器。</p>
+    <p><b>关闭服务器以后，页面还能用吗？</b>已经打开的页面能继续用（声音和练习都在浏览器里），但点链接跳到别的页面会打不开，需要重新启动。</p>
+    <p><b>右上角 ⚡ 上的数字是什么？</b>正在运行的服务个数（包括其他标签页）。点开就能逐个停止，或者一键全部停止。</p>
+    <p><b>引擎休眠后第一声慢了一点？</b>唤醒通常不到 0.1 秒。如果练习时介意，可以把"音频引擎静默多久后休眠"调长一些，或者选"从不"。</p>
+  </section>
+</div>
+</main>
+
+<script src="../assets/js/theory.js"></script>
+<script src="../assets/js/audio.js"></script>
+<script src="../assets/js/keyboard.js"></script>
+<script src="../assets/js/staff.js"></script>
+<script src="../assets/js/jianpu.js"></script>
+<script src="../assets/js/site.js"></script>
+<script src="../assets/js/services.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script>
+(function () {
+  'use strict';
+  var Svc = window.MTServices, esc = MTSite.esc;
+  function $(id) { return document.getElementById(id); }
+  function ago(ms) {
+    var s = Math.max(0, Math.round(ms / 1000));
+    if (s < 60) return s + ' 秒';
+    var m = Math.round(s / 60);
+    return m < 60 ? m + ' 分钟' : Math.floor(m / 60) + ' 小时 ' + (m % 60) + ' 分钟';
+  }
+  var SERVER_SHORT = { online: '运行中', checking: '检测中', file: '未使用', plain: '普通服务器', lost: '已断开', stopped: '已关闭' };
+
+  /* ---------- 服务列表（本页 + 其他标签页） ---------- */
+  function tabBlock(title, page, rows, tab, opts) {
+    var act = rows.filter(function (r) { return r.kind !== 'engine'; });
+    var eng = rows.filter(function (r) { return r.kind === 'engine'; });
+    var h = '<div class="tab-block' + (opts.self ? ' self' : '') + '"><div class="tab-head"><b>' + esc(title) + '</b>' +
+      (opts.self ? '<span class="tag me">本页</span>' : '') + (opts.hidden ? '<span class="tag">后台</span>' : '') +
+      '<span class="spacer"></span>' + (page && !opts.self ? '<a href="' + esc(MTSite.href(page)) + '" target="_blank" rel="noopener">在新标签页打开 ↗</a>' : '') + '</div>';
+    h += act.length ? Svc.renderRows(act, tab) : '<div class="svc-empty sm">没有正在运行的服务</div>';
+    if (eng.length) h += Svc.renderRows(eng, tab);
+    return h + '</div>';
+  }
+  function render() {
+    var s = Svc.snapshot();
+    var running = s.local.filter(function (r) { return r.kind !== 'engine'; }).length;
+    var engines = s.local.some(function (r) { return r.kind === 'engine' && r.active; }) ? 1 : 0;
+    var html = tabBlock(document.title.replace(/\s*·.*$/, ''), '', s.local, '', { self: true });
+    s.tabs.forEach(function (t) {
+      running += t.rows.filter(function (r) { return r.kind !== 'engine'; }).length;
+      if (t.rows.some(function (r) { return r.kind === 'engine' && r.active; })) engines++;
+      html += tabBlock(t.tab.title || t.tab.page, t.tab.page, t.rows, t.tab.id, { hidden: !t.tab.visible });
+    });
+    $('svc-list').innerHTML = html;
+    $('ov-running').textContent = running;
+    $('ov-tabs').textContent = 1 + s.tabs.length;
+    $('ov-engine').textContent = engines;
+    $('ov-server').innerHTML = esc(SERVER_SHORT[s.server.state] || s.server.state) + (s.server.state === 'online' && s.server.info ? '<small>:' + s.server.info.port + '</small>' : '');
+    renderServer(s.server);
+  }
+
+  /* ---------- 本地服务器 ---------- */
+  var clients = null, lastStatus = 0;
+  function renderServer(srv) {
+    var box = $('srv-box');
+    if (!box.querySelector('.confirm')) {
+      var extra = '';
+      if (srv.state !== 'online') {
+        extra = '<div class="cmd-list">启动方法：双击项目里的 <code>start.command</code>，或在终端里进入项目目录运行 <code>./start.sh</code>。</div>';
+      }
+      box.innerHTML = Svc.serverHtml(true) + extra;
+    }
+    var online = srv.state === 'online' && srv.info;
+    $('srv-idle-row').classList.toggle('disabled', !online);
+    $('srv-idle').disabled = !online;
+    if (online && document.activeElement !== $('srv-idle')) {
+      var v = String(srv.info.idle_minutes);
+      if (![].some.call($('srv-idle').options, function (o) { return o.value === v; })) {
+        var o = document.createElement('option'); o.value = v; o.textContent = v + ' 分钟'; $('srv-idle').appendChild(o);
+      }
+      $('srv-idle').value = v;
+    }
+    if (!online) { $('clients').innerHTML = ''; return; }
+    if (clients) {
+      $('clients').innerHTML = '<li style="color:var(--text-3);font-size:12.5px">服务器看到的页面（包括其他浏览器里打开的）：</li>' + clients.map(function (c) {
+        return '<li><span class="c-vis' + (c.visible ? ' on' : '') + '" title="' + (c.visible ? '前台' : '后台') + '"></span>' + esc(c.title || c.page) +
+          '<span class="c-meta">' + (c.services ? c.services + ' 个服务 · ' : '') + '已打开 ' + ago(Date.now() - c.since) + '</span></li>';
+      }).join('');
+    }
+  }
+  function loadStatus() {
+    if (Svc.server.state !== 'online') return;
+    lastStatus = Date.now();
+    Svc.server.status().then(function (d) { clients = d.clients || []; render(); }, function () { /* 下次心跳会更新状态 */ });
+  }
+  $('srv-idle').addEventListener('change', function () {
+    var v = +this.value;
+    Svc.server.setIdle(v).then(function () {
+      MTSite.toast(v ? '已设置：没有页面打开 ' + v + ' 分钟后自动退出' : '已设置：服务器不会自动退出');
+    }, function () { MTSite.toast('设置失败：服务器可能已经退出了'); });
+  });
+
+  /* ---------- 省资源设置 ---------- */
+  function syncSettings() {
+    var st = Svc.settings, a = document.activeElement;
+    if (a && a.closest && a.closest('.set-item')) return; // 用户正在操作某个设置时不打扰
+    $('set-sleep').value = String(Sound.settings.sleepAfter);
+    $('set-idle').value = String(st.idleStop);
+    $('set-mic').value = String(st.micHidden);
+    $('set-chips').checked = !!st.chips;
+  }
+  $('set-sleep').addEventListener('change', function () { Sound.setSleepAfter(+this.value); MTSite.toast(+this.value ? '音频引擎静默 ' + this.options[this.selectedIndex].text.replace(/（.*/, '') + '后自动休眠' : '音频引擎不再自动休眠'); });
+  $('set-idle').addEventListener('change', function () { Svc.setSetting('idleStop', +this.value); MTSite.toast('已保存'); });
+  $('set-mic').addEventListener('change', function () { Svc.setSetting('micHidden', +this.value); MTSite.toast('已保存'); });
+  $('set-chips').addEventListener('change', function () { Svc.setSetting('chips', this.checked); MTSite.toast('已保存，刷新教程页面后生效'); });
+  $('reset-btn').addEventListener('click', function () {
+    Sound.setSleepAfter(30);
+    Object.keys(Svc.DEFAULTS).forEach(function (k) { Svc.setSetting(k, Svc.DEFAULTS[k]); });
+    if (Svc.server.state === 'online') Svc.server.setIdle(10);
+    syncSettings();
+    MTSite.toast('已恢复推荐设置');
+  });
+  Sound.on(function (type) { if (type === 'settings') syncSettings(); });
+
+  /* ---------- 启动 ---------- */
+  $('launch-grid').innerHTML = Svc.launchGridHtml();
+  Svc.bindActions(document.querySelector('.tool-page'));
+  $('refresh-btn').addEventListener('click', function () { Svc.ping(); Svc.server.refresh(); loadStatus(); setTimeout(render, 300); });
+  Svc.on(function () { render(); syncSettings(); if (Date.now() - lastStatus > 5000) loadStatus(); });
+  syncSettings();
+  render();
+  Svc.ping();
+  setTimeout(loadStatus, 600);
+  setInterval(function () { render(); if (Date.now() - lastStatus > 5000) loadStatus(); }, 2000);
+})();
+</script>
+</body>
+</html>

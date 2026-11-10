@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>识谱练习 · 乐理入门</title>
+<script>try{var t=localStorage.getItem('mt-theme');document.documentElement.setAttribute('data-theme',t?JSON.parse(t):(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))}catch(e){}</script>
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+  .tool-page [hidden] { display: none !important; }
+  .nr-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; align-items: start; }
+  .nr-side { display: grid; gap: 16px; }
+  .nr-side .panel + .panel { margin-top: 0; }
+  .nr-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .nr-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .nr-score { font: 700 15px var(--font-mono); color: var(--text-2); }
+  .timer { display: flex; align-items: center; gap: 12px; margin: 12px 0 0; }
+  .timer-bar { flex: 1; height: 10px; border-radius: 99px; background: var(--bg-sunken); overflow: hidden; }
+  .timer-bar i { display: block; height: 100%; width: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--green), var(--accent)); transition: width .1s linear; }
+  .timer-bar i.low { background: var(--red); }
+  .timer-num { font: 800 24px var(--font-mono); min-width: 74px; text-align: right; }
+  .nr-stage { position: relative; min-height: 250px; display: grid; place-items: center; margin: 10px 0 4px; }
+  .nr-staff { width: 100%; }
+  .nr-staff .staff-box { margin: 0; }
+  .nr-overlay {
+    position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 20px;
+    background: color-mix(in srgb, var(--bg-elev) 92%, transparent); border-radius: 14px; z-index: 2;
+  }
+  .nr-overlay h3 { margin: 0 0 6px; font-size: 22px; }
+  .nr-overlay p { margin: 0 0 14px; color: var(--text-2); }
+  .nr-overlay .big { font: 800 52px/1.1 var(--font-mono); color: var(--primary); }
+  .nr-feedback { text-align: center; font-size: 17px; font-weight: 650; min-height: 30px; margin: 4px 0 12px; color: var(--text-2); }
+  .nr-feedback.ok { color: var(--green); }
+  .nr-feedback.bad { color: var(--red); }
+  .nr-hint { text-align: center; font-size: 13.5px; color: var(--text-2); background: var(--yellow-soft); border-radius: 10px; padding: 6px 12px; margin: 0 auto 10px; max-width: 560px; }
+  .acc-pre { display: flex; justify-content: center; margin-bottom: 10px; }
+  .acc-pre .segmented button { font-size: 15px; padding: 5px 16px; }
+  .note-btns { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+  .note-btn {
+    position: relative; padding: 12px 4px 9px; border-radius: 12px; border: 1.5px solid var(--border-strong); background: var(--bg);
+    display: grid; gap: 2px; justify-items: center; transition: border-color .12s, background .12s, transform .05s;
+  }
+  .note-btn:hover { border-color: var(--primary); background: var(--primary-soft); }
+  .note-btn:active { transform: translateY(1px); }
+  .note-btn b { font-size: 22px; line-height: 1.1; font-family: var(--font-serif); }
+  .note-btn span { font-size: 12px; color: var(--text-3); }
+  .note-btn kbd { position: absolute; top: 4px; right: 4px; font-size: 9.5px; opacity: .65; min-width: 1.4em; }
+  .note-btn.correct { border-color: var(--green); background: var(--green-soft); color: var(--green); }
+  .note-btn.wrong { border-color: var(--red); background: var(--red-soft); color: var(--red); }
+  .note-btn:disabled { cursor: default; }
+  .kb-answer .pk { height: 140px; }
+  .set-group { margin: 12px 0 0; }
+  .set-group:first-child { margin-top: 0; }
+  .set-label { font-size: 13px; font-weight: 700; color: var(--text-2); margin-bottom: 6px; }
+  .set-group .segmented { display: flex; width: 100%; }
+  .set-group .segmented button { flex: 1; padding: 5px 6px; }
+  .stat-row .stat .v { font-size: 20px; }
+  .weak-list { list-style: none; padding: 0; margin: 6px 0 0; font-size: 13.5px; }
+  .weak-list li { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; border-bottom: 1px dashed var(--border); }
+  .weak-list li:last-child { border-bottom: 0; }
+  .weak-list .nm { font-family: var(--font-serif); font-weight: 700; color: var(--primary-ink); }
+  .weak-list .ct { color: var(--text-3); font-family: var(--font-mono); font-size: 12.5px; }
+  .muted-box { font-size: 13px; color: var(--text-3); }
+  @media (max-width: 1040px) { .nr-layout { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 560px) {
+    .note-btns { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .nr-overlay .big { font-size: 40px; }
+  }
+</style>
+</head>
+<body data-page="reading" data-root="..">
+<main class="page">
+<div class="content wide tool-page">
+
+  <div class="tool-header">
+    <div>
+      <h1><span class="tool-icon">🎼</span>识谱练习</h1>
+      <p>看到谱上的音符，尽快说出它的名字。每天练 5 分钟，读谱会越来越快。</p>
+    </div>
+    <div class="segmented" id="mode-seg" role="tablist" aria-label="模式">
+      <button type="button" data-mode="practice">🧘 练习模式</button>
+      <button type="button" data-mode="challenge">⏱ 60 秒挑战</button>
+    </div>
+  </div>
+
+  <div class="nr-layout">
+    <div class="panel">
+      <div class="nr-bar">
+        <div class="nr-tags" id="nr-tags"></div>
+        <div class="nr-score" id="nr-score">答对 0 / 0</div>
+      </div>
+      <div class="timer" id="timer" hidden>
+        <div class="timer-bar"><i id="timer-fill"></i></div>
+        <span class="timer-num" id="timer-num">60.0</span>
+      </div>
+      <div class="nr-stage">
+        <div class="nr-staff" id="nr-staff"></div>
+        <div class="nr-overlay" id="overlay" hidden></div>
+      </div>
+      <div class="nr-hint" id="nr-hint" hidden></div>
+      <div class="nr-feedback" id="fb">这个音叫什么？</div>
+      <div id="answer-area"></div>
+    </div>
+
+    <aside class="nr-side">
+      <div class="panel">
+        <div class="panel-title">⚙️ 练习设置</div>
+        <div class="set-group">
+          <div class="set-label">谱号</div>
+          <div class="segmented" data-set="clef">
+            <button type="button" data-val="treble">高音谱表</button><button type="button" data-val="bass">低音谱表</button><button type="button" data-val="grand">大谱表混合</button>
+          </div>
+        </div>
+        <div class="set-group">
+          <div class="set-label">音域</div>
+          <div class="segmented" data-set="range">
+            <button type="button" data-val="staff">谱内（不用加线）</button><button type="button" data-val="ledger">含 2 条加线</button>
+          </div>
+        </div>
+        <div class="set-group">
+          <div class="set-label">作答方式</div>
+          <div class="segmented" data-set="answer">
+            <button type="button" data-val="name">音名</button><button type="button" data-val="solfege">唱名</button><button type="button" data-val="keyboard">钢琴键盘</button>
+          </div>
+        </div>
+        <div class="set-group" style="display:grid;gap:10px">
+          <label class="switch"><input type="checkbox" data-bool="acc"> 出现升号 / 降号</label>
+          <label class="switch"><input type="checkbox" data-bool="weak"> 多练易错的音</label>
+          <label class="switch"><input type="checkbox" data-bool="hint"> 显示口诀提示</label>
+          <label class="switch"><input type="checkbox" data-bool="sound"> 作答后播放这个音</label>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title" style="justify-content:space-between">📊 统计 <button class="btn btn-sm btn-ghost" id="btn-reset" type="button">清空记录</button></div>
+        <div class="stat-row">
+          <div class="stat"><div class="v" id="s-acc">—</div><div class="k">本次正确率</div></div>
+          <div class="stat"><div class="v" id="s-time">—</div><div class="k">平均用时</div></div>
+        </div>
+        <div class="stat-row" style="margin-top:10px">
+          <div class="stat"><div class="v" id="s-best">—</div><div class="k">挑战最佳（当前设置）</div></div>
+        </div>
+        <div class="set-label" style="margin-top:14px">最容易出错的音（累计）</div>
+        <ul class="weak-list" id="weak-list"></ul>
+      </div>
+    </aside>
+  </div>
+
+  <section class="how-to">
+    <h2 class="toc-anchor" id="how">使用说明</h2>
+    <ol class="steps">
+      <li>在右侧选择<b>谱号</b>和<b>音域</b>。零基础建议从"高音谱表 + 谱内"开始，熟练后再练低音谱表、加线和大谱表。</li>
+      <li>看谱上的音符，点击下方对应的按钮作答，也可以直接按电脑键盘上的字母 <kbd>C</kbd> <kbd>D</kbd> <kbd>E</kbd> <kbd>F</kbd> <kbd>G</kbd> <kbd>A</kbd> <kbd>B</kbd>；唱名模式下还可以按数字 <kbd>1</kbd>～<kbd>7</kbd>（do～si）。</li>
+      <li>打开"出现升号 / 降号"后，先选 ♭ / ♮ / ♯ 再点音名；键盘上可按 <kbd>-</kbd> 选降号、<kbd>=</kbd> 选升号、<kbd>0</kbd> 回到本位，或者按住 <kbd>Shift</kbd>（升）/ <kbd>Option</kbd>·<kbd>Alt</kbd>（降）再按字母。</li>
+      <li>"钢琴键盘"作答需要点到<b>准确八度</b>的那个键，是最接近真实演奏的练法。</li>
+      <li>"60 秒挑战"里尽可能多地答对，按 <kbd>Enter</kbd> 开始，每种设置组合都会单独记录最佳成绩。</li>
+    </ol>
+    <div class="grid-2">
+      <div class="callout memory" style="margin:0">
+        <div class="callout-title">识谱口诀</div>
+        <ul>
+          <li><b>高音谱表</b>：五条线从下往上是 <b>E G B D F</b>，四个间是 <b>F A C E</b>（正好拼成英文单词 face）。</li>
+          <li><b>低音谱表</b>：五条线从下往上是 <b>G B D F A</b>，四个间是 <b>A C E G</b>。</li>
+          <li><b>中央 C</b>：高音谱表的下加一线，也是低音谱表的上加一线。</li>
+        </ul>
+      </div>
+      <div class="callout tip" style="margin:0">
+        <div class="callout-title">怎么练更快</div>
+        <ul>
+          <li>先记住几个"地标音"：高音谱表第二线的 G、低音谱表第四线的 F、中央 C。</li>
+          <li>其他音从最近的地标往上下数：相邻的线和间只差一个音名。</li>
+          <li>先求准、再求快。正确率稳定在 90% 以上再去挑战速度。</li>
+        </ul>
+      </div>
+    </div>
+    <h2 class="toc-anchor" id="chapters">配合教程学习</h2>
+    <ul>
+      <li>音名、唱名与键盘位置：<a href="../chapters/02-keyboard.html">第 2 章 音名、唱名与键盘</a></li>
+      <li>五线谱、谱号、加线、大谱表与识谱口诀：<a href="../chapters/03-notation.html">第 3 章 看懂乐谱：五线谱与简谱</a></li>
+      <li>升号、降号与调号：<a href="../chapters/06-scales-keys.html">第 6 章 音阶与调</a></li>
+    </ul>
+    <p class="small muted">练习记录只保存在你自己的浏览器里（localStorage），不会上传。</p>
+  </section>
+</div>
+</main>
+
+<script src="../assets/js/theory.js"></script>
+<script src="../assets/js/audio.js"></script>
+<script src="../assets/js/keyboard.js"></script>
+<script src="../assets/js/staff.js"></script>
+<script src="../assets/js/jianpu.js"></script>
+<script src="../assets/js/site.js"></script>
+<script src="../assets/js/services.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script>
+(function () {
+  'use strict';
+  function $(s) { return document.querySelector(s); }
+  function $$(s) { return Array.prototype.slice.call(document.querySelectorAll(s)); }
+  var esc = MTSite.esc;
+
+  /* ---------------- 存储 ---------------- */
+  var SKEY = 'mt-reading';
+  var data = MTSite.store.get(SKEY, null) || {};
+  var prefs = Object.assign({ clef: 'treble', range: 'staff', answer: 'name', acc: false, weak: false, hint: false, sound: true, mode: 'practice' }, data.prefs || {});
+  var best = data.best || {};          // 设置组合 → 最佳得分
+  var noteStats = data.notes || {};    // 'treble:F♯4' → { c, t }
+  function save() { MTSite.store.set(SKEY, { prefs: prefs, best: best, notes: noteStats }); }
+
+  var LETTERS = MT.LETTERS;
+  var SOLF = ['do', 're', 'mi', 'fa', 'sol', 'la', 'si'];
+  var BOTTOM = { treble: 30, bass: 18 };        // 第一线的"音名序号"（E4、G2）
+  var RANGE = { staff: [-1, 9], ledger: [-5, 13] };
+  var CLEF_ZH = { treble: '高音谱表', bass: '低音谱表', grand: '大谱表' };
+  var HINTS = {
+    treble: '高音谱表 · 线（下→上）：E G B D F　间：F A C E　· 第二线是 G（高音谱号的圈绕着它）',
+    bass: '低音谱表 · 线（下→上）：G B D F A　间：A C E G　· 第四线是 F（低音谱号的两个点夹着它）'
+  };
+
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function tok(n) { return n.letter + (n.acc === 1 ? '#' : n.acc === -1 ? 'b' : '') + n.octave; }
+  function key(q) { return q.clef + ':' + MT.noteName(q.note); }
+  function settingsKey() { return [prefs.clef, prefs.range, prefs.acc ? 'acc' : 'nat', prefs.answer].join('|'); }
+
+  /* ---------------- 出题 ---------------- */
+  function candidate() {
+    var clef = prefs.clef === 'grand' ? (Math.random() < 0.5 ? 'treble' : 'bass') : prefs.clef;
+    var r = RANGE[prefs.range];
+    var step = rnd(r[0], r[1]);
+    var dia = BOTTOM[clef] + step;
+    var letter = LETTERS[dia % 7], octave = Math.floor(dia / 7);
+    var acc = 0;
+    if (prefs.acc && Math.random() < 0.4) {
+      acc = Math.random() < 0.5 ? 1 : -1;
+      if (acc === 1 && (letter === 'E' || letter === 'B')) acc = -1;
+      if (acc === -1 && (letter === 'F' || letter === 'C')) acc = 1;
+    }
+    var note = MT.parseNote(letter + (acc === 1 ? '#' : acc === -1 ? 'b' : '') + octave);
+    return { clef: clef, note: note, step: step };
+  }
+  function weight(c) {
+    var s = noteStats[key(c)];
+    if (!s || !s.t) return 1;
+    return 1 + 4 * (s.t - s.c) / s.t;
+  }
+  var last = null;
+  function makeQuestion() {
+    for (var i = 0; i < 50; i++) {
+      var c = candidate();
+      if (prefs.weak) {
+        // 抽 4 个候选，按错误率加权挑一个
+        var pool = [c, candidate(), candidate(), candidate()];
+        var total = 0; pool.forEach(function (p) { p.w = weight(p); total += p.w; });
+        var x = Math.random() * total;
+        for (var k = 0; k < pool.length; k++) { x -= pool[k].w; if (x <= 0) { c = pool[k]; break; } }
+      }
+      if (!last || key(c) !== key(last)) return c;
+    }
+    return candidate();
+  }
+
+  /* ---------------- 五线谱显示 ---------------- */
+  var staffEl = $('#nr-staff');
+  function renderStaff(q, mark) {
+    var t = tok(q.note) + ':w' + (mark === 'ok' ? '*3' : mark === 'bad' ? '*' : '');
+    var spec = { playable: false, spacing: 'even', noteSpace: 60, minWidth: 150, key: null, time: null, names: mark ? 'octave' : false, notes: null, treble: null, bass: null, clef: 'treble', scale: 2 };
+    if (prefs.clef === 'grand') {
+      spec.treble = q.clef === 'treble' ? t : '';
+      spec.bass = q.clef === 'bass' ? t : '';
+      spec.scale = 1.6;
+    } else {
+      spec.clef = q.clef;
+      spec.notes = t;
+    }
+    Staff.render(staffEl, spec);
+  }
+
+  /* ---------------- 作答区 ---------------- */
+  var area = $('#answer-area');
+  var accSel = 0, kb = null;
+  function renderAnswerArea() {
+    accSel = 0;
+    if (prefs.answer === 'keyboard') {
+      var lo, hi;
+      var r = RANGE[prefs.range];
+      var clefs = prefs.clef === 'grand' ? ['treble', 'bass'] : [prefs.clef];
+      clefs.forEach(function (c) {
+        var a = BOTTOM[c] + r[0], b = BOTTOM[c] + r[1];
+        var la = (Math.floor(a / 7) + 1) * 12 + MT.LETTER_PC[LETTERS[a % 7]] - 1;
+        var hb = (Math.floor(b / 7) + 1) * 12 + MT.LETTER_PC[LETTERS[b % 7]] + 1;
+        lo = lo == null ? la : Math.min(lo, la);
+        hi = hi == null ? hb : Math.max(hi, hb);
+      });
+      area.innerHTML = '<div class="kb-answer" id="kb-answer"></div><div class="kb-caption">点击谱上那个音对应的琴键（要找准八度）。白键上标出了每个 C 的位置。</div>';
+      kb = new PianoKeyboard('#kb-answer', { start: lo, end: hi, labels: 'c', size: 'normal', minWhiteWidth: 20, onNoteOn: function (m) { answerMidi(m); } });
+      return;
+    }
+    kb = null;
+    var h = '';
+    if (prefs.acc) {
+      h += '<div class="acc-pre"><div class="segmented" id="acc-pre">' +
+        '<button type="button" data-acc="-1">♭ 降</button><button type="button" data-acc="0" class="active">♮ 本位</button><button type="button" data-acc="1">♯ 升</button></div></div>';
+    }
+    h += '<div class="note-btns">' + LETTERS.map(function (l, i) {
+      var big = prefs.answer === 'solfege' ? SOLF[i] : l;
+      var small = prefs.answer === 'solfege' ? l : SOLF[i];
+      return '<button type="button" class="note-btn" data-letter="' + l + '"><kbd>' + (prefs.answer === 'solfege' ? (i + 1) : l) + '</kbd><b>' + big + '</b><span>' + small + '</span></button>';
+    }).join('') + '</div>';
+    area.innerHTML = h;
+    updateAccLabels();
+  }
+  function setAccSel(v) {
+    accSel = v;
+    var seg = $('#acc-pre');
+    if (seg) seg.querySelectorAll('button').forEach(function (b) { b.classList.toggle('active', +b.dataset.acc === v); });
+    updateAccLabels();
+  }
+  function updateAccLabels() {
+    var sym = accSel === 1 ? '♯' : accSel === -1 ? '♭' : '';
+    area.querySelectorAll('.note-btn').forEach(function (b, i) {
+      var l = b.dataset.letter;
+      b.querySelector('b').textContent = (prefs.answer === 'solfege' ? SOLF[i] : l) + sym;
+    });
+  }
+  area.addEventListener('click', function (e) {
+    var a = e.target.closest('[data-acc]');
+    if (a) { setAccSel(+a.dataset.acc); return; }
+    var b = e.target.closest('.note-btn');
+    if (b) answerLetter(b.dataset.letter, accSel);
+  });
+
+  /* ---------------- 流程 ---------------- */
+  var q = null, state = 'idle', shownAt = 0, nextTimer = null;
+  var session = { c: 0, t: 0, ms: 0 };
+  var challenge = { on: false, end: 0, timer: null, c: 0, t: 0, ms: 0 };
+  var fb = $('#fb');
+
+  function newQuestion() {
+    clearTimeout(nextTimer);
+    q = makeQuestion();
+    last = q;
+    state = 'asking';
+    renderStaff(q);
+    fb.className = 'nr-feedback';
+    fb.textContent = prefs.answer === 'keyboard' ? '这个音在键盘上的哪里？' : '这个音叫什么？';
+    area.querySelectorAll('.note-btn').forEach(function (b) { b.classList.remove('correct', 'wrong'); b.disabled = false; });
+    if (kb) { kb.clearHighlight(); }
+    setAccSel(0);
+    updateHint();
+    shownAt = performance.now();
+  }
+
+  function finish(ok, givenText, givenMidi) {
+    state = 'shown';
+    var ms = performance.now() - shownAt;
+    var k = key(q);
+    var s = noteStats[k] || (noteStats[k] = { c: 0, t: 0 });
+    s.t++; if (ok) s.c++;
+    session.t++; session.ms += ms; if (ok) session.c++;
+    if (challenge.on) { challenge.t++; challenge.ms += ms; if (ok) challenge.c++; }
+    save();
+    renderStaff(q, ok ? 'ok' : 'bad');
+    var name = MT.noteName(q.note), sol = MT.solfege(q.note);
+    fb.className = 'nr-feedback ' + (ok ? 'ok' : 'bad');
+    fb.innerHTML = ok
+      ? '✅ ' + esc(name) + '（' + esc(sol) + '）<span class="small muted"> · ' + (ms / 1000).toFixed(1) + ' 秒</span>'
+      : '❌ 这是 ' + esc(name) + '（' + esc(sol) + '）' + (givenText ? '，你选了 ' + esc(givenText) : '') +
+        (q.note.acc && givenText && givenText[0] === q.note.letter ? '<div class="small">别忘了看音符左边的变音记号，先选 ' + (q.note.acc > 0 ? '♯' : '♭') + ' 再点音名</div>' : '');
+    if (prefs.sound) {
+      if (prefs.answer !== 'keyboard') Sound.playNote(q.note.midi, { duration: 0.9 });
+      else if (!ok) Sound.playNote(q.note.midi, { duration: 0.9, delay: 0.35 });
+    }
+    if (kb) {
+      kb.setHighlight([q.note.midi], { cls: 'hl3', badges: [MT.pcName(q.note)] });
+      if (!ok && givenMidi != null) kb.setHighlight([givenMidi], { cls: 'hl2' }, true);
+      kb.scrollTo(q.note.midi);
+    }
+    updateStats();
+    var delay = challenge.on ? (ok ? 260 : 900) : (ok ? 650 : 1700);
+    nextTimer = setTimeout(function () {
+      if (challenge.on && performance.now() >= challenge.end) return;
+      if (prefs.mode === 'challenge' && !challenge.on) return;
+      newQuestion();
+    }, delay);
+  }
+
+  function canAnswer() {
+    if (state !== 'asking' || !q) return false;
+    if (prefs.mode === 'challenge' && !challenge.on) return false;
+    return true;
+  }
+  function answerLetter(letter, acc) {
+    if (!canAnswer()) return;
+    var ok = letter === q.note.letter && acc === q.note.acc;
+    var given = (prefs.answer === 'solfege' ? SOLF[LETTERS.indexOf(letter)] : letter) + (acc === 1 ? '♯' : acc === -1 ? '♭' : '');
+    area.querySelectorAll('.note-btn').forEach(function (b) {
+      b.disabled = true;
+      if (b.dataset.letter === q.note.letter) b.classList.add('correct');
+      else if (b.dataset.letter === letter) b.classList.add('wrong');
+    });
+    finish(ok, given, null);
+  }
+  function answerMidi(m) {
+    if (!canAnswer()) return;
+    var ok = m === q.note.midi;
+    finish(ok, MT.noteName(MT.fromMidi(m, q.note.acc < 0)), m);
+  }
+
+  /* ---------------- 60 秒挑战 ---------------- */
+  var overlay = $('#overlay');
+  function showStartOverlay() {
+    var b = best[settingsKey()];
+    overlay.innerHTML = '<div><h3>⏱ 60 秒挑战</h3><p>60 秒内尽可能多地答对。当前设置：' + esc(CLEF_ZH[prefs.clef]) + ' · ' + (prefs.range === 'staff' ? '谱内' : '含加线') + (prefs.acc ? ' · 含升降号' : '') + '</p>' +
+      (b ? '<p>这个设置的最佳成绩：<b>' + b + '</b> 题</p>' : '') +
+      '<button class="btn btn-primary btn-lg" type="button" id="btn-start">开始挑战 <kbd>Enter</kbd></button></div>';
+    overlay.hidden = false;
+    $('#btn-start').addEventListener('click', startChallenge);
+  }
+  function startChallenge() {
+    clearTimeout(nextTimer);
+    challenge.on = true; challenge.c = 0; challenge.t = 0; challenge.ms = 0;
+    challenge.end = performance.now() + 60000;
+    overlay.hidden = true;
+    $('#timer').hidden = false;
+    clearInterval(challenge.timer);
+    challenge.timer = setInterval(tick, 100);
+    tick();
+    newQuestion();
+  }
+  function tick() {
+    var left = Math.max(0, challenge.end - performance.now());
+    $('#timer-num').textContent = (left / 1000).toFixed(1);
+    var fill = $('#timer-fill');
+    fill.style.width = (left / 600) + '%';
+    fill.classList.toggle('low', left < 10000);
+    if (left <= 0) endChallenge();
+  }
+  function endChallenge() {
+    clearInterval(challenge.timer);
+    clearTimeout(nextTimer);
+    challenge.on = false;
+    state = 'idle';
+    var k = settingsKey(), prev = best[k] || 0, isNew = challenge.c > prev;
+    if (isNew) { best[k] = challenge.c; save(); }
+    var accp = challenge.t ? Math.round(challenge.c / challenge.t * 100) : 0;
+    overlay.innerHTML = '<div><h3>' + (isNew && challenge.c ? '🏆 新纪录！' : '时间到！') + '</h3><div class="big">' + challenge.c + '</div><p>答对 ' + challenge.c + ' 题 · 共答 ' + challenge.t + ' 题 · 正确率 ' + accp + '%' +
+      (challenge.t ? ' · 平均 ' + (challenge.ms / challenge.t / 1000).toFixed(2) + ' 秒/题' : '') + '</p>' +
+      '<p class="small">之前的最佳：' + (prev || '暂无') + '</p>' +
+      '<button class="btn btn-primary btn-lg" type="button" id="btn-start">再来一次 <kbd>Enter</kbd></button></div>';
+    overlay.hidden = false;
+    $('#btn-start').addEventListener('click', startChallenge);
+    updateStats();
+  }
+  function setMode(m) {
+    prefs.mode = m; save();
+    $$('#mode-seg button').forEach(function (b) { b.classList.toggle('active', b.dataset.mode === m); });
+    clearInterval(challenge.timer); clearTimeout(nextTimer);
+    challenge.on = false;
+    if (m === 'challenge') {
+      $('#timer').hidden = false;
+      $('#timer-num').textContent = '60.0';
+      $('#timer-fill').style.width = '100%';
+      $('#timer-fill').classList.remove('low');
+      state = 'idle';
+      showStartOverlay();
+      q = makeQuestion(); last = q; renderStaff(q);
+      fb.className = 'nr-feedback'; fb.textContent = '准备好了就开始吧！';
+    } else {
+      $('#timer').hidden = true;
+      overlay.hidden = true;
+      newQuestion();
+    }
+  }
+  $('#mode-seg').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-mode]');
+    if (b) setMode(b.dataset.mode);
+  });
+
+  /* ---------------- 设置 ---------------- */
+  function syncSettingsUI() {
+    $$('.segmented[data-set]').forEach(function (seg) {
+      seg.querySelectorAll('button').forEach(function (b) { b.classList.toggle('active', prefs[seg.dataset.set] === b.dataset.val); });
+    });
+    $$('input[data-bool]').forEach(function (inp) { inp.checked = !!prefs[inp.dataset.bool]; });
+    var tags = '<span class="tag primary">' + CLEF_ZH[prefs.clef] + '</span><span class="tag">' + (prefs.range === 'staff' ? '谱内' : '含加线') + '</span>' +
+      (prefs.acc ? '<span class="tag orange">含升降号</span>' : '') + '<span class="tag">' + { name: '音名作答', solfege: '唱名作答', keyboard: '键盘作答' }[prefs.answer] + '</span>';
+    $('#nr-tags').innerHTML = tags;
+  }
+  function updateHint() {
+    var h = $('#nr-hint');
+    if (!prefs.hint || !q) { h.hidden = true; return; }
+    h.hidden = false;
+    h.textContent = '💡 ' + HINTS[q.clef] + (prefs.range === 'ledger' ? ' · 加线上的音：继续按"线—间—线"往外数' : '');
+  }
+  $$('.segmented[data-set]').forEach(function (seg) {
+    seg.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-val]');
+      if (!b || prefs[seg.dataset.set] === b.dataset.val) return;
+      prefs[seg.dataset.set] = b.dataset.val; save();
+      syncSettingsUI(); renderAnswerArea(); updateStats();
+      setMode(prefs.mode);
+    });
+  });
+  $$('input[data-bool]').forEach(function (inp) {
+    inp.addEventListener('change', function () {
+      prefs[inp.dataset.bool] = inp.checked; save();
+      syncSettingsUI();
+      if (inp.dataset.bool === 'acc') { renderAnswerArea(); setMode(prefs.mode); }
+      if (inp.dataset.bool === 'hint') updateHint();
+      updateStats();
+    });
+  });
+
+  /* ---------------- 统计 ---------------- */
+  function updateStats() {
+    $('#nr-score').textContent = challenge.on || (prefs.mode === 'challenge' && challenge.t)
+      ? '本轮答对 ' + challenge.c + ' / ' + challenge.t
+      : '答对 ' + session.c + ' / ' + session.t;
+    $('#s-acc').textContent = session.t ? Math.round(session.c / session.t * 100) + '%' : '—';
+    $('#s-time').textContent = session.t ? (session.ms / session.t / 1000).toFixed(1) + 's' : '—';
+    var b = best[settingsKey()];
+    $('#s-best').textContent = b ? b + ' 题' : '—';
+    var rows = Object.keys(noteStats).map(function (k) { var s = noteStats[k]; return { k: k, c: s.c, t: s.t, err: s.t - s.c }; })
+      .filter(function (r) { return r.err > 0; })
+      .sort(function (a, b) { return (b.err / b.t - a.err / a.t) || (b.err - a.err); })
+      .slice(0, 6);
+    $('#weak-list').innerHTML = rows.length ? rows.map(function (r) {
+      var parts = r.k.split(':');
+      return '<li><span><span class="nm">' + esc(parts[1]) + '</span> <span class="muted small">' + CLEF_ZH[parts[0]] + '</span></span><span class="ct">错 ' + r.err + ' / ' + r.t + '</span></li>';
+    }).join('') : '<li class="muted-box">还没有出错记录。多练几题，这里会列出你最容易认错的音。</li>';
+  }
+  $('#btn-reset').addEventListener('click', function () {
+    if (!confirm('确定要清空识谱练习的累计记录（含挑战最佳成绩）吗？')) return;
+    noteStats = {}; best = {}; session = { c: 0, t: 0, ms: 0 };
+    save(); updateStats();
+    MTSite.toast('记录已清空');
+  });
+
+  /* ---------------- 键盘快捷键 ---------------- */
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.tool-page button');
+    if (b && e.detail > 0) b.blur();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey) return;
+    var ae = document.activeElement || {};
+    if (/INPUT|TEXTAREA|SELECT/.test(ae.tagName)) return;
+    if (e.key === 'Enter' && ae.tagName !== 'BUTTON') {
+      if (prefs.mode === 'challenge' && !challenge.on) { e.preventDefault(); startChallenge(); }
+      return;
+    }
+    if (prefs.answer === 'keyboard') return;
+    if (e.key === '-' || e.key === '_') { setAccSel(-1); e.preventDefault(); return; }
+    if (e.key === '=' || e.key === '+') { setAccSel(1); e.preventDefault(); return; }
+    if (e.key === '0') { setAccSel(0); e.preventDefault(); return; }
+    var m = /^Key([A-G])$/.exec(e.code || '');
+    if (m) {
+      e.preventDefault();
+      var acc = e.shiftKey ? 1 : e.altKey ? -1 : accSel;
+      if (!prefs.acc && acc !== 0) acc = 0;
+      answerLetter(m[1], acc);
+      return;
+    }
+    if (prefs.answer === 'solfege' && /^[1-7]$/.test(e.key) && !e.altKey) {
+      e.preventDefault();
+      answerLetter(LETTERS[+e.key - 1], accSel);
+    }
+  });
+
+  /* ---------------- 启动 ---------------- */
+  syncSettingsUI();
+  renderAnswerArea();
+  setMode(prefs.mode === 'challenge' ? 'challenge' : 'practice');
+  updateStats();
+
+  window.__reading = {
+    makeQuestion: makeQuestion, candidate: candidate, prefs: prefs, answerLetter: answerLetter, answerMidi: answerMidi,
+    get q() { return q; }, get state() { return state; }, startChallenge: startChallenge, endChallenge: endChallenge, setMode: setMode,
+    get session() { return session; }, get challenge() { return challenge; }
+  };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 8 章 和弦进行与和声入门 · 乐理入门</title>
+<script>try{var t=localStorage.getItem('mt-theme');document.documentElement.setAttribute('data-theme',t?JSON.parse(t):(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))}catch(e){}</script>
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+  .doc .term + .en { margin-left: .35em; }
+  .func-flow { display: flex; flex-wrap: wrap; align-items: stretch; justify-content: center; gap: 8px; }
+  .fn { flex: 1 1 120px; max-width: 170px; border-radius: 14px; padding: 12px 10px; text-align: center; border: 2px solid; }
+  .fn b { display: block; font-size: 17px; }
+  .fn span { display: block; font: 700 15px var(--font-serif); margin: 4px 0 2px; }
+  .fn small { color: var(--text-2); font-size: 13px; }
+  .fn.t { border-color: var(--green); background: var(--green-soft); }
+  .fn.t b { color: var(--green); }
+  .fn.s { border-color: var(--blue); background: var(--blue-soft); }
+  .fn.s b { color: var(--blue); }
+  .fn.d { border-color: var(--accent); background: var(--accent-soft); }
+  .fn.d b { color: var(--accent); }
+  .func-flow .arrow { align-self: center; font-size: 20px; color: var(--text-3); }
+  .ft { color: var(--green); font-weight: 700; }
+  .fs { color: var(--blue); font-weight: 700; }
+  .fd { color: var(--accent); font-weight: 700; }
+  .lab { display: grid; gap: 14px; }
+  .lab-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+  .lab-row .lbl { font-size: 13.5px; color: var(--text-2); font-weight: 650; }
+  .prog-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .prog-list button { border: 1px solid var(--border-strong); background: var(--bg-elev); border-radius: 9px; padding: 6px 11px; font-size: 13.5px; font-weight: 600; color: var(--text-2); }
+  .prog-list button:hover { border-color: var(--primary); color: var(--text); }
+  .prog-list button.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .prog-info { padding: 14px 18px; border-radius: 12px; background: var(--bg-soft); border: 1px solid var(--border); }
+  .prog-info h4 { margin: 0 0 4px; font-size: 17px; }
+  .prog-info p { margin: 0 0 10px; color: var(--text-2); font-size: 14.5px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { min-width: 62px; padding: 6px 10px 5px; border-radius: 11px; border: 2px solid var(--border-strong); background: var(--bg-elev); text-align: center; line-height: 1.25; position: relative; transition: transform .08s, box-shadow .15s; }
+  .chip .rn { font: 700 14px var(--font-serif); color: var(--text-2); }
+  .chip .sy { font-weight: 750; font-size: 16px; }
+  .chip.fT { border-color: color-mix(in srgb, var(--green) 60%, var(--border)); }
+  .chip.fS { border-color: color-mix(in srgb, var(--blue) 60%, var(--border)); }
+  .chip.fD { border-color: color-mix(in srgb, var(--accent) 70%, var(--border)); }
+  .chip.on { transform: translateY(-2px); box-shadow: 0 0 0 4px var(--primary-soft); background: var(--primary-soft); }
+  .chip .x { position: absolute; top: -8px; right: -8px; width: 20px; height: 20px; border-radius: 50%; border: 0; background: var(--text-3); color: #fff; font-size: 12px; line-height: 20px; padding: 0; display: none; }
+  .chip:hover .x { display: block; }
+  .legend { font-size: 13px; color: var(--text-3); display: flex; gap: 14px; flex-wrap: wrap; }
+  .legend i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; border: 2px solid; margin-right: 4px; vertical-align: -1px; }
+  .palette { display: flex; flex-wrap: wrap; gap: 6px; }
+  .palette button { min-width: 54px; border: 2px solid var(--border-strong); background: var(--bg-elev); border-radius: 10px; padding: 5px 9px; line-height: 1.25; }
+  .palette button .rn { display: block; font: 700 15px var(--font-serif); }
+  .palette button .sy { display: block; font-size: 12.5px; color: var(--text-2); }
+  .palette button.fT { border-color: color-mix(in srgb, var(--green) 55%, var(--border)); }
+  .palette button.fS { border-color: color-mix(in srgb, var(--blue) 55%, var(--border)); }
+  .palette button.fD { border-color: color-mix(in srgb, var(--accent) 65%, var(--border)); }
+  .palette button:hover { background: var(--primary-soft); }
+  .builder-out { min-height: 64px; padding: 12px; border: 2px dashed var(--border-strong); border-radius: 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .builder-out .empty { color: var(--text-3); font-size: 14px; }
+  .hint { padding: 10px 14px; border-radius: 10px; background: var(--primary-soft); color: var(--primary-ink); font-size: 14.5px; min-height: 22px; }
+  .texture h4 { margin: 0 0 4px; }
+  .texture p { margin: 0 0 6px; color: var(--text-2); font-size: 14.5px; }
+  .nw { white-space: nowrap; }
+</style>
+</head>
+<body data-page="ch08" data-root="..">
+<main class="page">
+<article class="content doc">
+
+<header class="chapter-header">
+  <div class="chapter-kicker">第 8 章</div>
+  <h1>和弦进行与和声入门：让和弦动起来</h1>
+  <p class="lead">一个和弦只是一个"画面"，几个和弦按顺序连起来，就成了一段"故事"——这就是<strong>和弦进行</strong>。为什么有的进行听起来"结束了"，有的却让人意犹未尽？为什么那么多流行歌曲都在用同一套和弦？这一章我们揭开背后的规律，最后亲手给《小星星》配上和弦。</p>
+  <div class="chapter-meta"><span>⏱ 预计 30 分钟</span><span>🎯 难度 ★★★☆☆</span><span>📚 建议先学：第 7 章 和弦</span></div>
+  <div class="goals">
+    <h4>学完本章，你将能够：</h4>
+    <ul>
+      <li>理解和弦的三种功能：<b>主（T）、下属（S）、属（D）</b>；</li>
+      <li>听出四种终止式：正格、变格、半终止、阻碍终止；</li>
+      <li>认识流行音乐最常用的几种和弦进行（1564、卡农进行、4536251……），并能在不同的调里弹出来；</li>
+      <li>学会用 I、IV、V 三个和弦给简单旋律配和弦；</li>
+      <li>知道柱式、分解、节奏型等常见的伴奏写法，能自己写一段和弦进行。</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+<h2 id="s8-1">8.1 和弦的功能：主、下属、属</h2>
+<p>在第 7 章里我们知道，每个大调都有 7 个调内和弦。它们在音乐里扮演着不同的"角色"，这种角色叫作和弦的<span class="term">功能</span><span class="en">Function</span>。最基本的功能只有三种：</p>
+
+<div class="figure">
+  <div class="func-flow">
+    <div class="fn t"><b>T 主功能</b><span>I</span><small>🏠 在家：稳定、安心</small></div>
+    <div class="arrow">→</div>
+    <div class="fn s"><b>S 下属功能</b><span>IV</span><small>🚪 出门：展开、期待</small></div>
+    <div class="arrow">→</div>
+    <div class="fn d"><b>D 属功能</b><span>V</span><small>🏃 想回家：紧张、迫切</small></div>
+    <div class="arrow">→</div>
+    <div class="fn t"><b>T 主功能</b><span>I</span><small>🏠 到家：圆满</small></div>
+  </div>
+  <div class="btn-row" style="justify-content:center">
+    <button data-play="C3 C4 E4 G4 | F2 C4 F4 A4 | G2 B3 D4 G4 | C3 C4 E4 G4" data-mode="progression" data-bpm="72" data-beats="2">听这个故事：C – F – G – C</button>
+  </div>
+  <div class="caption">最基本的和声"故事"：主 → 下属 → 属 → 主（C 大调里就是 I – IV – V – I）。</div>
+</div>
+
+<ul>
+  <li><span class="ft">主功能 T</span>（Tonic）：以 <b>I 级</b>为代表。它包含主音，听起来最稳定，像"家"。乐曲常常从这里开始，也在这里结束。</li>
+  <li><span class="fs">下属功能 S</span>（Subdominant）：以 <b>IV 级</b>为代表。它让音乐离开"家"，产生一种展开、向前走的感觉。</li>
+  <li><span class="fd">属功能 D</span>（Dominant）：以 <b>V 级</b>（尤其是 V7）为代表。它最紧张，强烈地想回到 I——还记得第 7 章 G7 里的 B 想上行到 C、F 想下行到 E 吗？</li>
+</ul>
+
+<div class="callout analogy">
+  <div class="callout-title">打个比方</div>
+  <p>和弦进行就像一次出门散步：<b>在家（T）→ 出门（S）→ 走在回家的路上，越来越想回家（D）→ 到家（T）</b>。听众的耳朵会本能地跟着这种"离开—紧张—回归"的节奏起伏，这就是和声的魅力。</p>
+</div>
+
+<h3>同一个功能，不止一个和弦</h3>
+<p>其他调内和弦也可以"代班"，因为它们和主要和弦有两个共同音，听起来很像：</p>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>功能</th><th>代表和弦</th><th>可以"代班"的和弦</th><th>C 大调</th><th>为什么像</th></tr></thead>
+  <tbody>
+    <tr><td><span class="ft">T 主</span></td><td class="nn">I</td><td class="nn">vi、iii</td><td class="nn">C；Am、Em</td><td>Am（A C E）和 C（C E G）共用 C、E 两个音</td></tr>
+    <tr><td><span class="fs">S 下属</span></td><td class="nn">IV</td><td class="nn">ii</td><td class="nn">F；Dm</td><td>Dm（D F A）和 F（F A C）共用 F、A</td></tr>
+    <tr><td><span class="fd">D 属</span></td><td class="nn">V、V7</td><td class="nn">vii°</td><td class="nn">G、G7；B°</td><td>B°（B D F）几乎就是去掉根音的 G7（G B D F）</td></tr>
+  </tbody>
+</table>
+</div>
+<p>所以"主 → 下属 → 属 → 主"可以有很多种说法，比如：</p>
+<p>
+  <button data-play="C3 C4 E4 G4 | D3 D4 F4 A4 | G2 B3 D4 G4 | C3 C4 E4 G4" data-mode="progression" data-bpm="72">I – ii – V – I（C – Dm – G – C）</button>
+  <button data-play="C3 C4 E4 G4 | A2 C4 E4 A4 | F2 C4 F4 A4 | G2 B3 F4 G4 | C3 C4 E4 G4" data-mode="progression" data-bpm="72">I – vi – IV – V7 – I</button>
+</p>
+
+<div class="callout try">
+  <div class="callout-title">动手试试：停在"半路上"</div>
+  <p>先听 <button data-play="C3 C4 E4 G4 | F2 C4 F4 A4 | G2 B3 F4 G4" data-mode="progression" data-bpm="72">C – F – G7</button>，在 G7 处停下来，是不是很想再听到一个 C？再听完整版 <button data-play="C3 C4 E4 G4 | F2 C4 F4 A4 | G2 B3 F4 G4 | C3 C4 E4 G4" data-mode="progression" data-bpm="72">C – F – G7 – C</button>，"到家"的满足感就出现了。</p>
+</div>
+</section>
+
+<section>
+<h2 id="s8-2">8.2 终止式：音乐里的"标点符号"</h2>
+<p>说话要用标点符号，音乐也一样。乐句结尾的那两个和弦，决定了这一句是"说完了"还是"还没说完"。这种乐句结尾的和弦进行叫作<span class="term">终止式</span><span class="en">Cadence</span>。最常见的有四种：</p>
+
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>名称</th><th>和弦</th><th>像什么标点</th><th>听感</th><th>听一听（C 大调）</th></tr></thead>
+  <tbody>
+    <tr><td class="nw"><b>正格终止</b><br><span class="muted small">完全终止</span></td><td class="nn nw">V → I</td><td><b>句号 。</b></td><td>完满、坚定地结束</td><td><button data-play="C3 C4 E4 G4 | F2 C4 F4 A4 | G2 B3 F4 G4 | C3 C4 E4 G4" data-mode="progression" data-bpm="72">… G7 → C</button></td></tr>
+    <tr><td class="nw"><b>变格终止</b><br><span class="muted small">"阿门"终止</span></td><td class="nn nw">IV → I</td><td><b>温柔的句号</b></td><td>柔和、庄重，像赞美诗结尾的"阿—门"</td><td><button data-play="C3 C4 E4 G4 | G2 B3 D4 G4 | F2 C4 F4 A4 | C3 C4 E4 G4" data-mode="progression" data-bpm="66">… F → C</button></td></tr>
+    <tr><td class="nw"><b>半终止</b></td><td class="nn nw">? → V</td><td><b>逗号 ，</b>或问号</td><td>停在半空中，还没说完，等待下一句</td><td><button data-play="C3 C4 E4 G4 | A2 C4 E4 A4 | F2 C4 F4 A4 | G2 B3 D4 G4" data-mode="progression" data-bpm="72">… F → G</button></td></tr>
+    <tr><td class="nw"><b>阻碍终止</b><br><span class="muted small">伪终止</span></td><td class="nn nw">V → vi</td><td><b>"……但是！"</b></td><td>以为要回家了，结果拐进了小调，出人意料</td><td><button data-play="C3 C4 E4 G4 | F2 C4 F4 A4 | G2 B3 F4 G4 | A2 C4 E4 A4" data-mode="progression" data-bpm="72">… G7 → Am</button></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>下面是正格终止在五线谱上的样子（大谱表：右手弹和弦，左手弹低音）。注意 G7 → C 时，右手的 B 往上走到 C，F 往下走到 E：</p>
+<div data-staff="grand" data-treble="[C4 E4 G4]:h^C [C4 F4 A4]:h^F | [B3 F4 G4]:h^G7 [C4 E4 G4]:h^C |]" data-bass="C3:h F2:h | G2:h C3:h |]" data-time="4/4" data-bpm="72" data-caption="I – IV – V7 – I：最经典的正格终止。"></div>
+
+<div class="callout memory">
+  <div class="callout-title">记忆口诀</div>
+  <p><b>V 到 I 是句号，IV 到 I 说"阿门"；停在 V 上是逗号，V 到 vi 说"但是"。</b></p>
+</div>
+
+<div class="callout tip">
+  <div class="callout-title">小贴士：歌曲是怎么"一问一答"的</div>
+  <p>很多旋律都是两句一组：第一句结束在 <b>V</b> 上（半终止，像提问），第二句结束在 <b>I</b> 上（正格终止，像回答）。听歌时留意每句话的结尾，你会发现这种"问—答"无处不在。第 9 章讲曲式时还会再提到它。</p>
+</div>
+</section>
+
+<section>
+<h2 id="s8-3">8.3 流行音乐的"万能和弦进行"</h2>
+<p>你可能听过这样的说法："学会四个和弦，就能弹唱一百首歌。"这并不夸张——很多流行歌曲用的是<b>同一组和弦进行</b>，只是旋律、节奏、音色不同。和弦进行本身没有版权，它们就像好用的"套路"，被一代代音乐人反复使用。</p>
+<p>下面这个播放器收录了最常用的几种进行。选一个调、选一个进行，按"播放"就能听到；播放时，和弦卡片、键盘和五线谱会同步高亮。卡片边框的颜色代表功能：<span class="ft">绿 = 主</span>、<span class="fs">蓝 = 下属</span>、<span class="fd">橙 = 属</span>。</p>
+
+<div class="figure lab" id="prog-lab">
+  <div class="lab-row">
+    <span class="lbl">调</span><select id="pl-key" aria-label="选择调"></select>
+    <span class="lbl">速度</span><input type="range" id="pl-bpm" min="60" max="160" value="96" aria-label="速度"><span id="pl-bpm-v" class="small muted">96 BPM</span>
+    <span class="lbl">每个和弦</span><div class="segmented" id="pl-beats"><button type="button" data-v="2" class="active">2 拍</button><button type="button" data-v="4">4 拍</button></div>
+  </div>
+  <div class="prog-list" id="pl-list"></div>
+  <div class="prog-info">
+    <h4 id="pl-name"></h4>
+    <p id="pl-desc"></p>
+    <div class="chips" id="pl-chips"></div>
+    <div class="btn-row" style="margin:12px 0 0">
+      <button class="btn btn-primary" id="pl-play" type="button">▶ 播放</button>
+      <span class="legend"><span><i style="border-color:var(--green)"></i>主功能 T</span><span><i style="border-color:var(--blue)"></i>下属功能 S</span><span><i style="border-color:var(--accent)"></i>属功能 D</span></span>
+    </div>
+  </div>
+  <div id="pl-kb"></div>
+  <div id="pl-staff"></div>
+  <div class="caption">播放器会自动为每个和弦选择离上一个和弦最近的转位，让声部连接更平滑（第 7 章 7.5 节）。左手弹根音作低音。</div>
+</div>
+
+<h3>一览表（以 C 大调为例）</h3>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>名称</th><th>级数</th><th>C 大调</th><th>特点</th></tr></thead>
+  <tbody>
+    <tr><td class="nw"><b>1564</b></td><td class="nn nw">I – V – vi – IV</td><td class="nn nw">C G Am F</td><td>当代流行音乐里最常见的进行之一，明亮中带一点感伤</td></tr>
+    <tr><td class="nw"><b>卡农进行</b></td><td class="nn">I – V – vi – iii – IV – I – IV – V</td><td class="nn">C G Am Em F C F G</td><td>出自帕赫贝尔《D 大调卡农》，低音像下楼梯一样一级级下行</td></tr>
+    <tr><td class="nw"><b>4536251</b></td><td class="nn">IV – V – iii – vi – ii – V – I</td><td class="nn">F G Em Am Dm G C</td><td>前四个和弦（4536）在日本流行乐里叫"王道进行"；接上 2–5–1 回到主和弦，是华语流行的常用套路</td></tr>
+    <tr><td class="nw"><b>1625</b></td><td class="nn nw">I – vi – ii – V</td><td class="nn nw">C Am Dm G</td><td>"回转进行"，适合循环；把 ii 换成 IV 就是 1950 年代流行的 I–vi–IV–V</td></tr>
+    <tr><td class="nw"><b>251</b></td><td class="nn nw">ii7 – V7 – Imaj7</td><td class="nn nw">Dm7 G7 Cmaj7</td><td>爵士乐的核心进行：下属 → 属 → 主，一步步回家</td></tr>
+    <tr><td class="nw"><b>6415</b></td><td class="nn nw">vi – IV – I – V</td><td class="nn nw">Am F C G</td><td>和 1564 是同一组和弦，从小和弦开始，情绪更浓</td></tr>
+    <tr><td class="nw"><b>小调进行</b></td><td class="nn nw">i – VI – III – VII</td><td class="nn nw">Am F C G（a 小调）</td><td>悲伤中带着力量；和 6415 恰好是同一组和弦（关系大小调共用和弦）</td></tr>
+    <tr><td class="nw"><b>安达卢西亚进行</b></td><td class="nn nw">i – VII – VI – V</td><td class="nn nw">Am G F E（a 小调）</td><td>低音 A–G–F–E 一路下行，浓郁的西班牙风味</td></tr>
+    <tr><td class="nw"><b>12 小节布鲁斯</b></td><td class="nn">I7 ×4 | IV7 ×2 | I7 ×2 | V7 IV7 I7 V7</td><td class="nn">C7 C7 C7 C7 F7 F7 C7 C7 G7 F7 C7 G7</td><td>布鲁斯和摇滚的骨架，12 小节一循环，只用三个属七和弦</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout note">
+  <div class="callout-title">为什么同一组和弦能写出不同的歌？</div>
+  <p>和弦进行只是"地基"。旋律、节奏、速度、伴奏方式、配器……任何一项不同，听起来就是完全不同的歌。反过来说，<b>学会这几种进行，你就掌握了大量歌曲的"骨架"</b>：拿到一首歌的和弦谱，很可能一眼就能认出它属于哪种套路。</p>
+</div>
+
+<div class="callout tip">
+  <div class="callout-title">12 小节布鲁斯是怎么数的？</div>
+  <p>每个和弦占一小节（4 拍），12 小节分成三行：第一行 4 小节都是 I7；第二行 IV7 两小节、I7 两小节；第三行 V7、IV7、I7、V7（最后的 V7 把音乐送回开头）。在播放器里选"12 小节布鲁斯"、每个和弦 4 拍，就能完整听一遍。</p>
+</div>
+<div class="launch-row"><span class="lr-label">在播放器里循环听、随意换调：</span><button data-launch="progression" data-args="k=C&m=major&s=I.V.vi.IV&pre=1564">1-5-6-4</button><button data-launch="progression" data-args="k=C&m=major&s=I.V.vi.iii.IV.I.IV.V&pre=canon">卡农进行</button><button data-launch="progression" data-args="k=C&m=major&s=IV.V.iii.vi.ii.V.I.I&pre=4536251">4-5-3-6-2-5-1</button><button data-launch="progression" data-args="k=C&m=major&s=IVmaj7.V7.iii7.vi&pre=royal">王道进行</button><button data-launch="progression" data-args="k=C&m=major&s=I.vi.IV.V&pre=1645">1-6-4-5</button></div>
+</section>
+
+<section>
+<h2 id="s8-4">8.4 给旋律配和弦</h2>
+<p>学会了和弦和功能，就可以做一件非常实用的事：<b>给一段旋律配上和弦</b>（也叫"配和声"或"编配伴奏"）。对于大多数儿歌、民歌，只用 I、IV、V 三个主要三和弦就够了。</p>
+
+<h3>四步配和弦法</h3>
+<ol class="steps">
+  <li><b>确定调。</b>看调号和结尾的音（通常结束在主音上）。《小星星》是 C 大调。</li>
+  <li><b>准备好"三件武器"</b>：I（C E G）、IV（F A C）、V（G B D）。它们合起来正好包含了音阶的全部 7 个音。</li>
+  <li><b>看强拍上的旋律音。</b>一般每小节（或每半小节）配一个和弦。看这一段<b>强拍上的音、出现最多的音</b>属于哪个和弦，就选哪个。</li>
+  <li><b>检查结尾，用耳朵确认。</b>乐句结尾尽量用终止式（V → I）；弹一遍，听起来"打架"的地方就换一个和弦试试。</li>
+</ol>
+
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>旋律音（C 大调）</th><th class="c">1 do</th><th class="c">2 re</th><th class="c">3 mi</th><th class="c">4 fa</th><th class="c">5 sol</th><th class="c">6 la</th><th class="c">7 si</th></tr></thead>
+  <tbody>
+    <tr><td>包含它的主要和弦</td><td class="c nn">I、IV</td><td class="c nn">V</td><td class="c nn">I</td><td class="c nn">IV</td><td class="c nn">I、V</td><td class="c nn">IV</td><td class="c nn">V</td></tr>
+    <tr><td>C 大调中是</td><td class="c nn">C、F</td><td class="c nn">G</td><td class="c nn">C</td><td class="c nn">F</td><td class="c nn">C、G</td><td class="c nn">F</td><td class="c nn">G</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>实例：给《小星星》配和弦</h3>
+<p>《小星星》的旋律来自一首 18 世纪的法国民歌，莫扎特还以它写过一套变奏曲。按照上面的方法，每半小节看一次：第 1 小节"1 1 5 5"都在 C 和弦里；第 2 小节"6 6"属于 F、"5"回到 C；第 4 小节"2 2"属于 G、最后的"1"回到 C（正格终止）……配好的结果如下：</p>
+<div data-staff="grand" data-treble="C4:q^C C4 G4 G4 | A4:q^F A4 G4:h^C | F4:q^F F4 E4:q^C E4 | D4:q^G D4 C4:h^C | G4:q^C G4 F4:q^F F4 | E4:q^C E4 D4:h^G | G4:q^C G4 F4:q^F F4 | E4:q^C E4 D4:h^G | C4:q^C C4 G4 G4 | A4:q^F A4 G4:h^C | F4:q^F F4 E4:q^C E4 | D4:q^G D4 C4:h^C |]" data-bass="[C3 E3 G3]:w | [C3 F3 A3]:h [C3 E3 G3]:h | [C3 F3 A3]:h [C3 E3 G3]:h | [B2 D3 G3]:h [C3 E3 G3]:h | [C3 E3 G3]:h [C3 F3 A3]:h | [C3 E3 G3]:h [B2 D3 G3]:h | [C3 E3 G3]:h [C3 F3 A3]:h | [C3 E3 G3]:h [B2 D3 G3]:h | [C3 E3 G3]:w | [C3 F3 A3]:h [C3 E3 G3]:h | [C3 F3 A3]:h [C3 E3 G3]:h | [B2 D3 G3]:h [C3 E3 G3]:h |]" data-time="4/4" data-bpm="100" data-caption="《小星星》配和弦：右手旋律，左手弹和弦。左手的 F 和弦用了 C–F–A（第二转位）、G 和弦用了 B–D–G（第一转位），手几乎不用移动。"></div>
+
+<p>弹唱谱（吉他谱、简谱歌本）里更常见的写法，是把和弦名直接标在简谱上方：</p>
+<div data-jianpu="1^C 1 5 5 | 6^F 6 5^C - | 4^F 4 3^C 3 | 2^G 2 1^C - | 5^C 5 4^F 4 | 3^C 3 2^G - | 5^C 5 4^F 4 | 3^C 3 2^G - | 1^C 1 5 5 | 6^F 6 5^C - | 4^F 4 3^C 3 | 2^G 2 1^C - |]" data-key="C" data-time="4/4" data-bpm="100" data-caption="同一首《小星星》的简谱和弦谱：和弦名写在它开始的那个音上方。"></div>
+
+<div class="callout note">
+  <div class="callout-title">不在和弦里的音怎么办？</div>
+  <p>旋律里经常会有一些音不属于当时的和弦，比如《小星星》第 5 小节"5 5 4 4"配 C、F 时没问题，但如果整小节都配 C，"4"就不在 C 和弦里。这种夹在和弦音之间、一带而过的音叫<span class="term">经过音</span>或<span class="term">辅助音</span>。它们通常出现在弱拍上、时值较短，不需要为它们换和弦——配和弦时<b>优先照顾强拍和长音</b>就好。</p>
+</div>
+
+<h3>练习：给《欢乐颂》配和弦</h3>
+<p>下面是贝多芬《第九交响曲》中《欢乐颂》主题的前 8 小节（C 大调）。试着只用 <b>C</b> 和 <b>G</b> 两个和弦，给每小节配一个和弦（最后一小节可以配两个）。先自己想，再展开参考答案。</p>
+<div data-staff="E4:q^? E4 F4 G4 | G4:q^? F4 E4 D4 | C4:q^? C4 D4 E4 | E4:q.^? D4:8 D4:h | E4:q^? E4 F4 G4 | G4:q^? F4 E4 D4 | C4:q^? C4 D4 E4 | D4:q.^? C4:8 C4:h^? |]" data-time="4/4" data-bpm="110" data-names="number" data-caption="《欢乐颂》旋律（下方标了简谱数字）。问号处填什么和弦？"></div>
+<details class="fold">
+  <summary>展开查看参考答案</summary>
+  <div class="fold-body">
+    <p>参考答案：<b>C | G | C | G | C | G | C | G C</b>。</p>
+    <ul>
+      <li>第 1、3、5、7 小节强拍上是 3（mi）或 1（do），都在 C 和弦里；</li>
+      <li>第 2、6 小节"5 4 3 2"里有 5、2，还有 4——它们都在 G7（G B D F）里，所以配 G；</li>
+      <li>第 4 小节落在 2（re）上并且持续两拍，配 G，形成半终止（像逗号）；</li>
+      <li>第 8 小节先是 2（配 G），最后落到 1（配 C），正格终止，完美结束。</li>
+    </ul>
+    <div data-staff="grand" data-treble="E4:q^C E4 F4 G4 | G4:q^G F4 E4 D4 | C4:q^C C4 D4 E4 | E4:q.^G D4:8 D4:h | E4:q^C E4 F4 G4 | G4:q^G F4 E4 D4 | C4:q^C C4 D4 E4 | D4:q.^G C4:8 C4:h^C |]" data-bass="[C3 E3 G3]:w | [B2 D3 G3]:w | [C3 E3 G3]:w | [B2 D3 G3]:w | [C3 E3 G3]:w | [B2 D3 G3]:w | [C3 E3 G3]:w | [B2 D3 G3]:h [C3 E3 G3]:h |]" data-time="4/4" data-bpm="110"></div>
+  </div>
+</details>
+</section>
+
+<section>
+<h2 id="s8-5">8.5 伴奏织体入门</h2>
+<p>和弦进行决定了"弹哪些和弦"，而<span class="term">伴奏织体</span>（也叫伴奏型）决定了"怎么弹"。同样是 <b>C – G – Am – F</b>，换一种弹法，气质就完全不同。下面四段谱例的和弦完全一样，点"播放"比较一下：</p>
+
+<div class="figure texture">
+  <h4>① 柱式和弦：所有音同时按下</h4>
+  <p>最简单、最稳重，适合慢歌、赞美诗，或者刚开始练伴奏时用。</p>
+  <div data-staff="grand" data-treble="[E4 G4 C5]:w^C | [D4 G4 B4]:w^G | [E4 A4 C5]:w^Am | [F4 A4 C5]:w^F |]" data-bass="C3:w | G2:w | A2:w | F2:w |]" data-time="4/4" data-bpm="80"></div>
+</div>
+
+<div class="figure texture">
+  <h4>② 分解和弦：把和弦的音一个一个弹出来</h4>
+  <p>左手按"根音–五音–八度–三音……"的顺序流动起来，抒情、柔和，是钢琴弹唱最常用的伴奏之一。</p>
+  <div data-staff="C3:8^C G3 C4 E4 C4 G3 E3 G3 | G2:8^G D3 G3 B3 G3 D3 B2 D3 | A2:8^Am E3 A3 C4 A3 E3 C3 E3 | F2:8^F C3 F3 A3 F3 C3 A2 C3 |]" data-clef="bass" data-time="4/4" data-bpm="84"></div>
+</div>
+
+<div class="figure texture">
+  <h4>③ 节奏型："咚—嚓—咚—嚓"</h4>
+  <p>左手在第 1、3 拍弹低音（根音和五音交替），右手在第 2、4 拍弹和弦。轻快、有弹性，常见于进行曲、乡村音乐和轻快的流行歌。</p>
+  <div data-staff="grand" data-treble="R:q^C [E4 G4 C5]:q R:q [E4 G4 C5]:q | R:q^G [D4 G4 B4]:q R:q [D4 G4 B4]:q | R:q^Am [E4 A4 C5]:q R:q [E4 A4 C5]:q | R:q^F [F4 A4 C5]:q R:q [F4 A4 C5]:q |]" data-bass="C3:q R:q G2:q R:q | G2:q R:q D3:q R:q | A2:q R:q E2:q R:q | F2:q R:q C3:q R:q |]" data-time="4/4" data-bpm="108"></div>
+</div>
+
+<div class="figure texture">
+  <h4>④ 华尔兹（3/4 拍）："咚—嚓—嚓"</h4>
+  <p>第 1 拍弹低音，第 2、3 拍弹和弦，配合第 4 章学过的"强—弱—弱"，马上就有了圆舞曲的感觉。</p>
+  <div data-staff="grand" data-treble="R:q^C [E4 G4 C5] [E4 G4 C5] | R:q^G [D4 G4 B4] [D4 G4 B4] | R:q^Am [E4 A4 C5] [E4 A4 C5] | R:q^F [F4 A4 C5] [F4 A4 C5] |]" data-bass="C3:q R:h | G2:q R:h | A2:q R:h | F2:q R:h |]" data-time="3/4" data-bpm="132"></div>
+</div>
+
+<div class="callout tip">
+  <div class="callout-title">怎么选伴奏型？</div>
+  <p>看歌曲的<b>速度和情绪</b>：慢而深情的歌用柱式或分解和弦；轻快的歌用节奏型；3/4 拍的歌用华尔兹型。在 <a href="../tools/progression.html">🎶 和弦进行播放器</a> 里可以一键切换更多伴奏型，还能加上鼓点。</p>
+</div>
+<div class="launch-row"><span class="lr-label">同一组和弦，换个伴奏型：</span><button data-launch="progression" data-args="k=C&m=major&s=I.V.vi.IV&p=block">柱式</button><button data-launch="progression" data-args="k=C&m=major&s=I.V.vi.IV&p=arp">分解</button><button data-launch="progression" data-args="k=C&m=major&s=I.V.vi.IV&p=pop">流行</button><button data-launch="progression" data-args="k=C&m=major&s=I.V.vi.IV&p=waltz&b=3">华尔兹</button></div>
+</section>
+
+<section>
+<h2 id="s8-6">8.6 动手写一段和弦进行</h2>
+<p>理论学了这么多，现在轮到你来"作曲"了！写一段好听的和弦进行，可以按照这几步来：</p>
+<ol class="steps">
+  <li><b>选一个调。</b>新手推荐 C 大调或 G 大调。</li>
+  <li><b>从 I 开始。</b>先让听众"在家"站稳脚跟（当然也可以从 vi 或 IV 开始，比如 6415、4536）。</li>
+  <li><b>出门走一圈。</b>用 IV、ii（下属）把音乐带出去，用 vi、iii 增加一点情绪色彩。</li>
+  <li><b>想回家时用 V。</b>V 或 V7 会制造强烈的"回家"愿望。</li>
+  <li><b>选择结尾：</b>用 V → I 结束（句号）；或者停在 V 上（逗号），让下一句来回答。</li>
+  <li><b>4 个或 8 个和弦一句，循环几遍，用耳朵检查。</b>哪里别扭就换一个同功能的和弦试试。</li>
+</ol>
+
+<div class="callout memory">
+  <div class="callout-title">"安全"的连接（大调）</div>
+  <p><b>I</b> 可以去任何和弦；<b>IV</b> → V、I、ii；<b>ii</b> → V；<b>V</b> → I、vi；<b>vi</b> → IV、ii；<b>iii</b> → vi、IV。记不住也没关系，耳朵永远是最终的裁判。</p>
+</div>
+
+<h3>和弦接龙</h3>
+<p>点击下面的和弦卡片，把它们依次加到你的进行里（最多 8 个），然后播放听听效果。鼠标移到已添加的和弦上可以删除它。</p>
+<div class="figure lab" id="builder">
+  <div class="lab-row"><span class="lbl">调</span><div class="segmented" id="bd-key"></div></div>
+  <div class="palette" id="bd-palette"></div>
+  <div class="builder-out" id="bd-out"><span class="empty">还没有和弦，点击上面的卡片开始吧（建议从 I 开始）</span></div>
+  <div class="btn-row" style="margin:0">
+    <button class="btn btn-primary" id="bd-play" type="button">▶ 播放我的进行</button>
+    <button class="btn" id="bd-undo" type="button">↶ 撤销</button>
+    <button class="btn" id="bd-clear" type="button">清空</button>
+    <button class="btn btn-ghost" id="bd-demo" type="button">来个示例</button>
+  </div>
+  <div class="hint" id="bd-hint">💡 小提示会显示在这里。</div>
+</div>
+<p>想要更多功能——循环播放、换伴奏型、加鼓点、分享给朋友？去 <a href="../tools/progression.html">🎶 和弦进行播放器</a> 继续创作吧。</p>
+</section>
+
+<section>
+<h2 id="s8-summary">本章小结</h2>
+<div class="callout summary">
+  <div class="callout-title">要点回顾</div>
+  <ul>
+    <li>和弦有三种基本功能：<b>主 T</b>（I，稳定的"家"）、<b>下属 S</b>（IV，出门）、<b>属 D</b>（V，想回家）。vi、iii 可以代替 I，ii 可以代替 IV，vii° 可以代替 V。</li>
+    <li>四种终止式：<b>正格 V→I</b>（句号）、<b>变格 IV→I</b>（"阿门"）、<b>半终止 →V</b>（逗号）、<b>阻碍 V→vi</b>（"但是"）。</li>
+    <li>流行音乐的常用进行：<b>1564、卡农进行、4536251、1625、251、6415</b>，小调的 i–VI–III–VII，以及 12 小节布鲁斯。用级数记忆，就能在任何调里使用。</li>
+    <li>给旋律配和弦：确定调 → 准备 I、IV、V → <b>看强拍和长音</b>属于哪个和弦 → 结尾用终止式，用耳朵检查。</li>
+    <li>同样的和弦可以有不同的<b>伴奏织体</b>：柱式、分解、节奏型、华尔兹……</li>
+  </ul>
+</div>
+
+<h3>小测验</h3>
+<div class="quiz-set">
+  <div class="quiz" data-answer="3">
+    <p class="quiz-q">在 C 大调中，代表"属功能"、最想回到主和弦的是哪个和弦？</p>
+    <ol class="quiz-opts"><li>C</li><li>F</li><li>G</li><li>Am</li></ol>
+    <div class="quiz-explain">属功能以 V 级为代表，C 大调的 V 级是 <b>G</b>（加上七音就是 G7）。C 是主功能，F 是下属功能，Am 可以代替主功能。</div>
+  </div>
+  <div class="quiz" data-answer="3">
+    <p class="quiz-q">听一听：<button data-play="C3 C4 E4 G4 | A2 C4 E4 A4 | F2 C4 F4 A4 | G2 B3 D4 G4" data-mode="progression" data-bpm="72">播放</button> 这段进行结束在哪种终止式上？</p>
+    <ol class="quiz-opts"><li>正格终止</li><li>变格终止</li><li>半终止</li><li>阻碍终止</li></ol>
+    <div class="quiz-explain">这段是 C – Am – F – <b>G</b>，停在了 V 级上，听起来"还没说完"，是<b>半终止</b>，像一个逗号或问号。</div>
+  </div>
+  <div class="quiz" data-answer="1">
+    <p class="quiz-q">"1564"（I–V–vi–IV）放到 <b>G 大调</b>里，是哪四个和弦？</p>
+    <ol class="quiz-opts"><li>G D Em C</li><li>G C D Em</li><li>G D E C</li><li>C G Am F</li></ol>
+    <div class="quiz-explain">G 大调音阶 G A B C D E F♯：I = G，V = D，vi = Em（小写，小三和弦），IV = C。所以是 <b>G – D – Em – C</b>。C G Am F 是 C 大调里的 1564。</div>
+  </div>
+  <div class="quiz" data-answer="1">
+    <p class="quiz-q">"卡农进行"这个名字来自哪部作品？</p>
+    <ol class="quiz-opts"><li>帕赫贝尔《D 大调卡农》</li><li>贝多芬《第九交响曲》</li><li>莫扎特《小星星变奏曲》</li><li>巴赫《G 弦上的咏叹调》</li></ol>
+    <div class="quiz-explain">卡农进行 I–V–vi–iii–IV–I–IV–V 来自德国作曲家<b>帕赫贝尔</b>大约 1680 年写的《D 大调卡农》，在 D 大调里是 D–A–Bm–F♯m–G–D–G–A。</div>
+  </div>
+  <div class="quiz" data-answer="2">
+    <p class="quiz-q">给 C 大调旋律配和弦时，某小节强拍上是一个长长的 la（6）。在 I、IV、V 中应优先选哪个？</p>
+    <ol class="quiz-opts"><li>I（C）</li><li>IV（F）</li><li>V（G）</li></ol>
+    <div class="quiz-explain">la 就是 A。三个主要和弦中只有 <b>F（F A C）</b>包含 A，所以选 IV。</div>
+  </div>
+  <div class="quiz" data-answer="4">
+    <p class="quiz-q">听一听：<button data-play="C3 C4 E4 G4 | F2 C4 F4 A4 | G2 B3 F4 G4 | A2 C4 E4 A4" data-mode="progression" data-bpm="72">播放</button> 前面一切都像要"回家"，最后却"拐了个弯"。这是哪种终止式？</p>
+    <ol class="quiz-opts"><li>正格终止</li><li>变格终止</li><li>半终止</li><li>阻碍终止</li></ol>
+    <div class="quiz-explain">G7 之后没有回到 C，而是去了 Am（V → vi），出人意料，这就是<b>阻碍终止</b>。</div>
+  </div>
+</div>
+
+<div class="callout tip">
+  <div class="callout-title">课后练一练</div>
+  <ul>
+    <li>在 <a href="../tools/progression.html">🎶 和弦进行播放器</a> 里，把 1564 依次放到 C、G、D 调，跟着哼一段自己的旋律。</li>
+    <li>打开 <a href="../tools/piano.html">🎹 在线钢琴</a>，用"就近指法"弹 C – G/B – Am – F，用信息面板检查每个和弦弹对了没有。</li>
+    <li>给《两只老虎》配和弦。提示：这首歌只用 <b>C</b> 和 <b>G</b> 两个和弦就能配好，试试哪些地方该用 G？</li>
+  </ul>
+</div>
+</section>
+
+</article>
+</main>
+
+<script src="../assets/js/theory.js"></script>
+<script src="../assets/js/audio.js"></script>
+<script src="../assets/js/keyboard.js"></script>
+<script src="../assets/js/staff.js"></script>
+<script src="../assets/js/jianpu.js"></script>
+<script src="../assets/js/site.js"></script>
+<script src="../assets/js/services.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script>
+(function () {
+  function $(s) { return document.querySelector(s); }
+  var mod = MT.mod;
+  var ACC_ASCII = { '-2': 'bb', '-1': 'b', '0': '', '1': '#', '2': '##' };
+  var FUNC_MAJ = ['T', 'S', 'T', 'S', 'D', 'T', 'D'];
+  var FUNC_MIN = ['T', 'S', 'T', 'S', 'D', 'S', 'D'];
+
+  /* ---------- 和弦生成与声部连接 ---------- */
+  function degreeOf(roman) {
+    var m = /^(b|♭|#|♯)?(VII|VI|V|IV|III|II|I|vii|vi|v|iv|iii|ii|i)/.exec(roman);
+    return m ? MT.ROMAN.indexOf(m[2].toUpperCase()) : 0;
+  }
+  function prettyRoman(r) { return r.replace(/^b/, '♭').replace(/^#/, '♯'); }
+  function funcOf(roman, minor) { return (minor ? FUNC_MIN : FUNC_MAJ)[degreeOf(roman)]; }
+  function spellAs(midi, notes) {
+    var pc = mod(midi, 12);
+    for (var i = 0; i < notes.length; i++) {
+      var n = notes[i];
+      if (mod(n.midi, 12) === pc) {
+        var oct = Math.floor((midi - MT.LETTER_PC[n.letter] - n.acc) / 12) - 1;
+        return n.letter + ACC_ASCII[n.acc] + oct;
+      }
+    }
+    return MT.noteName(MT.fromMidi(midi), { ascii: true });
+  }
+  function voicings(pcs) {
+    var out = [];
+    for (var inv = 0; inv < pcs.length; inv++) {
+      var order = pcs.slice(inv).concat(pcs.slice(0, inv));
+      for (var base = 55; base <= 67; base++) {
+        if (mod(base, 12) !== order[0]) continue;
+        var v = [base], cur = base;
+        for (var i = 1; i < order.length; i++) { var m = cur + 1; while (mod(m, 12) !== order[i]) m++; v.push(m); cur = m; }
+        if (v[v.length - 1] <= 81) out.push({ notes: v, inv: inv });
+      }
+    }
+    return out;
+  }
+  function center(v) { var s = 0; v.forEach(function (x) { s += x; }); return s / v.length; }
+  function moveCost(a, b) {
+    if (a.length === b.length) { var s = 0; for (var i = 0; i < a.length; i++) s += Math.abs(a[i] - b[i]); return s; }
+    var t = 0;
+    a.forEach(function (x) { var best = 99; b.forEach(function (y) { best = Math.min(best, Math.abs(x - y)); }); t += best; });
+    return t * 1.15;
+  }
+  /** romans → [{roman, chord, upper:[midi], bass:midi, func}] */
+  function buildProgression(romans, key, minor) {
+    var prev = null;
+    return romans.map(function (r) {
+      var c = MT.romanToChord(r, key, 4);
+      var pcs = c.notes.map(function (n) { return mod(n.midi, 12); });
+      var best = null, bestCost = Infinity;
+      voicings(pcs).forEach(function (cd) {
+        var cost = prev ? moveCost(cd.notes, prev) + Math.abs(center(cd.notes) - 64) * 0.35
+                        : (cd.inv === 0 ? 0 : 5) + Math.abs(center(cd.notes) - 64);
+        if (cost < bestCost) { bestCost = cost; best = cd; }
+      });
+      prev = best.notes;
+      var bass = 40 + mod(mod(c.root.midi, 12) - 4, 12); // E2 ~ D♯3
+      return { roman: r, chord: c, upper: best.notes, bass: bass, func: funcOf(r, minor) };
+    });
+  }
+  function beatsList(n, beats) {
+    var out = [];
+    for (var i = 0; i < n; i++) out.push(beats);
+    if (beats === 2 && n % 2 === 1) out[n - 1] = 4;
+    return out;
+  }
+  function chipHTML(p) {
+    return '<div class="rn">' + prettyRoman(p.roman) + '</div><div class="sy">' + p.chord.symbol + '</div>';
+  }
+  /** 播放：低音保持整个和弦时值，右手每拍弹一次 */
+  function playProgression(prog, opts) {
+    var events = [];
+    var bl = beatsList(prog.length, opts.beats);
+    for (var L = 0; L < (opts.loops || 1); L++) {
+      prog.forEach(function (p, i) {
+        events.push({ notes: [p.bass], beats: 0, holdBeats: bl[i], velocity: 0.72, ci: i, first: true });
+        for (var b = 0; b < bl[i]; b++) events.push({ notes: p.upper.slice(), beats: 1, velocity: b === 0 ? 0.7 : 0.48, ci: i });
+      });
+    }
+    return Sound.playSequence(events, {
+      bpm: opts.bpm,
+      onEvent: function (ev) { if (ev.first && opts.onChord) opts.onChord(ev.ci); },
+      onEnd: function () { if (opts.onEnd) opts.onEnd(); }
+    });
+  }
+  function staffSpec(prog, keyStr, beats) {
+    var bl = beatsList(prog.length, beats);
+    var tre = [], bas = [], acc = 0;
+    prog.forEach(function (p, i) {
+      var d = bl[i] === 4 ? ':w' : ':h';
+      tre.push('[' + p.upper.map(function (m) { return spellAs(m, p.chord.notes); }).join(' ') + ']' + d + '^' + p.chord.symbol.replace(/\s/g, ''));
+      bas.push(spellAs(p.bass, p.chord.notes) + d);
+      acc += bl[i];
+      if (acc % 4 === 0) { tre.push(i === prog.length - 1 ? '|]' : '|'); bas.push(i === prog.length - 1 ? '|]' : '|'); }
+    });
+    return { treble: tre.join(' '), bass: bas.join(' '), key: keyStr, time: '4/4', playable: false };
+  }
+
+  /* ---------- 8.3 和弦进行播放器 ---------- */
+  var PROGS = [
+    { id: '1564', name: '1564：I – V – vi – IV', romans: ['I', 'V', 'vi', 'IV'], desc: '当代流行音乐里最常见的和弦进行之一：明亮地开始，在 vi 处带一点感伤，再由 IV 把情绪托起来，然后循环。无数流行歌曲的副歌都建立在这四个和弦上。' },
+    { id: 'canon', name: '卡农进行', romans: ['I', 'V', 'vi', 'iii', 'IV', 'I', 'IV', 'V'], desc: '出自巴洛克作曲家帕赫贝尔（约 1680 年）的《D 大调卡农》。低音几乎一级一级往下走，温暖、有画面感，婚礼音乐和抒情歌曲特别爱用。试试切换到 D 大调，就是原曲的和弦。' },
+    { id: '4536251', name: '4536251（含"王道进行"）', romans: ['IV', 'V', 'iii', 'vi', 'ii', 'V', 'I'], desc: '从 IV 开始，先"出门"再一步步走回家。前四个和弦 4–5–3–6 在日本流行乐里被称为"王道进行"；接上 2–5–1 回到主和弦，就是华语流行常说的"4536251"。' },
+    { id: '1625', name: '1625：I – vi – ii – V', romans: ['I', 'vi', 'ii', 'V'], desc: '又叫"回转进行"（turnaround），最后的 V 很自然地把音乐送回开头的 I，适合循环。把 ii 换成 IV，就是 1950 年代非常流行的 I–vi–IV–V。' },
+    { id: '251', name: '251：ii7 – V7 – Imaj7', romans: ['ii7', 'V7', 'Imaj7'], desc: '爵士乐里最核心的进行，通常用七和弦弹：下属（ii7）→ 属（V7）→ 主（Imaj7），一步步"回家"，味道很"爵士"。' },
+    { id: '6415', name: '6415：vi – IV – I – V', romans: ['vi', 'IV', 'I', 'V'], desc: '和 1564 用的是同一组和弦，只是从 vi（小三和弦）开始，听起来更忧郁、更有情绪张力。' },
+    { id: 'minor', name: '小调 i – VI – III – VII', romans: ['i', 'VI', 'III', 'VII'], minor: true, desc: '以小调主和弦开始，走向三个大三和弦，悲伤中带着力量。在 a 小调里正好是 Am–F–C–G——和 6415 是同一组和弦！这就是关系大小调"共用和弦"的体现。' },
+    { id: 'andalusian', name: '安达卢西亚进行 i – VII – VI – V', romans: ['i', 'VII', 'VI', 'V'], minor: true, desc: '低音一路下行（a 小调里是 A–G–F–E），带着浓郁的西班牙、弗拉门戈风味。最后的 V 是大三和弦（来自和声小调），紧张地等待回到 i。' },
+    { id: 'blues', name: '12 小节布鲁斯', romans: ['I7', 'I7', 'I7', 'I7', 'IV7', 'IV7', 'I7', 'I7', 'V7', 'IV7', 'I7', 'V7'], beats: 4, loops: 1, desc: '布鲁斯与摇滚乐的骨架：12 小节一循环，只用 I7、IV7、V7 三个属七和弦。规律是：4 小节 I7 → 2 小节 IV7 → 2 小节 I7 → V7、IV7、I7、V7。建议每个和弦 4 拍。' }
+  ];
+  var KEYS = ['C', 'G', 'D', 'A', 'E', 'F', 'Bb', 'Eb'];
+  var keySel = $('#pl-key');
+  KEYS.forEach(function (k) {
+    var o = document.createElement('option');
+    o.value = k;
+    o.textContent = MT.pretty(k) + ' 大调 / ' + MT.pretty(MT.relativeMinor(k)).toLowerCase() + ' 小调';
+    keySel.appendChild(o);
+  });
+  var pl = { prog: PROGS[0], key: 'C', bpm: 96, beats: 2, player: null, built: null, view: null };
+  var plKbEl = $('#pl-kb');
+  var plKb = new PianoKeyboard(plKbEl, { start: 'E2', end: 'C6', labels: 'c', size: 'compact' });
+  plKbEl._kb = plKb;
+  var listEl = $('#pl-list');
+  PROGS.forEach(function (p) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.textContent = p.name.split('：')[0]; b.dataset.id = p.id; b.title = p.name;
+    if (p === pl.prog) b.classList.add('active');
+    b.addEventListener('click', function () {
+      listEl.querySelectorAll('button').forEach(function (x) { x.classList.toggle('active', x === b); });
+      pl.prog = p;
+      if (p.beats) setBeats(p.beats);
+      stopPl();
+      renderPl();
+    });
+    listEl.appendChild(b);
+  });
+  function setBeats(v) {
+    pl.beats = v;
+    $('#pl-beats').querySelectorAll('button').forEach(function (x) { x.classList.toggle('active', +x.dataset.v === v); });
+  }
+  function keyFor(p) { return p.minor ? MT.relativeMinor(pl.key) + 'm' : pl.key; }
+  function showChord(i) {
+    var p = pl.built[i];
+    $('#pl-chips').querySelectorAll('.chip').forEach(function (c, k) { c.classList.toggle('on', k === i); });
+    plKb.clearHighlight();
+    plKb.setHighlight(p.upper, { cls: 'hl', badges: p.upper.map(function (m) { return MT.pcName(MT.parseNote(spellAs(m, p.chord.notes))); }) });
+    plKb.setHighlight([p.bass], { cls: 'hl2', badges: [MT.pcName(MT.parseNote(spellAs(p.bass, p.chord.notes)))] }, true);
+    if (pl.view) pl.view.highlightEvents([i], 'hl2');
+  }
+  function renderPl() {
+    var p = pl.prog, key = keyFor(p);
+    pl.built = buildProgression(p.romans, key, !!p.minor);
+    $('#pl-name').textContent = p.name + '（' + MT.keyName(key).replace(/^([A-G][♯♭]?) 小调$/, function (m, t) { return t.toLowerCase() + ' 小调'; }) + '）';
+    $('#pl-desc').textContent = p.desc;
+    $('#pl-chips').innerHTML = pl.built.map(function (b) { return '<div class="chip f' + b.func + '">' + chipHTML(b) + '</div>'; }).join('');
+    pl.view = Staff.render($('#pl-staff'), staffSpec(pl.built, key, pl.beats));
+    plKb.clearHighlight();
+  }
+  function stopPl() { if (pl.player) pl.player.stop(); }
+  function resetPlayBtn() {
+    pl.player = null;
+    $('#pl-play').textContent = '▶ 播放';
+    $('#pl-chips').querySelectorAll('.chip').forEach(function (c) { c.classList.remove('on'); });
+    if (pl.view && pl.view.svg) pl.view.highlightEvents([], 'hl2');
+    plKb.clearHighlight();
+  }
+  $('#pl-play').addEventListener('click', function () {
+    if (pl.player) { stopPl(); return; }
+    renderPl();
+    pl.player = playProgression(pl.built, {
+      bpm: pl.bpm, beats: pl.beats, loops: pl.prog.loops || 2,
+      onChord: showChord, onEnd: resetPlayBtn
+    });
+    $('#pl-play').textContent = '■ 停止';
+  });
+  keySel.addEventListener('change', function () { pl.key = keySel.value; stopPl(); renderPl(); });
+  $('#pl-bpm').addEventListener('input', function () { pl.bpm = +this.value; $('#pl-bpm-v').textContent = pl.bpm + ' BPM'; });
+  $('#pl-beats').querySelectorAll('button').forEach(function (b) {
+    b.addEventListener('click', function () { setBeats(+b.dataset.v); stopPl(); renderPl(); });
+  });
+  renderPl();
+
+  /* ---------- 8.6 和弦接龙 ---------- */
+  var PAL = ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii°', 'V7'];
+  var BKEYS = [['C', 'C 大调'], ['G', 'G 大调'], ['D', 'D 大调'], ['F', 'F 大调'], ['A', 'A 大调']];
+  var bd = { key: 'C', list: [], player: null };
+  function bdKeySeg() {
+    var seg = $('#bd-key');
+    BKEYS.forEach(function (k) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = k[1]; b.dataset.v = k[0];
+      if (k[0] === bd.key) b.classList.add('active');
+      b.addEventListener('click', function () {
+        seg.querySelectorAll('button').forEach(function (x) { x.classList.toggle('active', x === b); });
+        bd.key = k[0]; stopBd(); renderPalette(); renderOut();
+      });
+      seg.appendChild(b);
+    });
+  }
+  function renderPalette() {
+    var pal = $('#bd-palette');
+    pal.innerHTML = '';
+    PAL.forEach(function (r) {
+      var c = MT.romanToChord(r, bd.key, 4);
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'f' + funcOf(r, false);
+      b.innerHTML = '<span class="rn">' + r + '</span><span class="sy">' + c.symbol + '</span>';
+      b.title = '添加 ' + c.symbol;
+      b.addEventListener('click', function () {
+        if (bd.list.length >= 8) { MTSite.toast('最多 8 个和弦，可以先删掉一些'); return; }
+        bd.list.push(r);
+        stopBd();
+        renderOut();
+        var built = buildProgression([r], bd.key, false)[0];
+        Sound.playChord([built.bass].concat(built.upper), { duration: 1.2, velocity: 0.65 });
+      });
+      pal.appendChild(b);
+    });
+  }
+  function renderOut() {
+    var out = $('#bd-out');
+    if (!bd.list.length) { out.innerHTML = '<span class="empty">还没有和弦，点击上面的卡片开始吧（建议从 I 开始）</span>'; hint(); return; }
+    var built = buildProgression(bd.list, bd.key, false);
+    out.innerHTML = '';
+    built.forEach(function (p, i) {
+      var c = document.createElement('div');
+      c.className = 'chip f' + p.func;
+      c.innerHTML = chipHTML(p) + '<button class="x" type="button" aria-label="删除">×</button>';
+      c.querySelector('.x').addEventListener('click', function () { bd.list.splice(i, 1); stopBd(); renderOut(); });
+      out.appendChild(c);
+    });
+    hint();
+  }
+  function hint() {
+    var L = bd.list, el = $('#bd-hint'), msg;
+    if (!L.length) msg = '💡 一段进行通常从 I 开始，先让耳朵"在家"站稳。';
+    else {
+      var last = L[L.length - 1], prev = L[L.length - 2];
+      var dl = degreeOf(last), dp = prev ? degreeOf(prev) : -1;
+      if (dl === 0 && dp === 4) msg = '🎉 V → I：正格终止，像句号一样完满地"到家"了！';
+      else if (dl === 0 && dp === 3) msg = '🙏 IV → I：变格终止（"阿门"终止），柔和地结束。';
+      else if (dl === 0 && L.length > 1) msg = '🏠 结束在 I 上，有"到家"的感觉。试试在它前面放一个 V，会更有力。';
+      else if (dl === 0) msg = '🏠 很好的开始！接下来用 IV 或 ii "出门"走走。';
+      else if (dl === 5 && dp === 4) msg = '😮 V → vi：阻碍终止！以为要回家，却拐了个弯。';
+      else if (dl === 4) msg = '❓ 停在 V 上：半终止，像一个问句，很想听到 I 来"回答"。';
+      else if (dl === 3 || dl === 1) msg = '🚪 现在在下属功能（"出门"了），接一个 V 制造回家的愿望吧。';
+      else if (dl === 5 || dl === 2) msg = '🎨 vi / iii 带来一点忧郁的色彩。接下来可以去 IV 或 ii。';
+      else msg = '⚡ vii° 很紧张，通常接 I。';
+      if (L.length >= 2 && degreeOf(L[0]) !== 0 && degreeOf(L[0]) !== 5 && degreeOf(L[0]) !== 3) msg += '（另外：从 I、vi 或 IV 开始会更自然。）';
+    }
+    el.textContent = msg;
+  }
+  function stopBd() { if (bd.player) bd.player.stop(); }
+  $('#bd-play').addEventListener('click', function () {
+    if (bd.player) { stopBd(); return; }
+    if (!bd.list.length) { MTSite.toast('先添加几个和弦吧'); return; }
+    var built = buildProgression(bd.list, bd.key, false);
+    var chips = $('#bd-out').querySelectorAll('.chip');
+    bd.player = playProgression(built, {
+      bpm: 92, beats: 2, loops: 2,
+      onChord: function (i) { chips.forEach(function (c, k) { c.classList.toggle('on', k === i); }); },
+      onEnd: function () { bd.player = null; chips.forEach(function (c) { c.classList.remove('on'); }); $('#bd-play').textContent = '▶ 播放我的进行'; }
+    });
+    $('#bd-play').textContent = '■ 停止';
+  });
+  $('#bd-undo').addEventListener('click', function () { bd.list.pop(); stopBd(); renderOut(); });
+  $('#bd-clear').addEventListener('click', function () { bd.list = []; stopBd(); renderOut(); });
+  $('#bd-demo').addEventListener('click', function () {
+    var demos = [['I', 'vi', 'IV', 'V'], ['I', 'IV', 'ii', 'V', 'I'], ['I', 'iii', 'IV', 'V'], ['vi', 'IV', 'I', 'V'], ['I', 'V', 'vi', 'iii', 'IV', 'I', 'ii', 'V']];
+    bd.list = MT.pick(demos).slice();
+    stopBd(); renderOut();
+  });
+  bdKeySeg(); renderPalette(); renderOut();
+})();
+</script>
+</body>
+</html>

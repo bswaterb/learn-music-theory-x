@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 6 章 音阶与调 · 乐理入门</title>
+<script>try{var t=localStorage.getItem('mt-theme');document.documentElement.setAttribute('data-theme',t?JSON.parse(t):(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))}catch(e){}</script>
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+  /* 全音 / 半音 标注条 */
+  .step-strip { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 4px; margin: 12px 0 10px; }
+  .step-strip .sn {
+    min-width: 42px; height: 46px; padding: 0 7px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font: 700 17px/1.1 var(--font-serif); background: var(--bg-elev); border: 1px solid var(--border-strong);
+  }
+  .step-strip .sn small { font: 600 10.5px/1.2 var(--font); color: var(--text-3); margin-top: 2px; }
+  .step-strip .sn.alt { border-color: color-mix(in srgb, var(--accent) 60%, transparent); background: var(--accent-soft); color: var(--accent); }
+  .step-strip .st { font-size: 12.5px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--blue-soft); color: var(--blue); white-space: nowrap; }
+  .step-strip .st.half { background: var(--accent-soft); color: var(--accent); }
+  .step-strip .st.aug { background: var(--red-soft); color: var(--red); }
+  .strip-label { text-align: center; font-size: 13px; font-weight: 700; color: var(--text-2); margin-top: 12px; }
+  /* 音阶构建器 */
+  .scale-builder .control-row { justify-content: center; }
+  .scale-builder .sb-caption { font-size: 14.5px; color: var(--text-2); }
+  .scale-builder .sb-caption b { color: var(--text); }
+  /* 调号小卡片 */
+  .ksig-grid { display: grid; gap: 12px; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 18px 0; }
+  .ksig-grid .card { padding: 10px 8px 8px; text-align: center; }
+  .ksig-grid .staff-box { margin: 4px 0; }
+  .ksig-grid .kname { font-weight: 700; font-size: 14.5px; }
+  .ksig-grid .kcount { font-size: 12.5px; color: var(--text-3); }
+  /* 调号小游戏 */
+  .keygame { text-align: center; }
+  .keygame .kg-opts { justify-content: center; }
+  .keygame .kg-opts .btn.right { background: var(--green-soft); border-color: var(--green); color: var(--green); }
+  .keygame .kg-opts .btn.wrong { background: var(--red-soft); border-color: var(--red); color: var(--red); }
+  .keygame .kg-staff { min-height: 110px; }
+  /* 五度圈 */
+  .cof-wrap { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 22px; align-items: center; }
+  .cof-svg { width: 100%; height: auto; display: block; color: var(--text); user-select: none; -webkit-user-select: none; }
+  .cof-seg { cursor: pointer; outline: none; }
+  .cof-seg path { stroke: var(--bg-elev); stroke-width: 2.5; transition: fill .15s; }
+  .cof-seg .maj { fill: var(--bg-soft); }
+  .cof-seg .min { fill: var(--bg-sunken); }
+  .cof-seg:hover .maj, .cof-seg:focus-visible .maj { fill: var(--primary-soft); }
+  .cof-seg.near .maj, .cof-seg.near .min { fill: var(--accent-soft); }
+  .cof-seg.active .maj { fill: var(--primary); }
+  .cof-seg.active .min { fill: var(--primary-2); }
+  .cof-seg.active text { fill: #fff; }
+  .cof-seg text { pointer-events: none; }
+  .cof-t-maj { font-size: 16px; font-weight: 800; }
+  .cof-t-min { font-size: 12.5px; font-weight: 650; }
+  .cof-t-cnt { font-size: 10px; font-weight: 700; opacity: .7; }
+  .cof-center { fill: var(--bg-elev); stroke: var(--border); }
+  .cof-c1 { font-size: 17px; font-weight: 800; }
+  .cof-c2 { font-size: 13px; opacity: .75; }
+  .cof-info h4 { margin: 0 0 6px; font-size: 19px; }
+  .cof-info p { margin: 0 0 6px; font-size: 14.5px; color: var(--text-2); }
+  .cof-info p b { color: var(--text); }
+  .mode-table td:last-child { white-space: nowrap; }
+  @media (max-width: 760px) {
+    .cof-wrap { grid-template-columns: minmax(0, 1fr); }
+    .ksig-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+</style>
+</head>
+<body data-page="ch06" data-root="..">
+<main class="page">
+<article class="content doc">
+
+<header class="chapter-header">
+  <div class="chapter-kicker">第 6 章</div>
+  <h1>音阶与调：音乐的"家"</h1>
+  <p class="lead">为什么有的歌听起来明亮开朗，有的却带着淡淡的忧伤？为什么一首歌唱到最后一个音，你会觉得"结束了"？答案藏在<strong>音阶</strong>和<strong>调</strong>里。这一章，我们用上一章学会的全音、半音和音程，亲手"搭"出大调和小调音阶，学会看懂调号，再认识五度圈和中国的五声音阶。</p>
+  <div class="chapter-meta"><span>⏱ 预计 35 分钟</span><span>🎯 难度 ★★★☆☆</span><span>🎧 建议戴耳机</span></div>
+  <div class="goals">
+    <h4>学完本章，你将能够：</h4>
+    <ul>
+      <li>理解<b>音阶、主音、调</b>是什么，知道音阶中每一级的名称；</li>
+      <li>用"<b>全全半全全全半</b>"在任意音上构建大调音阶，并拼对每个音；</li>
+      <li>区分<b>自然小调、和声小调、旋律小调</b>，找出关系大小调；</li>
+      <li>看懂<b>调号</b>，并根据调号说出是什么调；</li>
+      <li>认识<b>五度圈</b>和中国的<b>五声音阶</b>，分清<b>首调</b>与<b>固定调</b>。</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+<h2 id="s6-1">6.1 什么是音阶，什么是调</h2>
+<p><span class="term">音阶</span><span class="en">Scale</span> 就是把一组音<b>按高低顺序排成一排</b>，像一级一级的台阶。大部分音乐用的是由 7 个音组成的音阶（七声音阶），中国传统音乐里常用 5 个音的音阶（五声音阶，6.7 节会讲）。</p>
+<p>音阶的第一个音最特别，叫作<span class="term">主音</span><span class="en">Tonic</span>。它是整首曲子的"家"：旋律在外面转一圈，最后回到主音，就会有"到家了、结束了"的感觉。不信听听下面两段——它们只有最后一个音不一样：</p>
+
+<div class="figure">
+  <div data-staff="C4:q C4 G4 G4 | A4 A4 G4:h | F4:q F4 E4 E4 | D4 D4 C4:h*3 |]" data-time="4/4" data-bpm="112" data-scale="1" data-caption="上：停在 do（主音 C，绿色）上——踏实，说完了"></div>
+  <div data-staff="C4:q C4 G4 G4 | A4 A4 G4:h | F4:q F4 E4 E4 | D4 D4 D4:h* |]" data-time="4/4" data-bpm="112" data-scale="1" data-caption="下：停在 re（D，橙色）上——话好像只说了一半"></div>
+</div>
+
+<p><span class="term">调</span><span class="en">Key</span> 则回答两个问题：<b>主音是哪个音？用的是哪种音阶？</b>比如"C 大调"，就是以 C 为主音的大调音阶；"a 小调"，就是以 A 为主音的小调音阶（小调习惯用小写字母表示）。</p>
+
+<div class="callout analogy">
+  <div class="callout-title">打个比方</div>
+  <p>如果把音乐比作一个人出门散步，<b>主音</b>就是他的家，<b>音阶</b>就是家附近的街道布局，<b>调</b>就是"家的地址 + 街区的样子"。同一首歌换一个调来唱，就像搬到另一个街区——房子的格局一样，只是整体变高或变低了。</p>
+</div>
+
+<h3>音阶的"级"</h3>
+<p>音阶里的每个音按顺序叫作第一级、第二级……第七级，常用罗马数字 I～VII 表示。每一级都有自己的名字，其中最重要的是<b>主音（I）</b>、<b>属音（V）</b>、<b>下属音（IV）</b>和<b>导音（VII）</b>，第 8 章讲和弦进行时会天天用到它们。</p>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>级数</th><th>名称</th><th>C 大调中</th><th>简谱</th><th>它的"性格"</th></tr></thead>
+  <tbody>
+    <tr><td>I</td><td><b>主音</b></td><td class="nn">C</td><td>1</td><td>最稳定，是"家"</td></tr>
+    <tr><td>II</td><td>上主音</td><td class="nn">D</td><td>2</td><td>主音上方的音</td></tr>
+    <tr><td>III</td><td>中音</td><td class="nn">E</td><td>3</td><td>在主音和属音的正中间</td></tr>
+    <tr><td>IV</td><td><b>下属音</b></td><td class="nn">F</td><td>4</td><td>在主音下方纯五度（和属音"左右对称"）</td></tr>
+    <tr><td>V</td><td><b>属音</b></td><td class="nn">G</td><td>5</td><td>仅次于主音的重要音，在主音上方纯五度</td></tr>
+    <tr><td>VI</td><td>下中音</td><td class="nn">A</td><td>6</td><td>在主音和下属音的正中间（往下数）</td></tr>
+    <tr><td>VII</td><td><b>导音</b></td><td class="nn">B</td><td>7</td><td>离主音只差一个半音，强烈地想"回家"</td></tr>
+  </tbody>
+</table>
+</div>
+<p>感受一下导音"想回家"的力量：</p>
+<p>
+  <button data-play="C4 D4 E4 F4 G4 A4 B4" data-bpm="150">停在导音 B 上</button>
+  <button data-play="C4 D4 E4 F4 G4 A4 B4 C5" data-bpm="150" data-beats="1 1 1 1 1 1 1 2">回到主音 C</button>
+</p>
+<p>停在 B 上时，耳朵几乎是在"催"你把最后一个 C 弹出来——这就是导音名字的由来：它<b>引导</b>旋律回到主音。</p>
+</section>
+
+<section>
+<h2 id="s6-2">6.2 大调音阶：全全半全全全半</h2>
+<p>先看最简单的 <b>C 大调音阶</b>：从 C 开始，依次弹白键，一直弹到上面的 C。</p>
+<div class="figure">
+  <div id="kb-cmaj" data-keyboard="C4-C5" data-labels="name" data-highlight="C4 D4 E4 F4 G4 A4 B4 C5" data-badges="1 2 3 4 5 6 7 1"></div>
+  <div class="step-strip" data-strip="C4 D4 E4 F4 G4 A4 B4 C5"></div>
+  <div class="btn-row" style="justify-content:center;margin:0"><button data-play="C4 D4 E4 F4 G4 A4 B4 C5" data-bpm="150" data-kb="#kb-cmaj">播放 C 大调音阶</button></div>
+  <div class="caption">相邻两个音中间隔着一个黑键的是<b>全音</b>（蓝色），紧挨着、没有黑键的是<b>半音</b>（橙色）。</div>
+</div>
+
+<p>把每一步的距离连起来读，就得到了大调音阶的"<b>配方</b>"：</p>
+<div class="callout memory">
+  <div class="callout-title">大调音阶的结构</div>
+  <p style="font-size:18px"><b>全 — 全 — 半 — 全 — 全 — 全 — 半</b></p>
+  <p>读成"<b>全全半，全全全半</b>"。半音出现在第 3→4 级和第 7→8 级之间。只要按这个配方走，<b>从任何一个音出发</b>都能搭出一个大调音阶。</p>
+</div>
+
+<div class="callout tip">
+  <div class="callout-title">藏在里面的"两兄弟"</div>
+  <p>把 C 大调从中间切开：<b>C D E F</b> 和 <b>G A B C</b>，两半的结构都是"全全半"，中间用一个全音连起来。这种四个音的小组叫<span class="term">四音列</span>。有趣的是，C 大调的后半段 G A B C，正好是 G 大调的前半段——所以 C 大调和 G 大调是"关系最近的邻居"，6.6 节的五度圈会把这种关系画成一个圆。</p>
+</div>
+
+<h3>在其他音上搭建大调</h3>
+<p>现在试试从 <b>G</b> 出发，只弹白键：G A B C D E F G。按配方检查每一步：</p>
+<ol>
+  <li>G→A 全 ✓，A→B 全 ✓，B→C 半 ✓，C→D 全 ✓，D→E 全 ✓；</li>
+  <li>E→F 应该是<b>全音</b>，可白键 E 到 F 只有半音 ✗；</li>
+  <li>F→G 应该是<b>半音</b>，可白键 F 到 G 是全音 ✗。</li>
+</ol>
+<p>解决办法是把 F 升高半音变成 <b>F♯</b>：这样 E→F♯ 是全音，F♯→G 是半音，两个问题一起解决了。所以 <b>G 大调 = G A B C D E F♯ G</b>，有 1 个升号。</p>
+<div class="figure">
+  <div id="kb-gmaj" data-keyboard="F4-A5" data-size="compact" data-labels="name" data-highlight="G4 A4 B4 C5 D5 E5 F#5 G5" data-badges="1 2 3 4 5 6 7 1" data-hl2="F#5"></div>
+  <div class="step-strip" data-strip="G4 A4 B4 C5 D5 E5 F#5 G5"></div>
+  <div class="btn-row" style="justify-content:center;margin:0"><button data-play="G4 A4 B4 C5 D5 E5 F#5 G5" data-bpm="150" data-kb="#kb-gmaj">播放 G 大调音阶</button></div>
+</div>
+
+<p>再从 <b>F</b> 出发：F G A B C D E F。这次的问题出在第 3→4 级：A→B 是全音，但配方要求半音。把 B 降低成 <b>B♭</b> 就好了。所以 <b>F 大调 = F G A B♭ C D E F</b>，有 1 个降号。</p>
+<div class="figure">
+  <div id="kb-fmaj" data-keyboard="E4-G5" data-size="compact" data-labels="name" data-highlight="F4 G4 A4 Bb4 C5 D5 E5 F5" data-badges="1 2 3 4 5 6 7 1" data-hl2="Bb4"></div>
+  <div class="step-strip" data-strip="F4 G4 A4 Bb4 C5 D5 E5 F5"></div>
+  <div class="btn-row" style="justify-content:center;margin:0"><button data-play="F4 G4 A4 Bb4 C5 D5 E5 F5" data-bpm="150" data-kb="#kb-fmaj">播放 F 大调音阶</button></div>
+</div>
+
+<div class="callout warn">
+  <div class="callout-title">常见误区：G 大调的第 7 个音为什么写 F♯，不写 G♭？</div>
+  <p>F♯ 和 G♭ 是同一个黑键，但在音阶里有一条铁律：<b>七个音必须用上七个不同的字母</b>，C D E F G A B 各出现一次，不能重复也不能缺。G 大调里字母 G 已经当主音了，第 7 个位置只能留给字母 F，所以必须写成 <b>F♯</b>。这也是为什么有的调里会出现 E♯、B♯、C♭、F♭ 这样"看起来奇怪"的音名（第 2 章讲过，它们其实就是白键的另一个名字）。</p>
+</div>
+
+<h3>动手：大调音阶构建器</h3>
+<p>选一个主音，看看它的大调音阶长什么样。橙色的是需要升降号的音；五线谱上先上行、再下行，点"播放"可以听，键盘会同步亮起。</p>
+<div class="figure scale-builder" data-types="major" data-root="D">
+  <div class="control-row">
+    <div class="control"><span class="lbl">主音</span><select class="sb-root" aria-label="选择主音"></select></div>
+    <div class="control"><span class="lbl">类型</span><div class="segmented sb-type"></div></div>
+  </div>
+  <div class="step-strip sb-strip"></div>
+  <div class="sb-kb"></div>
+  <div class="sb-staff"></div>
+  <div class="caption sb-caption"></div>
+</div>
+<p>试着把 15 个主音都点一遍，留意每个调分别用了几个升号或降号——6.5 节我们会把它们整理成"调号"。</p>
+<div class="launch-row"><span class="lr-label">在词典里看看其他大调（五线谱 + 键盘 + 试听）：</span><button data-launch="dictionary" data-args="scale=G:major">G 大调</button><button data-launch="dictionary" data-args="scale=D:major">D 大调</button><button data-launch="dictionary" data-args="scale=F:major">F 大调</button><button data-launch="dictionary" data-args="scale=Bb:major">B♭ 大调</button></div>
+</section>
+
+<section>
+<h2 id="s6-3">6.3 小调音阶：自然、和声、旋律</h2>
+<p>这一次从 <b>A</b> 出发，同样只弹白键：A B C D E F G A。这就是 <b>a 小调音阶</b>，准确地说叫<span class="term">自然小调</span>。</p>
+<div class="figure">
+  <div id="kb-amin" data-keyboard="G4-B5" data-size="compact" data-labels="name" data-highlight="A4 B4 C5 D5 E5 F5 G5 A5" data-badges="1 2 3 4 5 6 7 1"></div>
+  <div class="step-strip" data-strip="A4 B4 C5 D5 E5 F5 G5 A5"></div>
+  <div class="btn-row" style="justify-content:center;margin:0"><button data-play="A4 B4 C5 D5 E5 F5 G5 A5" data-bpm="150" data-kb="#kb-amin">播放 a 自然小调音阶</button></div>
+</div>
+
+<div class="callout memory">
+  <div class="callout-title">自然小调的结构</div>
+  <p style="font-size:18px"><b>全 — 半 — 全 — 全 — 半 — 全 — 全</b></p>
+  <p>半音出现在第 2→3 级和第 5→6 级之间。和大调相比，半音"挪了位置"，整个音阶的色彩就完全变了。</p>
+</div>
+
+<p>连续听一听，感受大调和小调的不同：</p>
+<p>
+  <button data-play="C4 D4 E4 F4 G4 A4 B4 C5" data-bpm="140">C 大调</button>
+  <button data-play="A3 B3 C4 D4 E4 F4 G4 A4" data-bpm="140">a 自然小调</button>
+  <button data-play="C4 E4 G4 C5" data-mode="arp-chord" data-gap="0.22">C 大调的主和弦</button>
+  <button data-play="A3 C4 E4 A4" data-mode="arp-chord" data-gap="0.22">a 小调的主和弦</button>
+</p>
+<p>大多数人会觉得大调<b>明亮、开朗</b>，小调<b>柔和、忧伤</b>。不过这只是一种常见的倾向，并不是绝对的规律——欢快的小调舞曲、深沉的大调圣歌都多得很。</p>
+
+<h3>同一个主音：大调 vs 小调</h3>
+<p>把主音固定在 C，对比 C 大调和 c 自然小调：</p>
+<div class="figure">
+  <div class="strip-label">C 大调</div>
+  <div class="step-strip" data-strip="C4 D4 E4 F4 G4 A4 B4 C5"></div>
+  <div class="strip-label">c 自然小调</div>
+  <div class="step-strip" data-strip="C4 D4 Eb4 F4 G4 Ab4 Bb4 C5"></div>
+  <div class="btn-row" style="justify-content:center;margin:0">
+    <button data-play="C4 D4 E4 F4 G4 A4 B4 C5" data-bpm="140">C 大调</button>
+    <button data-play="C4 D4 Eb4 F4 G4 Ab4 Bb4 C5" data-bpm="140">c 自然小调</button>
+  </div>
+  <div class="caption">只有第 3、6、7 级不同：小调把它们各降低了半音（记作 ♭3、♭6、♭7）。</div>
+</div>
+<div class="callout tip">
+  <div class="callout-title">一个好用的公式</div>
+  <p><b>自然小调 = 把大调的第 3、6、7 级降低半音。</b>知道了任何一个大调，马上就能写出同一个主音的小调。</p>
+</div>
+
+<h3>和声小调：给小调一个"导音"</h3>
+<p>自然小调有个"小遗憾"：它的第 7 级（a 小调里的 G）离主音 A 有一个全音，没有大调里导音那种"非回家不可"的吸引力。于是人们把第 7 级<b>临时升高半音</b>，得到<span class="term">和声小调</span>：A B C D E F <b>G♯</b> A。</p>
+<div class="figure">
+  <div class="step-strip" data-strip="A4 B4 C5 D5 E5 F5 G#5 A5"></div>
+  <div class="btn-row" style="justify-content:center;margin:0">
+    <button data-play="E4 F4 G4 A4" data-bpm="100" data-beats="1 1 1 2">自然小调：G → A</button>
+    <button data-play="E4 F4 G#4 A4" data-bpm="100" data-beats="1 1 1 2">和声小调：G♯ → A</button>
+    <button data-play="A4 B4 C5 D5 E5 F5 G#5 A5" data-bpm="140">播放 a 和声小调</button>
+  </div>
+  <div class="caption">红色标出的 F→G♯ 是一个<b>增二度</b>（3 个半音），给和声小调带来一种独特的"异域"色彩。</div>
+</div>
+
+<h3>旋律小调：上行和下行不一样</h3>
+<p>和声小调里 F→G♯ 的大跳，唱起来有点别扭。为了让旋律更顺，人们在<b>上行</b>时把第 6、7 级都升高（F♯、G♯），<b>下行</b>时再还原成自然小调。这就是<span class="term">旋律小调</span>。</p>
+<div class="figure">
+  <div data-staff="A4:q B4 C5 D5 E5 F#5* G#5* A5 | A5 Gn5* Fn5* E5 D5 C5 B4 A4 |]" data-spacing="even" data-note-space="29" data-names="name" data-bpm="140"></div>
+  <div class="caption">左边上行（第 6、7 级升高），右边下行（还原成自然小调）。</div>
+</div>
+
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>以 A 为主音</th><th>第 6 级</th><th>第 7 级</th><th>特点</th></tr></thead>
+  <tbody>
+    <tr><td><b>自然小调</b></td><td class="nn">F</td><td class="nn">G</td><td>最"原汁原味"的小调，流行音乐里最常见</td></tr>
+    <tr><td><b>和声小调</b></td><td class="nn">F</td><td class="nn">G♯</td><td>有导音，6→7 级是增二度，带异域色彩，古典音乐里常用</td></tr>
+    <tr><td><b>旋律小调</b></td><td class="nn">F♯（上行）</td><td class="nn">G♯（上行）</td><td>上行流畅，下行还原成自然小调</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>动手：小调音阶构建器</h3>
+<div class="figure scale-builder" data-types="naturalMinor,harmonicMinor,melodicMinor" data-root="E">
+  <div class="control-row">
+    <div class="control"><span class="lbl">主音</span><select class="sb-root" aria-label="选择主音"></select></div>
+    <div class="control"><span class="lbl">类型</span><div class="segmented sb-type"></div></div>
+  </div>
+  <div class="step-strip sb-strip"></div>
+  <div class="sb-kb"></div>
+  <div class="sb-staff"></div>
+  <div class="caption sb-caption"></div>
+</div>
+<div class="launch-row"><span class="lr-label">三种小调放在一起对比：</span><button data-launch="dictionary" data-args="scale=A:naturalMinor">A 自然小调</button><button data-launch="dictionary" data-args="scale=A:harmonicMinor">A 和声小调</button><button data-launch="dictionary" data-args="scale=A:melodicMinor">A 旋律小调</button></div>
+</section>
+
+<section>
+<h2 id="s6-4">6.4 关系大小调与同主音大小调</h2>
+<h3>关系大小调：同一套音，不同的"家"</h3>
+<p>你可能已经发现了：C 大调和 a 小调用的<b>是完全相同的 7 个音</b>（全部白键），只是"家"不一样——一个以 C 为主音，一个以 A 为主音。这样共用一套音、共用一个调号的一对大调和小调，叫<span class="term">关系大小调</span>。</p>
+<p>
+  <button data-play="C4 D4 E4 F4 G4 A4 B4 C5" data-bpm="140">C 大调：从 C 走到 C</button>
+  <button data-play="A3 B3 C4 D4 E4 F4 G4 A4" data-bpm="140">a 小调：同样的音，从 A 走到 A</button>
+</p>
+<div class="callout memory">
+  <div class="callout-title">怎么找关系小调？</div>
+  <p>大调的<b>第 6 级</b>就是它的关系小调的主音；也可以说，从大调主音<b>往下数一个小三度</b>。反过来，小调主音往上数小三度，就是它的关系大调。</p>
+</div>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>大调</th><th>往下小三度</th><th>关系小调</th><th>共用的调号</th></tr></thead>
+  <tbody>
+    <tr><td>C 大调</td><td>C → A</td><td>a 小调</td><td>无升降号</td></tr>
+    <tr><td>G 大调</td><td>G → E</td><td>e 小调</td><td>1 个升号（F♯）</td></tr>
+    <tr><td>D 大调</td><td>D → B</td><td>b 小调</td><td>2 个升号（F♯ C♯）</td></tr>
+    <tr><td>F 大调</td><td>F → D</td><td>d 小调</td><td>1 个降号（B♭）</td></tr>
+    <tr><td>B♭ 大调</td><td>B♭ → G</td><td>g 小调</td><td>2 个降号（B♭ E♭）</td></tr>
+    <tr><td>E♭ 大调</td><td>E♭ → C</td><td>c 小调</td><td>3 个降号（B♭ E♭ A♭）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>同主音大小调：同一个"家"，不同的装修</h3>
+<p>主音相同、音阶不同的一对，叫<span class="term">同主音大小调</span>，比如 C 大调和 c 小调。它们的调号不同（C 大调没有升降号，c 小调有 3 个降号），但"家"是同一个。把一首大调的歌改成同主音小调，旋律的轮廓不变，色彩却会大变。</p>
+<p>用《两只老虎》试试（它源自法国儿歌《雅克兄弟》）：</p>
+<div class="figure">
+  <div data-staff="C4:q D4 E4 C4 | C4 D4 E4 C4 | E4 F4 G4:h | E4:q F4 G4:h |]" data-time="4/4" data-bpm="120" data-scale="1" data-caption="C 大调版：活泼、明亮"></div>
+  <div data-staff="C4:q D4 Eb4* C4 | C4 D4 Eb4* C4 | Eb4* F4 G4:h | Eb4:q* F4 G4:h |]" data-time="4/4" data-bpm="96" data-scale="1" data-caption="c 小调版：只把 E 换成 E♭（橙色），立刻变得低沉"></div>
+</div>
+<div class="callout note">
+  <div class="callout-title">音乐史上的真实例子</div>
+  <p>奥地利作曲家马勒在他的《第一交响曲》第三乐章里，就把这首儿歌改成了小调，变成一段缓慢、略带诡异的葬礼进行曲。同一段旋律，换个调式就换了一种情绪。</p>
+</div>
+</section>
+
+<section>
+<h2 id="s6-5">6.5 调号：一眼看出是什么调</h2>
+<p>G 大调里的 F 永远是 F♯。如果每次遇到 F 都写一个升号，谱面会非常乱。所以我们把这个升号<b>统一写在每行乐谱的开头</b>、谱号的右边，叫作<span class="term">调号</span><span class="en">Key Signature</span>。</p>
+<div class="figure">
+  <div data-staff="G4:q A4 B4 C5 D5 E5 F#5* G5" data-key="G" data-spacing="even" data-names="name" data-bpm="140"></div>
+  <div class="caption">谱号后面那个 ♯ 写在 F 的位置（第五线）上。之后所有的 F 都不用再写升号，但都要弹成 F♯（橙色那个音）。</div>
+</div>
+<div class="callout note">
+  <div class="callout-title">调号的有效范围</div>
+  <p>调号对<b>所有八度</b>的同名音都有效：调号里有 F♯，那么低音 F、高音 F 统统都是 F♯。除非遇到还原号 ♮（只在本小节内有效），或者乐谱中途换了新的调号。</p>
+</div>
+
+<h3>升号和降号的固定顺序</h3>
+<p>调号里的升号、降号不是随便排的，它们永远按固定顺序出现：</p>
+<div class="figure-row">
+  <div class="figure"><div data-staff="" data-key="C#" data-caption="升号顺序：F C G D A E B"></div></div>
+  <div class="figure"><div data-staff="" data-key="Cb" data-caption="降号顺序：B E A D G C F"></div></div>
+</div>
+<div class="callout memory">
+  <div class="callout-title">记忆口诀</div>
+  <ul>
+    <li><b>升号</b>：F C G D A E B，唱名是 <b>fa do sol re la mi si</b>，每一个都比前一个高纯五度。</li>
+    <li><b>降号</b>：B E A D G C F，唱名是 <b>si mi la re sol do fa</b>，正好是升号顺序<b>倒过来</b>。</li>
+    <li>英文口诀：<i>Father Charles Goes Down And Ends Battle</i>（反过来读就是降号）。</li>
+  </ul>
+  <p>所以有 2 个升号的调，一定是 F♯ 和 C♯；有 3 个降号的调，一定是 B♭、E♭ 和 A♭。</p>
+</div>
+
+<h3>根据调号认调</h3>
+<ol class="steps">
+  <li><b>没有升降号</b>：C 大调（或 a 小调）。</li>
+  <li><b>升号调</b>：找到<b>最后一个升号</b>，往上走一个小二度（上方相邻的音名），就是大调主音。例如两个升号 F♯、C♯，最后一个是 C♯，往上小二度是 D → <b>D 大调</b>。</li>
+  <li><b>降号调</b>：<b>倒数第二个降号</b>就是大调主音。例如三个降号 B♭、E♭、A♭，倒数第二个是 E♭ → <b>E♭ 大调</b>。只有一个降号时没有"倒数第二个"，记住它是 <b>F 大调</b>。</li>
+  <li><b>小调</b>：先认出大调，再往下数小三度，就是同一调号的关系小调。至于一首曲子到底是大调还是小调，要看它的结束音，以及是否频繁出现升高的第 7 级（比如 a 小调里的 G♯）。</li>
+</ol>
+
+<div class="ksig-grid">
+  <div class="card"><div data-staff="[G4 B4 D5]:w" data-key="G"></div><div class="kname">G 大调 / e 小调</div><div class="kcount">1 个升号</div></div>
+  <div class="card"><div data-staff="[D4 F#4 A4]:w" data-key="D"></div><div class="kname">D 大调 / b 小调</div><div class="kcount">2 个升号</div></div>
+  <div class="card"><div data-staff="[A4 C#5 E5]:w" data-key="A"></div><div class="kname">A 大调 / f♯ 小调</div><div class="kcount">3 个升号</div></div>
+  <div class="card"><div data-staff="[E4 G#4 B4]:w" data-key="E"></div><div class="kname">E 大调 / c♯ 小调</div><div class="kcount">4 个升号</div></div>
+  <div class="card"><div data-staff="[F4 A4 C5]:w" data-key="F"></div><div class="kname">F 大调 / d 小调</div><div class="kcount">1 个降号</div></div>
+  <div class="card"><div data-staff="[Bb4 D5 F5]:w" data-key="Bb"></div><div class="kname">B♭ 大调 / g 小调</div><div class="kcount">2 个降号</div></div>
+  <div class="card"><div data-staff="[Eb4 G4 Bb4]:w" data-key="Eb"></div><div class="kname">E♭ 大调 / c 小调</div><div class="kcount">3 个降号</div></div>
+  <div class="card"><div data-staff="[Ab4 C5 Eb5]:w" data-key="Ab"></div><div class="kname">A♭ 大调 / f 小调</div><div class="kcount">4 个降号</div></div>
+</div>
+<p class="small muted center">每张卡片上的和弦是该大调的主和弦（1、3、5 级），点击就能听。注意和弦里的升降号都已经包含在调号中了。</p>
+
+<details class="fold">
+  <summary>展开：全部 15 个大调的调号总表</summary>
+  <div class="fold-body">
+  <div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>升降号</th><th>大调</th><th>关系小调</th><th>调号里的音</th></tr></thead>
+    <tbody>
+      <tr><td>无</td><td>C</td><td>a</td><td>—</td></tr>
+      <tr><td>1 ♯</td><td>G</td><td>e</td><td>F♯</td></tr>
+      <tr><td>2 ♯</td><td>D</td><td>b</td><td>F♯ C♯</td></tr>
+      <tr><td>3 ♯</td><td>A</td><td>f♯</td><td>F♯ C♯ G♯</td></tr>
+      <tr><td>4 ♯</td><td>E</td><td>c♯</td><td>F♯ C♯ G♯ D♯</td></tr>
+      <tr><td>5 ♯</td><td>B</td><td>g♯</td><td>F♯ C♯ G♯ D♯ A♯</td></tr>
+      <tr><td>6 ♯</td><td>F♯</td><td>d♯</td><td>F♯ C♯ G♯ D♯ A♯ E♯</td></tr>
+      <tr><td>7 ♯</td><td>C♯</td><td>a♯</td><td>F♯ C♯ G♯ D♯ A♯ E♯ B♯</td></tr>
+      <tr><td>1 ♭</td><td>F</td><td>d</td><td>B♭</td></tr>
+      <tr><td>2 ♭</td><td>B♭</td><td>g</td><td>B♭ E♭</td></tr>
+      <tr><td>3 ♭</td><td>E♭</td><td>c</td><td>B♭ E♭ A♭</td></tr>
+      <tr><td>4 ♭</td><td>A♭</td><td>f</td><td>B♭ E♭ A♭ D♭</td></tr>
+      <tr><td>5 ♭</td><td>D♭</td><td>b♭</td><td>B♭ E♭ A♭ D♭ G♭</td></tr>
+      <tr><td>6 ♭</td><td>G♭</td><td>e♭</td><td>B♭ E♭ A♭ D♭ G♭ C♭</td></tr>
+      <tr><td>7 ♭</td><td>C♭</td><td>a♭</td><td>B♭ E♭ A♭ D♭ G♭ C♭ F♭</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="small muted">F♯ 大调和 G♭ 大调、C♯ 大调和 D♭ 大调、B 大调和 C♭ 大调，在钢琴上弹的是同样的键，叫作<b>等音调</b>。</p>
+  </div>
+</details>
+
+<h3>小游戏：看调号，猜大调</h3>
+<div class="figure keygame" id="keygame">
+  <div class="kg-staff"></div>
+  <p style="margin:6px 0 4px"><b>这个调号表示哪个大调？</b></p>
+  <div class="btn-row kg-opts"></div>
+  <div class="feedback kg-fb"></div>
+  <div class="btn-row" style="justify-content:center;margin-bottom:0"><button class="btn btn-sm btn-primary kg-next" type="button">换一题 →</button><span class="small muted kg-score"></span></div>
+</div>
+</section>
+
+<section>
+<h2 id="s6-6">6.6 五度圈</h2>
+<p>把上一节的调号排排队，会发现一个美妙的规律：从 C 大调出发，<b>每往上走一个纯五度，调号就多一个升号</b>：C（0）→ G（1♯）→ D（2♯）→ A（3♯）→ E（4♯）……反过来，<b>每往下走一个纯五度（也就是往上走一个纯四度），就多一个降号</b>：C → F（1♭）→ B♭（2♭）→ E♭（3♭）……</p>
+<p>把这 12 个调排成一个圆，就是乐手们最爱的"地图"——<span class="term">五度圈</span><span class="en">Circle of Fifths</span>。点击圆上的任意一个调试试：</p>
+
+<div class="figure">
+  <div class="cof-wrap">
+    <svg class="cof-svg" id="cof-svg" viewBox="0 0 360 360" role="img" aria-label="五度圈"></svg>
+    <div class="cof-info" id="cof-info"></div>
+  </div>
+  <div class="caption">外圈：大调；内圈：关系小调；小字：调号中升降号的个数。顺时针每一步升高纯五度，逆时针每一步降低纯五度。</div>
+</div>
+
+<h3>五度圈能帮我们做什么？</h3>
+<ul>
+  <li><b>记调号</b>：顺时针数第几格就有几个升号，逆时针数第几格就有几个降号。</li>
+  <li><b>找关系小调</b>：同一格的内圈就是。</li>
+  <li><b>找"邻居调"</b>：相邻的两个调只差一个升降号，大部分音都相同，转调时最顺耳，叫<span class="term">近关系调</span>。圆上离得越远，两个调的差别就越大。</li>
+  <li><b>理解和弦进行</b>：一个大调的 I、IV、V 三个最重要的和弦，正好是五度圈上相邻的三格（比如 C 大调的 C、F、G）。第 8 章会用到这个规律。</li>
+</ul>
+<div class="callout tip">
+  <div class="callout-title">再多一个小秘密</div>
+  <p>顺时针每多出来的那个升号，正好是新调的<b>第 7 级（导音）</b>：G 大调新增 F♯，D 大调新增 C♯……逆时针每多出来的那个降号，正好是新调的<b>第 4 级</b>：F 大调新增 B♭，B♭ 大调新增 E♭……这就是 6.5 节认调方法背后的道理。</p>
+</div>
+<p>想更深入地玩五度圈，可以打开完整的 <a href="../tools/circle-of-fifths.html">⭕ 五度圈工具</a>，里面还能查看每个调的全部调内和弦。</p>
+<div class="launch-row"><span class="lr-label">在五度圈上点一点：</span><button data-launch="circle" data-args="key=G">G 大调</button><button data-launch="circle" data-args="key=F">F 大调</button><button data-launch="circle" data-args="key=Em">E 小调</button><button data-launch="circle" data-args="key=Dm">D 小调</button></div>
+</section>
+
+<section>
+<h2 id="s6-7">6.7 五声音阶与中国调式</h2>
+<p>在中国传统音乐里，最常用的音阶只有 5 个音，叫<span class="term">五声音阶</span>。这五个音的古称是<b>宫、商、角、徵、羽</b>（读作 gōng、shāng、jué、zhǐ、yǔ）：</p>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>五声</th><th class="c">宫</th><th class="c">商</th><th class="c">角</th><th class="c">徵</th><th class="c">羽</th></tr></thead>
+  <tbody>
+    <tr><td>简谱（首调）</td><td class="c">1</td><td class="c">2</td><td class="c">3</td><td class="c">5</td><td class="c">6</td></tr>
+    <tr><td>唱名</td><td class="c">do</td><td class="c">re</td><td class="c">mi</td><td class="c">sol</td><td class="c">la</td></tr>
+    <tr><td>以 C 为宫</td><td class="c nn">C</td><td class="c nn">D</td><td class="c nn">E</td><td class="c nn">G</td><td class="c nn">A</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="figure">
+  <div id="kb-penta-c" data-keyboard="C4-B5" data-labels="name" data-highlight="C4 D4 E4 G4 A4 C5 D5 E5 G5 A5" data-badges="宫 商 角 徵 羽 宫 商 角 徵 羽"></div>
+  <div class="btn-row" style="justify-content:center;margin:0"><button data-play="C4 D4 E4 G4 A4 C5 D5 E5 G5 A5 C6" data-bpm="160" data-kb="#kb-penta-c">播放 C 宫五声音阶</button></div>
+</div>
+<p>和大调音阶比，五声音阶少了 <b>fa（4）</b>和 <b>si（7）</b>。这两个音恰好是大调里产生半音的地方（mi–fa、si–do），去掉它们，音阶里就<b>一个半音都没有</b>了，也没有三全音。所以五声音阶听起来特别柔和、开阔，怎么组合都不刺耳——这正是"中国风"旋律的秘密之一。</p>
+
+<h3>黑键就是五声音阶</h3>
+<p>钢琴上的 5 个黑键 F♯ G♯ A♯ C♯ D♯，恰好构成一个以 F♯ 为宫的五声音阶。所以<b>只弹黑键，随便怎么按都很好听</b>。点下面的按钮，让电脑在黑键上即兴一段（每次都不一样），你也可以直接在键盘上随意弹黑键：</p>
+<div class="figure">
+  <div id="kb-penta" data-keyboard="C4-B5" data-labels="c" data-highlight="F#4 G#4 A#4 C#5 D#5 F#5 G#5 A#5" data-badges="宫 商 角 徵 羽 宫 商 角"></div>
+  <div class="btn-row" style="justify-content:center;margin:0"><button class="btn btn-primary" type="button" id="penta-rand">🎲 来一段随机的黑键旋律</button></div>
+</div>
+
+<h3>一首五声音阶的名曲：《茉莉花》</h3>
+<p>江苏民歌《茉莉花》是世界上最有名的中国旋律之一（意大利作曲家普契尼还把它写进了歌剧《图兰朵》）。听听它的第一句，数一数用到了哪几个音：</p>
+<div class="figure">
+  <div data-jianpu="3 3_ 5_ | 6_ 1'_ 1'_ 6_ | 5 5_ 6_ | 5 - |]" data-key="F" data-time="2/4" data-bpm="66" data-lyrics="好 一 朵 美 丽 的 茉 莉 花 _ _"></div>
+  <div class="caption">这一句只用了 3、5、6、1 四个音，全部属于五声音阶。</div>
+</div>
+
+<h3>五种中国调式</h3>
+<p>同样的五个音，以不同的音作为"家"（主音），就得到五种调式：以宫为主音叫<b>宫调式</b>，以商为主音叫<b>商调式</b>……以此类推。下面都以 C 为宫：</p>
+<div class="table-wrap">
+<table class="table mode-table">
+  <thead><tr><th>调式</th><th>主音</th><th>音阶</th><th>听感</th><th class="c">试听</th></tr></thead>
+  <tbody>
+    <tr><td><b>宫调式</b></td><td>宫（1）</td><td class="nn">C D E G A C</td><td>明亮，接近大调</td><td class="c"><button class="play-btn sm" data-play="C4 D4 E4 G4 A4 C5" data-bpm="150">听</button></td></tr>
+    <tr><td><b>商调式</b></td><td>商（2）</td><td class="nn">D E G A C D</td><td>介于明暗之间</td><td class="c"><button class="play-btn sm" data-play="D4 E4 G4 A4 C5 D5" data-bpm="150">听</button></td></tr>
+    <tr><td><b>角调式</b></td><td>角（3）</td><td class="nn">E G A C D E</td><td>较暗，略带忧郁</td><td class="c"><button class="play-btn sm" data-play="E4 G4 A4 C5 D5 E5" data-bpm="150">听</button></td></tr>
+    <tr><td><b>徵调式</b></td><td>徵（5）</td><td class="nn">G A C D E G</td><td>明朗、舒展，民歌中常见</td><td class="c"><button class="play-btn sm" data-play="G4 A4 C5 D5 E5 G5" data-bpm="150">听</button></td></tr>
+    <tr><td><b>羽调式</b></td><td>羽（6）</td><td class="nn">A C D E G A</td><td>柔和、深沉，接近小调</td><td class="c"><button class="play-btn sm" data-play="A3 C4 D4 E4 G4 A4" data-bpm="150">听</button></td></tr>
+  </tbody>
+</table>
+</div>
+<div class="callout note">
+  <div class="callout-title">世界各地都有五声音阶</div>
+  <p>五声音阶并不是中国独有的。苏格兰民歌《友谊地久天长》、美国圣歌《奇异恩典》（Amazing Grace）的旋律也都只用了这五个音。在流行、摇滚和布鲁斯里，吉他手最常用来即兴的就是"大调五声"（相当于宫调式）和"小调五声"（相当于羽调式）。</p>
+</div>
+
+<details class="fold">
+  <summary>延伸：西方的七种"教会调式"（点击展开试听）</summary>
+  <div class="fold-body">
+    <p>和五种中国调式的思路一样：只用 C 大调的 7 个白键，但从不同的键开始、以它为"家"，就得到七种调式。它们在中世纪的教堂音乐里被系统使用，所以叫<b>教会调式</b>。今天在爵士、电影配乐和摇滚里依然很常见。</p>
+    <div class="table-wrap">
+    <table class="table mode-table">
+      <thead><tr><th>调式</th><th>起始白键</th><th>听感</th><th class="c">试听</th></tr></thead>
+      <tbody>
+        <tr><td>伊奥尼亚 <span class="en">Ionian</span></td><td>C</td><td>就是大调</td><td class="c"><button class="play-btn sm" data-play="C4 D4 E4 F4 G4 A4 B4 C5" data-bpm="170">听</button></td></tr>
+        <tr><td>多利亚 <span class="en">Dorian</span></td><td>D</td><td>小调色彩，但第 6 级明亮</td><td class="c"><button class="play-btn sm" data-play="D4 E4 F4 G4 A4 B4 C5 D5" data-bpm="170">听</button></td></tr>
+        <tr><td>弗里几亚 <span class="en">Phrygian</span></td><td>E</td><td>西班牙、弗拉门戈风味</td><td class="c"><button class="play-btn sm" data-play="E4 F4 G4 A4 B4 C5 D5 E5" data-bpm="170">听</button></td></tr>
+        <tr><td>利底亚 <span class="en">Lydian</span></td><td>F</td><td>梦幻、飘浮</td><td class="c"><button class="play-btn sm" data-play="F4 G4 A4 B4 C5 D5 E5 F5" data-bpm="170">听</button></td></tr>
+        <tr><td>混合利底亚 <span class="en">Mixolydian</span></td><td>G</td><td>大调色彩，带一点摇滚、布鲁斯味</td><td class="c"><button class="play-btn sm" data-play="G4 A4 B4 C5 D5 E5 F5 G5" data-bpm="170">听</button></td></tr>
+        <tr><td>爱奥利亚 <span class="en">Aeolian</span></td><td>A</td><td>就是自然小调</td><td class="c"><button class="play-btn sm" data-play="A3 B3 C4 D4 E4 F4 G4 A4" data-bpm="170">听</button></td></tr>
+        <tr><td>洛克里亚 <span class="en">Locrian</span></td><td>B</td><td>极不稳定，很少单独使用</td><td class="c"><button class="play-btn sm" data-play="B3 C4 D4 E4 F4 G4 A4 B4" data-bpm="170">听</button></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="small muted">单独听音阶时，调式之间的差别不算明显；在 <a href="../tools/chord-scale.html">📖 和弦与音阶词典</a>里可以把它们移到任意主音上对比。</p>
+  </div>
+</details>
+<div class="launch-row"><span class="lr-label">听听五声音阶：</span><button data-launch="dictionary" data-args="scale=C:majorPentatonic">C 大调五声</button><button data-launch="dictionary" data-args="scale=A:minorPentatonic">A 小调五声</button></div>
+</section>
+
+<section>
+<h2 id="s6-8">6.8 首调唱名与固定调唱名</h2>
+<p>学到这里，你可能会有个疑问：在 G 大调里，G 应该唱成 "sol" 还是 "do"？这要看你用的是哪种唱名法——两种都有人用，而且在中国都很常见：</p>
+<ul>
+  <li><span class="term">固定调唱名</span>：do 永远是 C，re 永远是 D……不管什么调都不变。G 大调音阶唱作 sol la si do re mi <b>♯fa</b> sol。</li>
+  <li><span class="term">首调唱名</span>：do 永远是<b>当前调的主音</b>。G 大调里 G 就唱 do，音阶唱作 do re mi fa sol la si do。<b>简谱用的就是首调</b>：谱子开头写着"1=G"，意思是"把 G 当作 1（do）"。</li>
+</ul>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>G 大调音阶</th><th>G</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F♯</th><th>G</th></tr></thead>
+  <tbody>
+    <tr><td><b>首调唱名</b></td><td>do</td><td>re</td><td>mi</td><td>fa</td><td>sol</td><td>la</td><td>si</td><td>do</td></tr>
+    <tr><td><b>简谱（1=G）</b></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>1̇</td></tr>
+    <tr><td><b>固定调唱名</b></td><td>sol</td><td>la</td><td>si</td><td>do</td><td>re</td><td>mi</td><td>♯fa</td><td>sol</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>首调的好处是：<b>同一首歌在任何调里都"写得一样、唱得一样"</b>。比如下面两段简谱完全相同，只是"1="不同，弹出来就整体高低不同：</p>
+<div class="figure">
+  <div data-jianpu="1 1 5 5 | 6 6 5 - | 4 4 3 3 | 2 2 1 - |]" data-key="C" data-time="4/4" data-bpm="112" data-caption="1=C：1 唱作 do，弹的是 C"></div>
+  <div data-jianpu="1 1 5 5 | 6 6 5 - | 4 4 3 3 | 2 2 1 - |]" data-key="G" data-time="4/4" data-bpm="112" data-caption="1=G：同样的谱子，1 仍唱作 do，但弹的是 G——整体升高了"></div>
+</div>
+<p>这种"整体平移到另一个调"的操作叫<span class="term">移调</span>。用首调思考，移调只需要改一下"1="；用固定调，每个音的名字都得重新算。</p>
+
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th></th><th>首调（movable do）</th><th>固定调（fixed do）</th></tr></thead>
+  <tbody>
+    <tr><td><b>do 是谁</b></td><td>当前调的主音</td><td>永远是 C</td></tr>
+    <tr><td><b>优点</b></td><td>直接反映每个音在调里的"角色"，视唱、移调、扒歌都方便</td><td>和五线谱、乐器上的位置一一对应，读谱直接</td></tr>
+    <tr><td><b>常见场景</b></td><td>简谱、合唱、流行音乐、中小学音乐课</td><td>钢琴、小提琴等器乐的专业训练</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="callout tip">
+  <div class="callout-title">给新手的建议</div>
+  <p>两种都值得了解：<b>用固定调认五线谱上的音</b>（C 就是 C），<b>用首调理解音乐</b>（主音是 1、属音是 5）。本教程讲音名时用固定的 C D E，讲音阶级数、简谱和和弦功能时用首调的 1 2 3——你已经在不知不觉中同时用上它们了。</p>
+</div>
+</section>
+
+<section>
+<h2 id="s6-summary">本章小结</h2>
+<div class="callout summary">
+  <div class="callout-title">要点回顾</div>
+  <ul>
+    <li><b>音阶</b>是按高低排列的一组音；第一个音叫<b>主音</b>，是音乐的"家"；<b>调</b> = 主音 + 音阶类型。</li>
+    <li>音阶的级：主音 I、属音 V、下属音 IV、导音 VII 最重要；导音离主音半音，强烈地想"回家"。</li>
+    <li><b>大调</b>：全全半全全全半。每个字母只用一次，需要的地方加升降号（G 大调有 F♯，F 大调有 B♭）。</li>
+    <li><b>自然小调</b>：全半全全半全全（= 大调降低 3、6、7 级）；<b>和声小调</b>升高第 7 级；<b>旋律小调</b>上行升高 6、7 级、下行还原。</li>
+    <li><b>关系大小调</b>共用一套音和调号，小调主音在大调主音下方小三度；<b>同主音大小调</b>主音相同、调号不同。</li>
+    <li><b>调号</b>：升号顺序 F C G D A E B，降号顺序 B E A D G C F；最后一个升号上方小二度 / 倒数第二个降号 = 大调主音。</li>
+    <li><b>五度圈</b>：顺时针每走一步升纯五度、多一个升号，逆时针多一个降号；相邻调是近关系调。</li>
+    <li><b>五声音阶</b>：宫商角徵羽 = 1 2 3 5 6，没有半音；黑键就是五声音阶。</li>
+    <li><b>首调</b>：do = 主音（简谱"1=G"）；<b>固定调</b>：do = C。</li>
+  </ul>
+</div>
+
+<h3>小测验</h3>
+<div class="quiz-set">
+  <div class="quiz" data-answer="1">
+    <p class="quiz-q">大调音阶相邻各音之间的全音、半音排列是？</p>
+    <ol class="quiz-opts"><li>全全半全全全半</li><li>全半全全半全全</li><li>全全全半全全半</li><li>半全全全半全全</li></ol>
+    <div class="quiz-explain">大调是<b>全全半全全全半</b>；第二个选项"全半全全半全全"是自然小调。</div>
+  </div>
+  <div class="quiz" data-answer="2">
+    <p class="quiz-q">一段乐谱的调号是两个升号（F♯、C♯），它是什么大调？</p>
+    <ol class="quiz-opts"><li>C♯ 大调</li><li>D 大调</li><li>G 大调</li><li>A 大调</li></ol>
+    <div class="quiz-explain">最后一个升号是 C♯，往上小二度是 D，所以是 <b>D 大调</b>（它的关系小调是 b 小调）。G 大调只有 1 个升号，A 大调有 3 个。</div>
+  </div>
+  <div class="quiz" data-answer="1">
+    <p class="quiz-q">G 大调的关系小调是？</p>
+    <ol class="quiz-opts"><li>e 小调</li><li>g 小调</li><li>d 小调</li></ol>
+    <div class="quiz-explain">从 G 往下数小三度是 E（也就是 G 大调的第 6 级），所以是 <b>e 小调</b>，两者都有 1 个升号 F♯。g 小调是 G 大调的同主音小调。</div>
+  </div>
+  <div class="quiz" data-answer="2">
+    <p class="quiz-q">听一听：<button data-play="C4 D4 Eb4 F4 G4 Ab4 Bb4 C5" data-bpm="130">播放一条音阶</button> 这是哪种音阶？</p>
+    <ol class="quiz-opts"><li>大调音阶</li><li>自然小调音阶</li><li>五声音阶</li></ol>
+    <div class="quiz-explain">这是 c <b>自然小调</b>：C D E♭ F G A♭ B♭ C，一共 7 个不同的音（五声音阶只有 5 个），第 3、6、7 级比 C 大调低了半音，听起来更暗、更柔和。</div>
+  </div>
+  <div class="quiz" data-answer="2">
+    <p class="quiz-q">中国五声音阶"宫商角徵羽"对应简谱的哪几个音？</p>
+    <ol class="quiz-opts"><li>1 2 3 4 5</li><li>1 2 3 5 6</li><li>1 3 4 5 6</li><li>2 3 5 6 7</li></ol>
+    <div class="quiz-explain">宫商角徵羽 = <b>1 2 3 5 6</b>（do re mi sol la），去掉了会产生半音的 4 和 7。</div>
+  </div>
+  <div class="quiz" data-answer="2">
+    <p class="quiz-q">简谱开头写着"1=G"，那么谱中的"3"应该弹哪个音？</p>
+    <ol class="quiz-opts"><li>E</li><li>B</li><li>G</li></ol>
+    <div class="quiz-explain">首调唱名中 1 = G，所以 2 = A，<b>3 = B</b>。如果按固定调把 3 当成 E，就弹错了。</div>
+  </div>
+</div>
+
+<div class="callout tip">
+  <div class="callout-title">课后练一练</div>
+  <p>① 打开 <a href="../tools/chord-scale.html">📖 和弦与音阶词典</a>的"音阶"页，把 G、D、F、B♭ 大调和它们的关系小调都弹一遍；② 在 <a href="../tools/circle-of-fifths.html">⭕ 五度圈</a>上顺时针、逆时针各走一圈，边走边说出每个调的升降号个数；③ 在 <a href="../tools/piano.html">🎹 在线钢琴</a>上只用黑键，即兴一段属于你自己的"中国风"旋律。</p>
+</div>
+</section>
+
+</article>
+</main>
+
+<script src="../assets/js/theory.js"></script>
+<script src="../assets/js/audio.js"></script>
+<script src="../assets/js/keyboard.js"></script>
+<script src="../assets/js/staff.js"></script>
+<script src="../assets/js/jianpu.js"></script>
+<script src="../assets/js/site.js"></script>
+<script src="../assets/js/services.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script>
+(function () {
+  var TYPE_LABEL = { major: '大调', naturalMinor: '自然小调', harmonicMinor: '和声小调', melodicMinor: '旋律小调' };
+  var MAJOR_ROOTS = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb'];
+  var MINOR_ROOTS = ['A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'D', 'G', 'C', 'F', 'Bb', 'Eb', 'Ab'];
+
+  function ascii(n) { return MT.noteName(n, { ascii: true }); }
+  function stepInfo(semis) {
+    if (semis === 1) return { t: '半', c: 'half' };
+    if (semis === 2) return { t: '全', c: 'whole' };
+    if (semis === 3) return { t: '全+半', c: 'aug' };
+    return { t: semis + ' 个半音', c: 'aug' };
+  }
+  function renderStrip(el, notes) {
+    var h = '';
+    notes.forEach(function (n, i) {
+      if (i > 0) { var s = stepInfo(Math.abs(n.midi - notes[i - 1].midi)); h += '<span class="st ' + s.c + '">' + s.t + '</span>'; }
+      h += '<span class="sn' + (n.acc ? ' alt' : '') + '">' + MT.pcName(n) + '<small>' + (i % 7 + 1) + '</small></span>';
+    });
+    el.innerHTML = h;
+  }
+  function sigText(ks) {
+    if (!ks.count) return '没有升降号';
+    return Math.abs(ks.count) + ' 个' + (ks.count > 0 ? '升号' : '降号') + '（' + ks.names.join(' ') + '）';
+  }
+
+  /* ---- 静态的全/半音标注条 ---- */
+  document.querySelectorAll('[data-strip]').forEach(function (el) { renderStrip(el, MT.parseNotes(el.getAttribute('data-strip'))); });
+
+  /* ---- 音阶构建器 ---- */
+  function makeBuilder(box, types, defRoot) {
+    var rootSel = box.querySelector('.sb-root'), seg = box.querySelector('.sb-type');
+    var strip = box.querySelector('.sb-strip'), staffEl = box.querySelector('.sb-staff'), cap = box.querySelector('.sb-caption');
+    var state = { type: types[0], root: defRoot };
+    var kb = new PianoKeyboard(box.querySelector('.sb-kb'), { start: 'B3', end: 'B5', labels: 'c', size: 'compact' });
+    seg.innerHTML = types.map(function (t) { return '<button type="button" data-t="' + t + '">' + TYPE_LABEL[t] + '</button>'; }).join('');
+    if (types.length < 2) seg.closest('.control').style.display = 'none';
+    function fillRoots() {
+      var list = state.type === 'major' ? MAJOR_ROOTS : MINOR_ROOTS;
+      rootSel.innerHTML = list.map(function (r) { return '<option value="' + r + '">' + MT.pretty(r) + '</option>'; }).join('');
+      if (list.indexOf(state.root) < 0) state.root = list[0];
+      rootSel.value = state.root;
+    }
+    function update() {
+      seg.querySelectorAll('button').forEach(function (b) { b.classList.toggle('active', b.dataset.t === state.type); });
+      var up = MT.scale(state.root + '4', state.type);
+      var down = MT.scale(state.root + '4', state.type === 'melodicMinor' ? 'naturalMinor' : state.type).reverse();
+      renderStrip(strip, up);
+      kb.clearHighlight();
+      kb.setHighlight(up.map(function (n) { return n.midi; }), { cls: 'hl', badges: up.map(function (n, i) { return String(i % 7 + 1); }) });
+      var upStr = up.map(function (n) { return ascii(n) + ':q'; }).join(' ');
+      var downStr = down.map(function (n) {
+        var same = up.filter(function (u) { return u.letter === n.letter && u.octave === n.octave; })[0];
+        if (same && same.acc !== n.acc && n.acc === 0) return n.letter + 'n' + n.octave;
+        return ascii(n);
+      }).join(' ');
+      Staff.render(staffEl, {
+        notes: upStr + ' | ' + downStr + ' |]', spacing: 'even', noteSpace: 30, names: 'name', bpm: 160,
+        onSlot: function (slot) { var ev = slot.evs[0]; if (ev && !ev.rest) ev.notes.forEach(function (n) { kb.flash(n.midi, 300); }); }
+      });
+      var ks = MT.keySignature(state.root + (state.type === 'major' ? '' : 'm'));
+      var txt = '<b>' + MT.pretty(state.root) + ' ' + TYPE_LABEL[state.type] + '</b>：' + up.map(function (n) { return MT.pcName(n); }).join(' ') + '。';
+      if (state.type === 'major' || state.type === 'naturalMinor') txt += '调号：' + sigText(ks) + '。';
+      else txt += '调号与 ' + MT.pretty(state.root) + ' 自然小调相同——' + sigText(ks) + '；' + (state.type === 'harmonicMinor' ? '再临时升高第 7 级。' : '上行时临时升高第 6、7 级，下行还原。');
+      cap.innerHTML = txt;
+    }
+    rootSel.addEventListener('change', function () { state.root = rootSel.value; update(); });
+    seg.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-t]');
+      if (!b) return;
+      state.type = b.dataset.t; fillRoots(); update();
+    });
+    fillRoots(); update();
+  }
+  document.querySelectorAll('.scale-builder').forEach(function (box) {
+    makeBuilder(box, box.getAttribute('data-types').split(','), box.getAttribute('data-root'));
+  });
+
+  /* ---- 调号小游戏 ---- */
+  var game = document.getElementById('keygame');
+  if (game) {
+    var POOL = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'];
+    var gStaff = game.querySelector('.kg-staff'), gOpts = game.querySelector('.kg-opts'), gFb = game.querySelector('.kg-fb'), gScore = game.querySelector('.kg-score');
+    var cur = null, answered = false, right = 0, total = 0;
+    var nextQ = function () {
+      var k;
+      do { k = MT.pick(POOL); } while (k === cur);
+      cur = k; answered = false;
+      Staff.render(gStaff, { notes: '', key: k, playable: false, scale: 1.45 });
+      var opts = [k];
+      while (opts.length < 4) { var o = MT.pick(POOL); if (opts.indexOf(o) < 0) opts.push(o); }
+      gOpts.innerHTML = MT.shuffle(opts).map(function (o) { return '<button class="btn" type="button" data-k="' + o + '">' + MT.pretty(o) + ' 大调</button>'; }).join('');
+      gFb.textContent = ''; gFb.className = 'feedback kg-fb';
+    };
+    gOpts.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-k]');
+      if (!b || answered) return;
+      answered = true; total++;
+      var ks = MT.keySignature(cur);
+      var tri = MT.chord(cur + '4', 'maj').map(function (n) { return n.midi; });
+      var ok = b.dataset.k === cur;
+      gOpts.querySelectorAll('button').forEach(function (x) {
+        if (x.dataset.k === cur) x.classList.add('right');
+        x.disabled = true;
+      });
+      var hint;
+      if (ks.count > 0) hint = '最后一个升号是 ' + ks.names[ks.names.length - 1] + '，往上小二度就是 ' + MT.pretty(cur) + '。';
+      else if (ks.count < -1) hint = '倒数第二个降号是 ' + ks.names[ks.names.length - 2] + '，它就是主音。';
+      else if (ks.count === -1) hint = '只有一个降号（B♭）的是 F 大调，要单独记住。';
+      else hint = '没有升降号的是 C 大调。';
+      if (ok) { right++; b.classList.add('right'); gFb.className = 'feedback kg-fb ok'; gFb.textContent = '✅ 答对了！' + MT.pretty(cur) + ' 大调：' + sigText(ks) + '。'; }
+      else { b.classList.add('wrong'); gFb.className = 'feedback kg-fb bad'; gFb.textContent = '❌ 是 ' + MT.pretty(cur) + ' 大调。' + hint; }
+      Sound.playChord(tri, { duration: 1.6 });
+      gScore.textContent = '已答 ' + total + ' 题，答对 ' + right + ' 题';
+    });
+    game.querySelector('.kg-next').addEventListener('click', nextQ);
+    nextQ();
+  }
+
+  /* ---- 五度圈 ---- */
+  var svg = document.getElementById('cof-svg'), info = document.getElementById('cof-info');
+  if (svg) {
+    var CX = 180, CY = 180, R1 = 176, R2 = 124, R3 = 80;
+    var pt = function (r, deg) { var a = deg * Math.PI / 180; return [(CX + r * Math.cos(a)).toFixed(2), (CY + r * Math.sin(a)).toFixed(2)]; };
+    var sector = function (r1, r2, a1, a2) {
+      var p1 = pt(r2, a1), p2 = pt(r2, a2), p3 = pt(r1, a2), p4 = pt(r1, a1);
+      return 'M' + p1.join(' ') + 'A' + r2 + ' ' + r2 + ' 0 0 1 ' + p2.join(' ') + 'L' + p3.join(' ') + 'A' + r1 + ' ' + r1 + ' 0 0 0 ' + p4.join(' ') + 'Z';
+    };
+    var cnt = function (c) { return c > 0 ? c + '♯' : c < 0 ? (-c) + '♭' : '0'; };
+    var minorName = function (m) { return MT.pretty(m).toLowerCase(); };
+    var h = '';
+    MT.CIRCLE.forEach(function (k, i) {
+      var a1 = -105 + i * 30, a2 = a1 + 30, am = a1 + 15;
+      var majL = MT.pretty(k.major) + (k.enharmonic ? '/' + MT.pretty(k.enharmonic.major) : '');
+      var minL = minorName(k.minor) + (k.enharmonic ? '/' + minorName(k.enharmonic.minor) : '');
+      var cntL = cnt(k.count) + (k.enharmonic ? '/' + cnt(k.enharmonic.count) : '');
+      var pM = pt(156, am), pC = pt(134, am), pm = pt(102, am);
+      h += '<g class="cof-seg" data-i="' + i + '" tabindex="0" role="button" aria-label="' + majL + ' 大调">' +
+        '<path class="maj" d="' + sector(R2, R1, a1, a2) + '"/>' +
+        '<path class="min" d="' + sector(R3, R2, a1, a2) + '"/>' +
+        '<text class="cof-t-maj" x="' + pM[0] + '" y="' + pM[1] + '" text-anchor="middle" dominant-baseline="central" fill="currentColor">' + majL + '</text>' +
+        '<text class="cof-t-cnt" x="' + pC[0] + '" y="' + pC[1] + '" text-anchor="middle" dominant-baseline="central" fill="currentColor">' + cntL + '</text>' +
+        '<text class="cof-t-min" x="' + pm[0] + '" y="' + pm[1] + '" text-anchor="middle" dominant-baseline="central" fill="currentColor">' + minL + '</text></g>';
+    });
+    h += '<circle class="cof-center" cx="' + CX + '" cy="' + CY + '" r="' + (R3 - 3) + '"/>';
+    h += '<text class="cof-c1" x="' + CX + '" y="' + (CY - 8) + '" text-anchor="middle" fill="currentColor">五度圈</text>';
+    h += '<text class="cof-c2" x="' + CX + '" y="' + (CY + 16) + '" text-anchor="middle" fill="currentColor">点击一个调</text>';
+    svg.innerHTML = h;
+    var c1 = svg.querySelector('.cof-c1'), c2 = svg.querySelector('.cof-c2');
+
+    var select = function (i, play) {
+      var k = MT.CIRCLE[i];
+      svg.querySelectorAll('.cof-seg').forEach(function (g) {
+        var j = +g.dataset.i;
+        g.classList.toggle('active', j === i);
+        g.classList.toggle('near', j === (i + 1) % 12 || j === (i + 11) % 12);
+      });
+      var ks = MT.keySignature(k.major);
+      var spell = function (c) {
+        // 邻居调的拼法与当前调保持同一侧（升号调用升号拼法，降号调用降号拼法）
+        if (c.enharmonic && ((k.count < 0 && c.count > 0) || (k.count > 0 && c.count < 0))) return c.enharmonic.major;
+        return c.major;
+      };
+      var dom = spell(MT.CIRCLE[(i + 1) % 12]), sub = spell(MT.CIRCLE[(i + 11) % 12]);
+      c1.textContent = MT.pretty(k.major) + ' 大调';
+      c2.textContent = minorName(k.minor) + ' 小调';
+      var tri = MT.chord(k.major + '4', 'maj');
+      info.innerHTML =
+        '<h4>' + MT.pretty(k.major) + ' 大调 · ' + minorName(k.minor) + ' 小调</h4>' +
+        '<p>调号：<b>' + sigText(ks) + '</b></p>' +
+        '<p>音阶：<b>' + MT.scale(k.major + '4', 'major').slice(0, 7).map(function (n) { return MT.pcName(n); }).join(' ') + '</b></p>' +
+        '<p>属调（顺时针邻居）：<b>' + MT.pretty(dom) + ' 大调</b>；下属调（逆时针邻居）：<b>' + MT.pretty(sub) + ' 大调</b></p>' +
+        (k.enharmonic ? '<p class="small">等音调：' + MT.pretty(k.enharmonic.major) + ' 大调，有 ' + Math.abs(k.enharmonic.count) + ' 个' + (k.enharmonic.count > 0 ? '升号' : '降号') + '，弹的是同样的键。</p>' : '') +
+        '<div class="cof-staff"></div>' +
+        '<div class="btn-row" style="margin:6px 0 0"><button class="btn btn-sm cof-scale" type="button">▶ 音阶</button><button class="btn btn-sm cof-prog" type="button">▶ I–IV–V–I</button></div>';
+      Staff.render(info.querySelector('.cof-staff'), { notes: '[' + tri.map(ascii).join(' ') + ']:w', key: k.major, playable: false });
+      info.querySelector('.cof-scale').addEventListener('click', function () {
+        var sc = MT.scale(k.major + '4', 'major');
+        Sound.playSequence(sc.map(function (n) { return { notes: [n.midi], beats: 1 }; }), { bpm: 170 });
+      });
+      info.querySelector('.cof-prog').addEventListener('click', function () {
+        var dc = MT.diatonicChords(k.major);
+        var seq = [dc[0], dc[3], dc[4], dc[0]].map(function (c, idx) {
+          var notes = c.notes.map(function (n) { return n.midi; });
+          var bass = notes[0] - 12;
+          return { notes: [bass].concat(notes), beats: idx === 3 ? 4 : 2 };
+        });
+        Sound.playSequence(seq, { bpm: 100 });
+      });
+      if (play) Sound.playChord(tri.map(function (n) { return n.midi; }), { duration: 1.6 });
+    };
+    svg.addEventListener('click', function (e) { var g = e.target.closest('.cof-seg'); if (g) select(+g.dataset.i, true); });
+    svg.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      var g = e.target.closest('.cof-seg'); if (!g) return;
+      e.preventDefault(); select(+g.dataset.i, true);
+    });
+    select(0, false);
+  }
+
+  /* ---- 黑键五声即兴 ---- */
+  var pBtn = document.getElementById('penta-rand');
+  if (pBtn) {
+    pBtn.addEventListener('click', function () {
+      var scale = ['F#4', 'G#4', 'A#4', 'C#5', 'D#5', 'F#5', 'G#5', 'A#5'];
+      var rhythms = [[1, 1, 0.5, 0.5, 1, 1, 1, 0.5, 0.5, 2], [0.5, 0.5, 1, 1, 1, 0.5, 0.5, 1, 1, 2], [1, 0.5, 0.5, 1, 1, 1, 1, 0.5, 0.5, 2]];
+      var rhythm = MT.pick(rhythms);
+      var idx = MT.pick([0, 2, 3, 5]);
+      var events = rhythm.map(function (b, i) {
+        if (i === rhythm.length - 1) idx = idx >= 4 ? 5 : 0;
+        else if (i > 0) idx = Math.max(0, Math.min(7, idx + MT.pick([-2, -1, -1, 1, 1, 2])));
+        return { notes: [scale[idx]], beats: b };
+      });
+      var box = document.getElementById('kb-penta');
+      var kb = box && box._kb;
+      var bpm = 112;
+      Sound.playSequence(events, {
+        bpm: bpm,
+        onEvent: function (ev) { if (kb) kb.flash(MT.toMidi(ev.notes[0]), ev.beats * 60000 / bpm * 0.85); }
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>

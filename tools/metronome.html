@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>节拍器 · 乐理入门</title>
+<meta name="description" content="精确的在线节拍器：任意拍号、重音设置、细分节奏、敲击测速、速度训练与静音小节训练。">
+<script>try{var t=localStorage.getItem('mt-theme');document.documentElement.setAttribute('data-theme',t?JSON.parse(t):(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))}catch(e){}</script>
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+  .metro-wrap { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  .metro-main { text-align: center; position: relative; overflow: hidden; transition: background-color .12s; }
+  .metro-main.flash { background-color: var(--accent-soft); }
+  .bpm-line { display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-top: 4px; }
+  .metro-main input.bpm-input {
+    width: 3.4em; border: 0; background: transparent; text-align: center; padding: 0; height: auto; border-radius: 12px;
+    font: 800 88px/1 var(--font-mono); color: var(--text); letter-spacing: -.03em; -moz-appearance: textfield;
+  }
+  .bpm-input::-webkit-outer-spin-button, .bpm-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .metro-main input.bpm-input:focus { outline: none; box-shadow: none; background: var(--bg-soft); }
+  .bpm-unit { font: 700 16px var(--font-mono); color: var(--text-3); }
+  .tempo-term { font-size: 15px; color: var(--text-2); margin: 6px 0 2px; min-height: 24px; }
+  .tempo-term b { color: var(--primary-ink); }
+  .note-unit { font-size: 13px; color: var(--text-3); }
+  .bpm-ctrl { display: flex; align-items: center; gap: 8px; margin: 16px auto 6px; max-width: 520px; }
+  .bpm-ctrl input[type="range"] { flex: 1; min-width: 0; }
+  .bpm-ctrl .btn { min-width: 46px; padding: 0 8px; }
+  .main-actions { display: flex; justify-content: center; gap: 12px; margin: 18px 0 8px; flex-wrap: wrap; }
+  .main-actions .btn-lg { min-width: 150px; }
+  .tap-btn.tapped { background: var(--accent-soft); border-color: var(--accent); }
+  .beats { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px 12px; margin: 22px auto 6px; max-width: 640px; }
+  .beat { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; user-select: none; background: none; border: 0; padding: 0; }
+  .beat .dot {
+    width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font: 800 15px var(--font-mono);
+    background: var(--bg-soft); border: 2px solid var(--border-strong); color: var(--text-2); transition: transform .06s, background .06s, box-shadow .06s;
+  }
+  .beat[data-acc="2"] .dot { border-color: var(--accent); color: var(--accent); border-width: 3px; }
+  .beat[data-acc="1"] .dot { border-color: var(--primary); color: var(--primary); }
+  .beat[data-acc="-1"] .dot { border-style: dashed; opacity: .55; }
+  .beat .acc-lbl { font-size: 11.5px; color: var(--text-3); font-weight: 600; }
+  .beat.on .dot { transform: scale(1.16); background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 0 0 6px var(--primary-soft); }
+  .beat.on[data-acc="2"] .dot { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 6px var(--accent-soft); }
+  .beat.on[data-acc="-1"] .dot { background: var(--bg-sunken); color: var(--text-3); box-shadow: none; }
+  .metro-main.muted .beat.on .dot { background: var(--bg-sunken); border-color: var(--border-strong); color: var(--text-3); box-shadow: none; }
+  .bar-info { font-size: 14px; color: var(--text-3); min-height: 22px; margin-top: 6px; }
+  .bar-info b { color: var(--text); font-family: var(--font-mono); }
+  .pendulum { width: 220px; height: 150px; margin: 12px auto 0; display: block; }
+  .pendulum .arm { transform-origin: 110px 140px; transition-property: transform; transition-timing-function: cubic-bezier(.45, 0, .55, 1); }
+  .pendulum .scale-arc { stroke: var(--border-strong); }
+  .mute-banner { display: none; margin-top: 10px; font-weight: 700; color: var(--accent); }
+  .metro-main.muted .mute-banner { display: block; }
+  .set-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 12px 0; }
+  .set-row > .lbl { font-weight: 650; font-size: 14px; color: var(--text-2); min-width: 64px; }
+  .stepper { display: inline-flex; align-items: center; gap: 6px; }
+  .stepper .val { min-width: 34px; text-align: center; font: 800 18px var(--font-mono); }
+  .presets { display: flex; flex-wrap: wrap; gap: 6px; }
+  .presets .btn { min-width: 52px; font-family: var(--font-mono); }
+  .practice-box { border-top: 1px dashed var(--border); margin-top: 14px; padding-top: 12px; }
+  .practice-box h4 { margin: 0 0 8px; font-size: 15px; display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+  .practice-box .fields { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 14px; color: var(--text-2); }
+  .practice-box input[type="number"] { width: 74px; }
+  .practice-box .status { font-size: 13.5px; color: var(--text-3); margin-top: 8px; min-height: 20px; }
+  .timer { font: 800 34px var(--font-mono); }
+  .kbd-table td:first-child { white-space: nowrap; font-weight: 600; }
+  @media (max-width: 960px) { .metro-wrap { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) {
+    .metro-main input.bpm-input { font-size: 68px; }
+    .beat .dot { width: 38px; height: 38px; }
+    .main-actions .btn-lg { min-width: 120px; }
+    .bpm-ctrl { gap: 6px; }
+    .bpm-ctrl .btn { min-width: 40px; padding: 0 6px; }
+  }
+</style>
+</head>
+<body data-page="metronome" data-root="..">
+<main class="page">
+<div class="content wide tool-page">
+
+  <div class="tool-header">
+    <div>
+      <h1><span class="tool-icon">⏱️</span>节拍器</h1>
+      <p>音乐的"心跳"。练琴、练唱、练节奏时用它保持稳定的速度。点击下方圆点可以设置每一拍的强弱。</p>
+    </div>
+  </div>
+
+  <div class="metro-wrap">
+    <div class="panel metro-main" id="metro-main">
+      <div class="bpm-line">
+        <input class="bpm-input" id="bpm-input" type="number" min="20" max="300" step="1" value="100" aria-label="速度（每分钟拍数）">
+        <span class="bpm-unit">BPM</span>
+      </div>
+      <div class="tempo-term" id="tempo-term"></div>
+      <div class="note-unit" id="note-unit"></div>
+      <div class="bpm-ctrl">
+        <button class="btn" type="button" data-delta="-5">−5</button>
+        <button class="btn" type="button" data-delta="-1">−1</button>
+        <input type="range" id="bpm-range" min="20" max="300" value="100" aria-label="速度滑块">
+        <button class="btn" type="button" data-delta="1">+1</button>
+        <button class="btn" type="button" data-delta="5">+5</button>
+      </div>
+      <div class="main-actions">
+        <button class="btn btn-primary btn-lg" id="start-btn" type="button">▶ 开始</button>
+        <button class="btn btn-lg tap-btn" id="tap-btn" type="button">👆 敲击测速</button>
+      </div>
+      <div class="beats" id="beats" aria-label="拍点（点击切换强弱）"></div>
+      <div class="bar-info" id="bar-info">点击圆点可切换：强 → 次强 → 弱 → 静音</div>
+      <div class="mute-banner">🤫 静音小节：心里继续数拍子！</div>
+      <svg class="pendulum" id="pendulum" viewBox="0 0 220 150" aria-hidden="true">
+        <path class="scale-arc" d="M30 62 A92 92 0 0 1 190 62" fill="none" stroke-width="2" stroke-dasharray="2 6"/>
+        <g class="arm" id="arm">
+          <line x1="110" y1="140" x2="110" y2="22" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          <rect x="99" y="52" width="22" height="16" rx="3" style="fill:var(--primary)"/>
+        </g>
+        <circle cx="110" cy="140" r="6" style="fill:var(--text-2)"/>
+      </svg>
+    </div>
+
+    <div>
+      <div class="panel">
+        <div class="panel-title">🎼 拍号与声音</div>
+        <div class="set-row">
+          <span class="lbl">每小节</span>
+          <span class="stepper"><button class="btn btn-sm" id="beats-minus" type="button">−</button><span class="val" id="beats-val">4</span><button class="btn btn-sm" id="beats-plus" type="button">+</button></span>
+          <span class="muted small">拍，</span>
+          <span class="lbl" style="min-width:auto">以</span>
+          <select id="unit-sel" aria-label="拍子单位"><option value="2">二分音符</option><option value="4">四分音符</option><option value="8">八分音符</option></select>
+          <span class="muted small">为一拍</span>
+        </div>
+        <div class="set-row">
+          <span class="lbl">常用拍号</span>
+          <div class="presets" id="presets">
+            <button class="btn btn-sm" data-ts="2/4" type="button">2/4</button><button class="btn btn-sm" data-ts="3/4" type="button">3/4</button><button class="btn btn-sm" data-ts="4/4" type="button">4/4</button><button class="btn btn-sm" data-ts="5/4" type="button">5/4</button><button class="btn btn-sm" data-ts="6/8" type="button">6/8</button><button class="btn btn-sm" data-ts="7/8" type="button">7/8</button><button class="btn btn-sm" data-ts="9/8" type="button">9/8</button><button class="btn btn-sm" data-ts="12/8" type="button">12/8</button>
+          </div>
+        </div>
+        <div class="set-row">
+          <span class="lbl">细分</span>
+          <div class="segmented" id="seg-sub"><button type="button" data-v="1" title="每拍响一次">无</button><button type="button" data-v="2" title="每拍分成 2 份">八分</button><button type="button" data-v="3" title="每拍分成 3 份">三连音</button><button type="button" data-v="4" title="每拍分成 4 份">十六分</button></div>
+        </div>
+        <div class="set-row">
+          <span class="lbl">音色</span>
+          <div class="segmented" id="seg-sound"><button type="button" data-v="wood">木鱼</button><button type="button" data-v="beep">电子音</button><button type="button" data-v="tick">咔哒</button></div>
+        </div>
+        <div class="set-row">
+          <span class="lbl">音量</span>
+          <input type="range" id="vol" min="0.1" max="1.5" step="0.05" style="flex:1;max-width:220px" aria-label="节拍器音量">
+        </div>
+        <div class="set-row">
+          <label class="switch"><input type="checkbox" id="sw-pendulum">摆锤动画</label>
+          <label class="switch"><input type="checkbox" id="sw-flash">强拍闪屏</label>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">🏋️ 练习助手</div>
+        <div class="practice-box" style="border-top:0;margin-top:0;padding-top:0">
+          <h4><span>⏲ 练习计时</span><button class="btn btn-sm btn-ghost" id="timer-reset" type="button">重置</button></h4>
+          <div class="timer" id="timer">00:00</div>
+          <div class="status">节拍器运行时自动计时，记录你今天练了多久。</div>
+        </div>
+        <div class="practice-box">
+          <h4><span>🚀 速度训练</span><label class="switch"><input type="checkbox" id="tr-on">开启</label></h4>
+          <div class="fields">
+            <span>每</span><input type="number" id="tr-every" min="1" max="64" aria-label="每几小节"><span>小节</span>
+            <span>加</span><input type="number" id="tr-step" min="1" max="40" aria-label="每次增加的速度"><span>BPM，</span>
+            <span>直到</span><input type="number" id="tr-target" min="20" max="300" aria-label="目标速度"><span>BPM</span>
+          </div>
+          <div class="status" id="tr-status">先用能弹准的慢速开始，让节拍器每隔几个小节自动加快一点。</div>
+        </div>
+        <div class="practice-box">
+          <h4><span>🤫 静音小节训练</span><label class="switch"><input type="checkbox" id="gap-on">开启</label></h4>
+          <div class="fields">
+            <span>响</span><input type="number" id="gap-play" min="1" max="16" aria-label="发声小节数"><span>小节，</span>
+            <span>静音</span><input type="number" id="gap-mute" min="1" max="16" aria-label="静音小节数"><span>小节，循环</span>
+          </div>
+          <div class="status" id="gap-status">静音时请在心里继续数拍；声音回来时，看看你是否还在拍子上。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="how-to">
+    <h2 class="toc-anchor" id="how">使用说明</h2>
+    <div class="table-wrap">
+      <table class="table kbd-table">
+        <thead><tr><th>快捷键</th><th>作用</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>空格</kbd></td><td>开始 / 停止</td></tr>
+          <tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>速度 +1 / −1</td></tr>
+          <tr><td><kbd>→</kbd> <kbd>←</kbd></td><td>速度 +5 / −5</td></tr>
+          <tr><td><kbd>T</kbd></td><td>敲击测速：跟着歌曲的节拍连续敲 4 下以上，自动算出速度</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>几个概念</h3>
+    <ul>
+      <li><b>BPM</b>（Beats Per Minute）：每分钟多少拍。60 BPM 就是每秒一拍，120 BPM 是每秒两拍。数字下方会显示对应的意大利语速度术语，比如 Andante（行板）。</li>
+      <li><b>强弱拍</b>：点击拍点圆圈可以在"强 → 次强 → 弱 → 静音"之间切换。4/4 拍默认是"强、弱、次强、弱"，6/8 拍是"强、弱、弱、次强、弱、弱"。</li>
+      <li><b>细分</b>：在每一拍里再加上较轻的"咔"声。练八分音符选 2，练三连音选 3，练十六分音符选 4。</li>
+      <li><b>x/8 拍</b>：以八分音符为一拍时，BPM 表示每分钟多少个八分音符。比如 6/8 拍、BPM 180，相当于每分钟 60 个附点四分音符。</li>
+    </ul>
+    <h3>练习建议</h3>
+    <ol class="steps">
+      <li>先找到一个能<b>完全弹准</b>的慢速，哪怕只有 60 BPM。</li>
+      <li>开启"速度训练"，比如每 4 小节加 4 BPM，让速度一点点提高。</li>
+      <li>用"静音小节训练"检验内心的节拍感：响 2 小节、静音 2 小节，看看声音回来时你是否还对得上。</li>
+    </ol>
+    <p>配合 <a href="../chapters/04-rhythm.html">第 4 章 节奏与节拍</a> 学习；想检验自己的节奏感，试试 <a href="rhythm-trainer.html">🥁 节奏练习</a>。</p>
+  </section>
+
+</div>
+</main>
+
+<script src="../assets/js/theory.js"></script>
+<script src="../assets/js/audio.js"></script>
+<script src="../assets/js/keyboard.js"></script>
+<script src="../assets/js/staff.js"></script>
+<script src="../assets/js/jianpu.js"></script>
+<script src="../assets/js/site.js"></script>
+<script src="../assets/js/services.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script>
+(function () {
+  'use strict';
+  function $(s, el) { return (el || document).querySelector(s); }
+  function $$(s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); }
+  var store = MTSite.store;
+  var MIN = 20, MAX = 300;
+
+  function defaultAccents(beats, unit) {
+    var a = [];
+    for (var i = 0; i < beats; i++) a.push(0);
+    a[0] = 2;
+    if (unit === 8 && beats % 3 === 0 && beats > 3) { for (var j = 3; j < beats; j += 3) a[j] = 1; }
+    else if (unit === 8 && beats === 7) { a[2] = 1; a[4] = 1; }
+    else if (unit === 8 && beats === 5) { a[3] = 1; }
+    else if (beats === 4) a[2] = 1;
+    else if (beats === 5) a[3] = 1;
+    else if (beats === 6) a[3] = 1;
+    return a;
+  }
+
+  var st = Object.assign({
+    bpm: 100, beats: 4, unit: 4, accents: null, sub: 1, sound: 'wood', volume: 1,
+    pendulum: true, flash: false,
+    trainer: { on: false, every: 4, step: 4, target: 140 },
+    gap: { on: false, play: 2, mute: 2 }
+  }, store.get('mt-metronome', {}));
+  st.bpm = clampBpm(st.bpm);
+  if (!Array.isArray(st.accents) || st.accents.length !== st.beats) st.accents = defaultAccents(st.beats, st.unit);
+  st.trainer = Object.assign({ on: false, every: 4, step: 4, target: 140 }, st.trainer || {});
+  st.gap = Object.assign({ on: false, play: 2, mute: 2 }, st.gap || {});
+  st.trainer.on = false; st.gap.on = false; // 训练模式不跨页面保留开启状态
+  function save() { store.set('mt-metronome', st); }
+  function clampBpm(b) { b = Math.round(+b || 100); return Math.max(MIN, Math.min(MAX, b)); }
+
+  /* ---------------- 速度 ---------------- */
+  var bpmInput = $('#bpm-input'), bpmRange = $('#bpm-range'), termEl = $('#tempo-term'), unitEl = $('#note-unit');
+  var UNIT_NAME = { 2: '二分音符', 4: '四分音符 ♩', 8: '八分音符 ♪' };
+  function renderBpm() {
+    if (document.activeElement !== bpmInput) bpmInput.value = st.bpm;
+    bpmRange.value = st.bpm;
+    var t = MT.tempoTerm(st.bpm);
+    termEl.innerHTML = '<b>' + t.it + '</b> · ' + t.zh + ' · ' + t.desc;
+    unitEl.textContent = '每分钟 ' + st.bpm + ' 个' + UNIT_NAME[st.unit].replace(/ .*/, '') + '，每拍 ' + (60 / st.bpm).toFixed(3) + ' 秒';
+  }
+  function setBpm(b, silent) {
+    st.bpm = clampBpm(b);
+    if (clock) clock.setBpm(st.bpm);
+    renderBpm();
+    if (!silent) save();
+  }
+  bpmRange.addEventListener('input', function () { setBpm(+bpmRange.value); });
+  bpmInput.addEventListener('change', function () { setBpm(+bpmInput.value); });
+  bpmInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { setBpm(+bpmInput.value); bpmInput.blur(); } });
+  bpmInput.addEventListener('blur', function () { setBpm(+bpmInput.value); });
+  $$('[data-delta]').forEach(function (b) {
+    var timer = null, rep = null;
+    function step() { setBpm(st.bpm + (+b.dataset.delta)); }
+    b.addEventListener('pointerdown', function (e) { e.preventDefault(); step(); timer = setTimeout(function () { rep = setInterval(step, 90); }, 450); });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) { b.addEventListener(ev, function () { clearTimeout(timer); clearInterval(rep); }); });
+    b.addEventListener('keydown', function (e) { if (e.key === 'Enter') step(); });
+  });
+
+  /* ---------------- 敲击测速 ---------------- */
+  var taps = [], tapBtn = $('#tap-btn');
+  function tap() {
+    var now = performance.now();
+    if (taps.length && now - taps[taps.length - 1] > 2000) taps = [];
+    taps.push(now);
+    if (taps.length > 8) taps.shift();
+    tapBtn.classList.add('tapped');
+    setTimeout(function () { tapBtn.classList.remove('tapped'); }, 90);
+    if (taps.length >= 2) {
+      var sum = 0;
+      for (var i = 1; i < taps.length; i++) sum += taps[i] - taps[i - 1];
+      setBpm(60000 / (sum / (taps.length - 1)));
+      tapBtn.textContent = '👆 已敲 ' + taps.length + ' 下';
+    } else tapBtn.textContent = '👆 继续敲…';
+    clearTimeout(tap._t);
+    tap._t = setTimeout(function () { tapBtn.textContent = '👆 敲击测速'; }, 2200);
+  }
+  tapBtn.addEventListener('pointerdown', function (e) { e.preventDefault(); tap(); });
+
+  /* ---------------- 拍号 / 重音 ---------------- */
+  var beatsEl = $('#beats'), beatsVal = $('#beats-val'), unitSel = $('#unit-sel');
+  var ACC_NAME = { '2': '强', '1': '次强', '0': '弱', '-1': '静音' };
+  function renderBeats() {
+    beatsVal.textContent = st.beats;
+    unitSel.value = String(st.unit);
+    beatsEl.innerHTML = '';
+    st.accents.forEach(function (a, i) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'beat'; b.dataset.acc = a; b.dataset.i = i;
+      b.title = '第 ' + (i + 1) + ' 拍：' + ACC_NAME[a] + '（点击切换）';
+      b.innerHTML = '<span class="dot">' + (i + 1) + '</span><span class="acc-lbl">' + ACC_NAME[a] + '</span>';
+      b.addEventListener('click', function () {
+        var order = [2, 1, 0, -1];
+        var cur = st.accents[i];
+        st.accents[i] = order[(order.indexOf(cur) + 1) % order.length];
+        save(); renderBeats();
+      });
+      beatsEl.appendChild(b);
+    });
+    $$('#presets [data-ts]').forEach(function (p) { p.classList.toggle('active', p.dataset.ts === st.beats + '/' + st.unit); });
+    renderBpm();
+  }
+  function setMeter(beats, unit) {
+    st.beats = Math.max(1, Math.min(12, beats));
+    st.unit = unit;
+    st.accents = defaultAccents(st.beats, st.unit);
+    save(); renderBeats();
+  }
+  $('#beats-minus').addEventListener('click', function () { setMeter(st.beats - 1, st.unit); });
+  $('#beats-plus').addEventListener('click', function () { setMeter(st.beats + 1, st.unit); });
+  unitSel.addEventListener('change', function () { setMeter(st.beats, +unitSel.value); });
+  $$('#presets [data-ts]').forEach(function (p) {
+    p.addEventListener('click', function () { var ts = p.dataset.ts.split('/'); setMeter(+ts[0], +ts[1]); });
+  });
+
+  /* ---------------- 细分 / 音色 / 音量 / 视觉 ---------------- */
+  function bindSegmented(el, value, onChange) {
+    var btns = $$('button', el);
+    function mark(v) { btns.forEach(function (b) { b.classList.toggle('active', b.dataset.v === String(v)); }); }
+    mark(value);
+    btns.forEach(function (b) { b.addEventListener('click', function () { mark(b.dataset.v); onChange(b.dataset.v); }); });
+  }
+  var pendingSub = null;
+  bindSegmented($('#seg-sub'), st.sub, function (v) { st.sub = +v; save(); if (clock) pendingSub = st.sub; });
+  bindSegmented($('#seg-sound'), st.sound, function (v) {
+    st.sound = v; save();
+    if (!clock) Sound.click(null, { accent: 2, sound: st.sound, level: st.volume });
+  });
+  var vol = $('#vol');
+  vol.value = st.volume;
+  vol.addEventListener('input', function () { st.volume = +vol.value; save(); });
+  vol.addEventListener('change', function () { if (!clock) Sound.click(null, { accent: 0, sound: st.sound, level: st.volume }); });
+  var swPend = $('#sw-pendulum'), swFlash = $('#sw-flash'), pend = $('#pendulum'), arm = $('#arm');
+  swPend.checked = st.pendulum; swFlash.checked = st.flash;
+  function renderPendulum() { pend.style.display = st.pendulum ? '' : 'none'; }
+  swPend.addEventListener('change', function () { st.pendulum = swPend.checked; save(); renderPendulum(); });
+  swFlash.addEventListener('change', function () { st.flash = swFlash.checked; save(); });
+  renderPendulum();
+
+  /* ---------------- 练习助手 ---------------- */
+  var trOn = $('#tr-on'), trEvery = $('#tr-every'), trStep = $('#tr-step'), trTarget = $('#tr-target'), trStatus = $('#tr-status');
+  var gapOn = $('#gap-on'), gapPlay = $('#gap-play'), gapMute = $('#gap-mute'), gapStatus = $('#gap-status');
+  trEvery.value = st.trainer.every; trStep.value = st.trainer.step; trTarget.value = st.trainer.target;
+  gapPlay.value = st.gap.play; gapMute.value = st.gap.mute;
+  function intVal(el, lo, hi, d) { var v = Math.round(+el.value); if (!isFinite(v)) v = d; v = Math.max(lo, Math.min(hi, v)); el.value = v; return v; }
+  function readTrainer() {
+    st.trainer.every = intVal(trEvery, 1, 64, 4);
+    st.trainer.step = intVal(trStep, 1, 40, 4);
+    st.trainer.target = intVal(trTarget, MIN, MAX, 140);
+    save();
+  }
+  function readGap() { st.gap.play = intVal(gapPlay, 1, 16, 2); st.gap.mute = intVal(gapMute, 1, 16, 2); save(); }
+  [trEvery, trStep, trTarget].forEach(function (el) { el.addEventListener('change', readTrainer); });
+  [gapPlay, gapMute].forEach(function (el) { el.addEventListener('change', readGap); });
+  trOn.addEventListener('change', function () {
+    readTrainer();
+    st.trainer.on = trOn.checked;
+    barsSinceChange = 0;
+    trStatus.textContent = trOn.checked
+      ? '已开启：从 ' + st.bpm + ' BPM 开始，每 ' + st.trainer.every + ' 小节' + (st.trainer.target >= st.bpm ? '加' : '减') + ' ' + st.trainer.step + ' BPM，直到 ' + st.trainer.target + ' BPM。'
+      : '已关闭。';
+  });
+  gapOn.addEventListener('change', function () {
+    readGap();
+    st.gap.on = gapOn.checked;
+    gapCycleStart = cnt.bar;
+    gapStatus.textContent = gapOn.checked ? '已开启：响 ' + st.gap.play + ' 小节、静音 ' + st.gap.mute + ' 小节，循环进行。' : '已关闭。';
+    if (!gapOn.checked) setMuted(false);
+  });
+
+  var elapsed = store.get('mt-metronome-time', { day: '', ms: 0 });
+  var today = new Date().toDateString();
+  if (elapsed.day !== today) elapsed = { day: today, ms: 0 };
+  var runStart = 0, timerEl = $('#timer');
+  function fmt(ms) { var s = Math.floor(ms / 1000); var m = Math.floor(s / 60); var h = Math.floor(m / 60); s %= 60; m %= 60; return (h ? h + ':' + String(m).padStart(2, '0') : String(m).padStart(2, '0')) + ':' + String(s).padStart(2, '0'); }
+  function renderTimer() { timerEl.textContent = fmt(elapsed.ms + (runStart ? performance.now() - runStart : 0)); }
+  $('#timer-reset').addEventListener('click', function () { elapsed.ms = 0; if (runStart) runStart = performance.now(); store.set('mt-metronome-time', elapsed); renderTimer(); });
+  setInterval(function () { if (runStart) renderTimer(); }, 500);
+  renderTimer();
+
+  /* ---------------- 调度 ---------------- */
+  var clock = null, handle = null;
+  var cnt = { sub: 0, beat: 0, bar: 0, total: 0 };
+  var curSub = 1, curBeats = 4, barsSinceChange = 0, gapCycleStart = 0, muted = false;
+  var mainEl = $('#metro-main'), barInfo = $('#bar-info'), startBtn = $('#start-btn');
+  var swing = 1;
+
+  function setMuted(m) { muted = m; mainEl.classList.toggle('muted', m); }
+
+  function onBarStart(time) {
+    if (cnt.bar > 0 && st.trainer.on) {
+      barsSinceChange++;
+      if (barsSinceChange >= st.trainer.every) {
+        barsSinceChange = 0;
+        var target = st.trainer.target;
+        if (st.bpm !== target) {
+          var next = st.bpm < target ? Math.min(target, st.bpm + st.trainer.step) : Math.max(target, st.bpm - st.trainer.step);
+          st.bpm = next;
+          clock.setBpm(next);
+          Sound.at(time, function () {
+            renderBpm(); save();
+            trStatus.textContent = next === target ? '🎉 已达到目标速度 ' + target + ' BPM！' : '速度提升到 ' + next + ' BPM，目标 ' + target + ' BPM。';
+          });
+        }
+      }
+    }
+    var willMute = false;
+    if (st.gap.on) {
+      var cycle = st.gap.play + st.gap.mute;
+      var pos = ((cnt.bar - gapCycleStart) % cycle + cycle) % cycle;
+      willMute = pos >= st.gap.play;
+      var left = willMute ? cycle - pos : st.gap.play - pos;
+      Sound.at(time, function () {
+        setMuted(willMute);
+        gapStatus.textContent = willMute ? '🤫 静音中，还剩 ' + left + ' 小节' : '🔊 发声中，还剩 ' + left + ' 小节';
+      });
+    } else if (muted) Sound.at(time, function () { setMuted(false); });
+    return willMute;
+  }
+
+  var barMuted = false;
+  function onTick(tick, time) {
+    if (cnt.sub === 0) {
+      if (pendingSub != null) { curSub = pendingSub; clock.setTicksPerBeat(curSub); pendingSub = null; }
+      curBeats = st.beats;
+      if (cnt.beat >= curBeats) { cnt.beat = 0; cnt.bar++; }
+      if (cnt.beat === 0) barMuted = onBarStart(time);
+      var acc = st.accents[cnt.beat];
+      if (acc == null) acc = 0;
+      if (!barMuted && acc >= 0) Sound.click(time, { accent: acc, sound: st.sound, level: st.volume });
+      var b = cnt.beat, bar = cnt.bar, isDown = b === 0;
+      cnt.total++;
+      Sound.at(time, function () { showBeat(b, bar, isDown); });
+    } else {
+      var acc2 = st.accents[cnt.beat];
+      if (!barMuted && acc2 !== -1) Sound.click(time, { accent: 0, sound: 'tick', level: st.volume * 0.5 });
+    }
+    cnt.sub++;
+    if (cnt.sub >= curSub) { cnt.sub = 0; cnt.beat++; }
+  }
+
+  function showBeat(b, bar, isDown) {
+    $$('.beat', beatsEl).forEach(function (el, i) { el.classList.toggle('on', i === b); });
+    barInfo.innerHTML = '第 <b>' + (bar + 1) + '</b> 小节 · 第 <b>' + (b + 1) + '</b> 拍';
+    if (st.pendulum) {
+      swing = -swing;
+      arm.style.transitionDuration = (60 / st.bpm).toFixed(3) + 's';
+      arm.style.transform = 'rotate(' + (swing * 26) + 'deg)';
+    }
+    if (st.flash && isDown && !muted) {
+      mainEl.classList.add('flash');
+      setTimeout(function () { mainEl.classList.remove('flash'); }, 110);
+    }
+  }
+
+  function start() {
+    if (clock) return;
+    Sound.ensure();
+    handle = { stop: stop };
+    Sound.claim(handle, function () { return '节拍器 · ' + st.bpm + ' BPM · ' + st.beats + '/' + st.unit + ' 拍'; });
+    cnt = { sub: 0, beat: 0, bar: 0, total: 0 };
+    curSub = st.sub; curBeats = st.beats; pendingSub = null; barsSinceChange = 0; gapCycleStart = 0; barMuted = false;
+    setMuted(false);
+    swing = -1;
+    arm.style.transitionDuration = '0s';
+    arm.style.transform = 'rotate(-26deg)';
+    clock = Sound.createClock({ bpm: st.bpm, ticksPerBeat: curSub, onTick: onTick });
+    clock.start(0.1);
+    startBtn.textContent = '■ 停止';
+    startBtn.classList.remove('btn-primary');
+    runStart = performance.now();
+  }
+  function stop() {
+    if (!clock) return;
+    clock.stop(); clock = null;
+    if (handle) { Sound.unclaim(handle); handle = null; }
+    startBtn.textContent = '▶ 开始';
+    startBtn.classList.add('btn-primary');
+    $$('.beat', beatsEl).forEach(function (el) { el.classList.remove('on'); });
+    setMuted(false);
+    arm.style.transitionDuration = '.4s';
+    arm.style.transform = 'rotate(0deg)';
+    if (runStart) { elapsed.ms += performance.now() - runStart; runStart = 0; store.set('mt-metronome-time', elapsed); renderTimer(); }
+    barInfo.textContent = '点击圆点可切换：强 → 次强 → 弱 → 静音';
+  }
+  function toggle() { if (clock) stop(); else start(); }
+  startBtn.addEventListener('click', function () { toggle(); startBtn.blur(); });
+  window.addEventListener('pagehide', stop);
+
+  /* ---------------- 快捷键 ---------------- */
+  function isTyping(el) {
+    if (!el || !el.tagName) return false;
+    var t = el.tagName;
+    if (t === 'TEXTAREA' || t === 'SELECT') return true;
+    if (t === 'INPUT') return !/^(checkbox|radio|button|submit|reset|color)$/i.test(el.type || '');
+    return !!el.isContentEditable;
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var onRange = e.target && e.target.tagName === 'INPUT' && e.target.type === 'range';
+    if (onRange ? !(e.code === 'Space' || e.code === 'KeyT') : isTyping(e.target)) return;
+    switch (e.code) {
+      case 'Space': e.preventDefault(); if (!e.repeat) toggle(); break;
+      case 'ArrowUp': e.preventDefault(); setBpm(st.bpm + 1); break;
+      case 'ArrowDown': e.preventDefault(); setBpm(st.bpm - 1); break;
+      case 'ArrowRight': e.preventDefault(); setBpm(st.bpm + 5); break;
+      case 'ArrowLeft': e.preventDefault(); setBpm(st.bpm - 5); break;
+      case 'KeyT': if (!e.repeat) { e.preventDefault(); tap(); } break;
+    }
+  });
+  document.addEventListener('keyup', function (e) {
+    var onRange = e.target && e.target.tagName === 'INPUT' && e.target.type === 'range';
+    if (e.code === 'Space' && (onRange || !isTyping(e.target))) e.preventDefault();
+  });
+
+  renderBeats();
+  renderBpm();
+
+  /* ---------------- 地址栏参数：#bpm=80&ts=3/4&play=1 ----------------
+   * 文档里的「⚡ 临时启动」按钮、服务面板都用它预设速度和拍号；play=1 表示打开后直接开始 */
+  function readHash() {
+    var q = {};
+    location.hash.slice(1).split('&').forEach(function (kv) { var i = kv.indexOf('='); if (i > 0) q[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1)); });
+    var ts = /^(\d{1,2})\/(2|4|8)$/.exec(q.ts || '');
+    if (ts && (+ts[1] !== st.beats || +ts[2] !== st.unit)) setMeter(+ts[1], +ts[2]);
+    if (q.bpm && isFinite(+q.bpm)) setBpm(+q.bpm);
+    if (q.play === '1') {
+      if (clock) stop();
+      start();
+      setTimeout(function () {
+        if (clock && Sound.state === 'suspended') MTSite.toast('浏览器拦截了自动播放：在节拍器上随便点一下就会响起来', 4000);
+      }, 500);
+    }
+  }
+  readHash();
+  window.addEventListener('hashchange', readHash);
+
+  window.MTMetronome = { st: st, start: start, stop: stop, setBpm: setBpm, setMeter: setMeter, tap: tap, get running() { return !!clock; }, get counters() { return cnt; } };
+})();
+</script>
+</body>
+</html>

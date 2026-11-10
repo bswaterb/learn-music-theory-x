@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 7 章 和弦 · 乐理入门</title>
+<script>try{var t=localStorage.getItem('mt-theme');document.documentElement.setAttribute('data-theme',t?JSON.parse(t):(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))}catch(e){}</script>
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+  .lab { display: grid; gap: 14px; }
+  .lab-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  .lab-row .lbl { font-size: 13.5px; color: var(--text-2); font-weight: 650; min-width: 3.2em; }
+  .lab-info { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; padding: 14px 18px; border-radius: 12px; background: var(--bg-soft); border: 1px solid var(--border); }
+  .lab-sym { font: 800 34px/1.1 var(--font); color: var(--primary); min-width: 110px; }
+  .lab-detail { flex: 1; min-width: 220px; font-size: 14.5px; line-height: 1.75; }
+  .lab-detail b { color: var(--text); }
+  .lab-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .segmented.roots button { min-width: 2.7em; padding: 5px 8px; }
+  .kb-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 18px; }
+  .kb-grid .kb-cell h4 { margin: 0 0 6px; font-size: 15px; }
+  .kb-grid .kb-cell .small { margin: 6px 0 0; color: var(--text-2); }
+  .dia-cards { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+  .dia-card { border: 1px solid var(--border-strong); border-radius: 11px; padding: 9px 4px 8px; text-align: center; background: var(--bg-elev); cursor: pointer; transition: border-color .15s, background .15s, transform .08s; }
+  .dia-card:hover { border-color: var(--primary); }
+  .dia-card:active { transform: translateY(1px); }
+  .dia-card .rn { font: 700 19px/1.3 var(--font-serif); }
+  .dia-card .sym { font-weight: 750; color: var(--primary-ink); font-size: 15px; }
+  .dia-card .q { font-size: 12px; color: var(--text-3); }
+  .dia-card.q-maj .q { color: var(--accent); }
+  .dia-card.q-min .q { color: var(--blue); }
+  .dia-card.q-dim .q { color: var(--red); }
+  .dia-card.on { border-color: var(--primary); background: var(--primary-soft); box-shadow: 0 0 0 3px var(--primary-soft); }
+  .doc .term + .en { margin-left: .35em; }
+  .nw { white-space: nowrap; }
+  .table.names td:first-child { white-space: nowrap; }
+  .formula { font-family: var(--font-serif); font-weight: 700; letter-spacing: .04em; white-space: nowrap; }
+  .stack-demo { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 15px; }
+  .stack-demo .nk { display: inline-grid; place-items: center; min-width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--border-strong); background: var(--bg-elev); font-weight: 700; }
+  .stack-demo .nk.on { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .stack-demo .nk.skip { opacity: .45; text-decoration: line-through; }
+  @media (max-width: 760px) { .dia-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); } .kb-grid { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body data-page="ch07" data-root="..">
+<main class="page">
+<article class="content doc">
+
+<header class="chapter-header">
+  <div class="chapter-kicker">第 7 章</div>
+  <h1>和弦：同时响起的几个音</h1>
+  <p class="lead">前面几章，我们听的大多是"一个接一个"出现的音。当三个或更多的音<strong>同时</strong>响起，就构成了<strong>和弦</strong>。吉他弹唱、钢琴伴奏、乐队编曲，几乎都建立在和弦之上。学完这一章，你就能看懂 C、Am、G7、Cmaj7 这样的和弦名，并能在键盘上把它们弹出来。</p>
+  <div class="chapter-meta"><span>⏱ 预计 30 分钟</span><span>🎯 难度 ★★★☆☆</span><span>📚 建议先学：第 5 章 音程、第 6 章 音阶与调</span></div>
+  <div class="goals">
+    <h4>学完本章，你将能够：</h4>
+    <ul>
+      <li>说出什么是和弦、什么是"三度叠置"，认识根音、三音、五音；</li>
+      <li>区分并听辨<b>大三、小三、减三、增三</b>四种三和弦；</li>
+      <li>看懂和弦符号（C、Cm、C°、C+、G7、Cmaj7……）和罗马数字级数（I、IV、V、vi……）；</li>
+      <li>理解<b>和弦转位</b>和斜线和弦（如 C/E），知道为什么要用转位；</li>
+      <li>写出任意大调的七个调内和弦，记住口诀"大小小大大小减"。</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+<h2 id="s7-1">7.1 什么是和弦</h2>
+<p>第 5 章我们学过：两个音同时响起，叫作"和声音程"。如果同时响起的是<strong>三个或更多</strong>音名不同的音，它就叫<span class="term">和弦</span><span class="en">Chord</span>。</p>
+
+<h3>三度叠置：隔一个音取一个</h3>
+<p>和弦并不是随便按几个键。最常见的和弦都是用<span class="term">三度叠置</span>的方法搭起来的：从一个音出发，<b>隔一个音名取一个音</b>，像叠积木一样，一层一层往上叠三度。</p>
+<div class="figure">
+  <div class="stack-demo" style="justify-content:center">
+    <span class="nk on">C</span><span class="nk skip">D</span><span class="nk on">E</span><span class="nk skip">F</span><span class="nk on">G</span>
+    <span style="margin:0 6px">→</span><b>C – E – G</b>
+  </div>
+  <div style="margin-top:14px" id="kb-ceg" data-keyboard="C4-B5" data-labels="name" data-highlight="C4 E4 G4" data-badges="R 3 5"></div>
+  <div class="btn-row" style="justify-content:center">
+    <button data-play="C4 E4 G4" data-mode="arp" data-kb="#kb-ceg">一个一个弹（分解）</button>
+    <button data-play="C4 E4 G4" data-mode="chord" data-kb="#kb-ceg">同时弹（柱式）</button>
+  </div>
+  <div class="caption">在白键上"隔一个取一个"：C、（跳过 D）E、（跳过 F）G。相邻两个音都相距一个三度。</div>
+</div>
+
+<h3>根音、三音、五音</h3>
+<p>和弦里的每个音都有自己的"职务"：</p>
+<ul>
+  <li><span class="term">根音</span><span class="en">Root，简写 R</span>：最下面的"地基"，<b>和弦以它命名</b>。C–E–G 的根音是 C，所以叫"C 和弦"。</li>
+  <li><span class="term">三音</span><span class="en">3rd</span>：根音上方三度的音（这里是 E）。它决定和弦是"明亮"还是"忧伤"（下一节详细讲）。</li>
+  <li><span class="term">五音</span><span class="en">5th</span>：根音上方五度的音（这里是 G）。它让和弦更饱满、更稳。</li>
+</ul>
+
+<div class="callout analogy">
+  <div class="callout-title">打个比方</div>
+  <p>和弦像一个三口之家：<b>根音</b>是户主，决定这家"姓什么"；<b>三音</b>决定这家人的性格是开朗还是内向；<b>五音</b>让这个家更稳固、更完整。</p>
+</div>
+
+<p>在五线谱上，三度叠置的和弦特别好认：它像一串糖葫芦，三个音<b>要么全在线上，要么全在间里</b>，一个挨一个地"摞"起来。</p>
+<div data-staff="[C4 E4 G4]:w_全在线上 | [D4 F4 A4]:w_全在间里 | [E4 G4 B4]:w_全在线上 | [F4 A4 C5]:w_全在间里 |]" data-caption="四个三度叠置的和弦：C–E–G、D–F–A、E–G–B、F–A–C。点一下符头可以试听。"></div>
+
+<div class="callout try">
+  <div class="callout-title">动手试试：七个白键和弦</div>
+  <p>只用白键、从每个音出发"隔一个取一个"，可以得到 7 个和弦。逐个听一听，留意它们的"表情"：</p>
+  <p>
+    <button data-play="C4 E4 G4" data-mode="chord">C–E–G</button>
+    <button data-play="D4 F4 A4" data-mode="chord">D–F–A</button>
+    <button data-play="E4 G4 B4" data-mode="chord">E–G–B</button>
+    <button data-play="F4 A4 C5" data-mode="chord">F–A–C</button>
+    <button data-play="G4 B4 D5" data-mode="chord">G–B–D</button>
+    <button data-play="A4 C5 E5" data-mode="chord">A–C–E</button>
+    <button data-play="B4 D5 F5" data-mode="chord">B–D–F</button>
+  </p>
+  <p>你会发现：有的听起来<b>明亮</b>（C、F、G 开头的），有的有点<b>忧伤</b>（D、E、A 开头的），而 B–D–F 特别<b>紧张</b>。明明都是"隔一个取一个"，为什么表情不同？下一节揭晓。</p>
+</div>
+
+<div class="callout note">
+  <div class="callout-title">音可以重复，也可以换八度</div>
+  <p>只要组成音的<b>音名</b>不变，和弦的名字就不变。比如 C–E–G–C（多加一个高八度的 C）仍然是 C 和弦。吉他上最常见的 C 和弦其实有 5 个音：C–E–G–C–E。</p>
+  <p><button data-play="C3 E3 G3 C4 E4" data-mode="chord" data-strum="0.035" data-instrument="guitar" data-dur="2.4">吉他上的 C 和弦（扫弦）</button> <button data-play="C3 G3 C4 E4 G4 C5" data-mode="chord" data-dur="2.4">钢琴上的"大" C 和弦</button></p>
+</div>
+</section>
+
+<section>
+<h2 id="s7-2">7.2 四种三和弦</h2>
+<p>由根音、三音、五音这三个音组成的和弦，叫<span class="term">三和弦</span><span class="en">Triad</span>。回忆第 5 章：三度有大有小——<b>大三度 = 4 个半音</b>，<b>小三度 = 3 个半音</b>。三和弦由两个三度摞成，两个三度"一大一小"地组合，正好有四种可能：</p>
+
+<div class="table-wrap">
+<table class="table names">
+  <thead><tr><th>名称</th><th>从下往上</th><th>半音数</th><th>根音→五音</th><th>以 C 为根</th><th>符号</th><th>听感</th><th class="c">试听</th></tr></thead>
+  <tbody>
+    <tr><td><b>大三和弦</b></td><td>大三度 + 小三度</td><td>4 + 3</td><td>纯五度</td><td class="nn">C E G</td><td class="nn">C</td><td>明亮、稳定、开朗</td><td class="c"><button data-play="C4 E4 G4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 C 大三和弦"></button></td></tr>
+    <tr><td><b>小三和弦</b></td><td>小三度 + 大三度</td><td>3 + 4</td><td>纯五度</td><td class="nn">C E♭ G</td><td class="nn">Cm</td><td>柔和、忧伤</td><td class="c"><button data-play="C4 Eb4 G4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 C 小三和弦"></button></td></tr>
+    <tr><td><b>减三和弦</b></td><td>小三度 + 小三度</td><td>3 + 3</td><td>减五度</td><td class="nn">C E♭ G♭</td><td class="nn">Cdim（C°）</td><td>紧张、不安</td><td class="c"><button data-play="C4 Eb4 Gb4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 C 减三和弦"></button></td></tr>
+    <tr><td><b>增三和弦</b></td><td>大三度 + 大三度</td><td>4 + 4</td><td>增五度</td><td class="nn">C E G♯</td><td class="nn">Caug（C+）</td><td>悬疑、梦幻、"飘"</td><td class="c"><button data-play="C4 E4 G#4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 C 增三和弦"></button></td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="figure">
+  <div class="kb-grid">
+    <div class="kb-cell"><h4>大三和弦 C</h4><div data-keyboard="C4-B4" data-size="compact" data-labels="none" data-highlight="C4 E4 G4" data-badges="R 3 5"></div><p class="small">C→E 4 个半音，E→G 3 个半音</p></div>
+    <div class="kb-cell"><h4>小三和弦 Cm</h4><div data-keyboard="C4-B4" data-size="compact" data-labels="none" data-highlight="C4 Eb4 G4" data-badges="R ♭3 5"></div><p class="small">C→E♭ 3 个半音，E♭→G 4 个半音</p></div>
+    <div class="kb-cell"><h4>减三和弦 Cdim</h4><div data-keyboard="C4-B4" data-size="compact" data-labels="none" data-highlight="C4 Eb4 Gb4" data-badges="R ♭3 ♭5"></div><p class="small">C→E♭ 3 个半音，E♭→G♭ 3 个半音</p></div>
+    <div class="kb-cell"><h4>增三和弦 Caug</h4><div data-keyboard="C4-B4" data-size="compact" data-labels="none" data-highlight="C4 E4 G#4" data-badges="R 3 ♯5"></div><p class="small">C→E 4 个半音，E→G♯ 4 个半音</p></div>
+  </div>
+  <div class="btn-row" style="justify-content:center">
+    <button data-play="C4 E4 G4 | C4 Eb4 G4 | C4 Eb4 Gb4 | C4 E4 G#4" data-mode="progression" data-bpm="70">四种三和弦连着听：大 → 小 → 减 → 增</button>
+  </div>
+  <div class="caption">标签里的"♭3""♭5""♯5"表示：和大三和弦相比，这个音被降低或升高了半音。</div>
+</div>
+
+<div class="callout memory">
+  <div class="callout-title">记忆口诀</div>
+  <p>从下往上看两个三度：<b>"大小"是大三，"小大"是小三，"小小"是减三，"大大"是增三。</b></p>
+  <p>还可以这样记：大三和弦和小三和弦<b>只差一个音</b>——把大三和弦的三音降低半音，就变成了小三和弦。</p>
+  <p><button data-play="C4 E4 G4 | C4 Eb4 G4 | C4 E4 G4 | C4 Eb4 G4" data-mode="progression" data-bpm="80">C ↔ Cm 来回切换，只有中间的音在动</button></p>
+</div>
+
+<p>现在你就能解释上一节的"七个白键和弦"了：C–E–G、F–A–C、G–B–D 是<b>大三和弦</b>；D–F–A、E–G–B、A–C–E 是<b>小三和弦</b>；B–D–F 两个都是小三度，是<b>减三和弦</b>——它的根音和五音相距"减五度"（6 个半音，也就是第 5 章的"三全音"），所以格外紧张。</p>
+
+<h3>和弦实验室：任选根音和类型</h3>
+<p>选一个根音，再选一种三和弦，看看它在键盘和五线谱上长什么样。每次切换都会自动播放。</p>
+<div class="figure lab" id="triad-lab">
+  <div class="lab-row"><span class="lbl">根音</span><div class="segmented roots" id="tl-root"></div></div>
+  <div class="lab-row"><span class="lbl">类型</span><div class="segmented" id="tl-type"></div></div>
+  <div class="lab-info">
+    <div class="lab-sym" id="tl-sym">C</div>
+    <div class="lab-detail">
+      <div><b id="tl-zh">C 大三和弦</b> <span class="muted" id="tl-alt"></span></div>
+      <div>组成音：<span class="nn" id="tl-notes">C E G</span></div>
+      <div>结构：<span id="tl-struct">大三度 + 小三度</span></div>
+    </div>
+    <div class="lab-btns">
+      <button id="tl-block" data-play="C4 E4 G4" data-mode="chord" data-kb="#tl-kb">柱式</button>
+      <button id="tl-arp" data-play="C4 E4 G4" data-mode="arp-chord" data-kb="#tl-kb">琶音</button>
+    </div>
+  </div>
+  <div id="tl-kb"></div>
+  <div id="tl-staff"></div>
+  <div class="caption">键盘上的 R 表示根音，3、5 表示三音、五音（带 ♭/♯ 表示比大三和弦降低/升高了半音）。</div>
+</div>
+
+<div class="callout warn">
+  <div class="callout-title">常见误区</div>
+  <ul>
+    <li>"小三和弦"的"小"，说的是<b>根音到三音是小三度</b>，不是说这个和弦"小"或"不重要"。流行歌曲里小三和弦和大三和弦一样常用。</li>
+    <li>和弦按<b>音名</b>拼写，要保持"隔一个取一个"。比如 E 大三和弦是 E–G♯–B，不能写成 E–A♭–B（那样就不是三度叠置了）。所以在实验室里，个别减/增三和弦会出现重升 𝄪、重降 𝄫，它们只是写法，弹的时候就是括号里提示的那个键。</li>
+  </ul>
+</div>
+<div class="launch-row"><span class="lr-label">在和弦词典里换个根音试试：</span><button data-launch="dictionary" data-args="chord=C:maj:0">C 大三</button><button data-launch="dictionary" data-args="chord=C:min:0">C 小三</button><button data-launch="dictionary" data-args="chord=C:dim:0">C 减三</button><button data-launch="dictionary" data-args="chord=C:aug:0">C 增三</button></div>
+</section>
+
+<section>
+<h2 id="s7-3">7.3 和弦的名字怎么写</h2>
+<h3>和弦符号</h3>
+<p>流行歌曲的吉他谱、钢琴谱上，常在旋律上方写着 C、Am、G7 这样的字母，这叫<span class="term">和弦符号</span><span class="en">Chord symbol</span>。规则很简单：<b>根音的音名 + 表示类型的后缀</b>。</p>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>写法</th><th>含义</th><th>组成音</th><th class="c">试听</th></tr></thead>
+  <tbody>
+    <tr><td class="nn">C</td><td>只写字母 = <b>大三和弦</b></td><td class="nn">C E G</td><td class="c"><button data-play="C4 E4 G4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 C"></button></td></tr>
+    <tr><td class="nn">Cm</td><td><b>小三和弦</b>，m 是 minor（小）的缩写；也写作 Cmin、C−</td><td class="nn">C E♭ G</td><td class="c"><button data-play="C4 Eb4 G4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 Cm"></button></td></tr>
+    <tr><td class="nn">Cdim / C°</td><td><b>减三和弦</b>，dim 是 diminished（减）的缩写</td><td class="nn">C E♭ G♭</td><td class="c"><button data-play="C4 Eb4 Gb4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 Cdim"></button></td></tr>
+    <tr><td class="nn">Caug / C+</td><td><b>增三和弦</b>，aug 是 augmented（增）的缩写</td><td class="nn">C E G♯</td><td class="c"><button data-play="C4 E4 G#4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 Caug"></button></td></tr>
+    <tr><td class="nn">F♯m</td><td>根音带升降号时，写在字母后面：升 F 小三和弦</td><td class="nn">F♯ A C♯</td><td class="c"><button data-play="F#4 A4 C#5" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 F♯m"></button></td></tr>
+    <tr><td class="nn">B♭</td><td>降 B 大三和弦</td><td class="nn">B♭ D F</td><td class="c"><button data-play="Bb3 D4 F4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 B♭"></button></td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout warn">
+  <div class="callout-title">小心大小写</div>
+  <p>小写 <b>m</b> = minor（小）；大写 <b>M</b> 或 <b>maj</b> = major（大）。<span class="nn">Cm7</span> 和 <span class="nn">CM7</span> 只差一个字母的大小写，却是完全不同的两个和弦（7.4 节会讲）。看谱时一定要看清楚！</p>
+</div>
+
+<h3>罗马数字级数</h3>
+<p>和弦符号告诉你"弹哪几个音"。但分析音乐时，人们更关心这个和弦<b>在调里排第几</b>：它的根音是音阶的第几个音？这就是<span class="term">级数</span>，用罗马数字表示。</p>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>罗马数字</th><th class="c">I</th><th class="c">II</th><th class="c">III</th><th class="c">IV</th><th class="c">V</th><th class="c">VI</th><th class="c">VII</th></tr></thead>
+  <tbody>
+    <tr><td>对应的音阶级数</td><td class="c">1</td><td class="c">2</td><td class="c">3</td><td class="c">4</td><td class="c">5</td><td class="c">6</td><td class="c">7</td></tr>
+    <tr><td>C 大调中的根音</td><td class="c nn">C</td><td class="c nn">D</td><td class="c nn">E</td><td class="c nn">F</td><td class="c nn">G</td><td class="c nn">A</td><td class="c nn">B</td></tr>
+  </tbody>
+</table>
+</div>
+<p>罗马数字的<b>大小写</b>还顺便告诉你和弦的类型：</p>
+<ul>
+  <li><b>大写</b>（I、IV、V）= 大三和弦；</li>
+  <li><b>小写</b>（ii、iii、vi）= 小三和弦；</li>
+  <li><b>小写 + °</b>（vii°）= 减三和弦；<b>大写 + +</b>（III+）= 增三和弦。</li>
+</ul>
+<p>所以在 C 大调里，<b>I = C、ii = Dm、IV = F、V = G、vi = Am</b>（为什么是这样，7.6 节揭晓）。</p>
+
+<div class="callout example">
+  <div class="callout-title">级数的好处：换调不换"味道"</div>
+  <p>"I–IV–V–I"在 C 大调里是 C–F–G–C，在 G 大调里是 G–C–D–G。音高变了，但听起来是同一个"故事"：</p>
+  <p>
+    <button data-play="C3 C4 E4 G4 | F2 C4 F4 A4 | G2 B3 D4 G4 | C3 C4 E4 G4" data-mode="progression" data-bpm="80">C 大调：C – F – G – C</button>
+    <button data-play="G2 B3 D4 G4 | C3 C4 E4 G4 | D3 A3 D4 F#4 | G2 B3 D4 G4" data-mode="progression" data-bpm="80">G 大调：G – C – D – G</button>
+  </p>
+  <p>流行音乐圈常说的"1645""4536"，就是把级数写成阿拉伯数字的简称（第 8 章会大量用到）。</p>
+</div>
+</section>
+
+<section>
+<h2 id="s7-4">7.4 七和弦</h2>
+<p>在三和弦上面<b>再叠一个三度</b>，就得到四个音：根音、三音、五音、七音。最上面的音和根音相距七度，所以叫<span class="term">七和弦</span><span class="en">Seventh chord</span>。七和弦比三和弦更丰富、更有"味道"，爵士、R&amp;B、抒情流行里到处都是它。</p>
+<p>七和弦的名字可以这样理解：<b>七和弦 = 一个三和弦 + 一个七度</b>。最常见的五种（以 C 为根音）：</p>
+
+<div class="table-wrap">
+<table class="table names">
+  <thead><tr><th>名称</th><th>符号</th><th>组成</th><th>公式</th><th>组成音</th><th>听感</th><th class="c">试听</th></tr></thead>
+  <tbody>
+    <tr><td><b>大七和弦</b></td><td class="nn">Cmaj7<br><span class="muted small">CM7、CΔ7</span></td><td>大三和弦 + 大七度</td><td class="formula">1 3 5 7</td><td class="nn">C E G B</td><td>温柔、梦幻、有"咖啡馆"的感觉</td><td class="c"><button data-play="C4 E4 G4 B4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 Cmaj7"></button></td></tr>
+    <tr><td><b>属七和弦</b></td><td class="nn">C7</td><td>大三和弦 + 小七度</td><td class="formula">1 3 5 ♭7</td><td class="nn">C E G B♭</td><td>有张力，强烈地想"回家"</td><td class="c"><button data-play="C4 E4 G4 Bb4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 C7"></button></td></tr>
+    <tr><td><b>小七和弦</b></td><td class="nn">Cm7<br><span class="muted small">C−7</span></td><td>小三和弦 + 小七度</td><td class="formula">1 ♭3 5 ♭7</td><td class="nn">C E♭ G B♭</td><td>柔和、慵懒</td><td class="c"><button data-play="C4 Eb4 G4 Bb4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 Cm7"></button></td></tr>
+    <tr><td><b>半减七和弦</b></td><td class="nn">Cm7♭5<br><span class="muted small">Cø7</span></td><td>减三和弦 + 小七度</td><td class="formula">1 ♭3 ♭5 ♭7</td><td class="nn">C E♭ G♭ B♭</td><td>暗淡、有过渡感</td><td class="c"><button data-play="C4 Eb4 Gb4 Bb4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 Cm7♭5"></button></td></tr>
+    <tr><td><b>减七和弦</b></td><td class="nn">Cdim7<br><span class="muted small">C°7</span></td><td>减三和弦 + 减七度</td><td class="formula">1 ♭3 ♭5 𝄫7</td><td class="nn">C E♭ G♭ B𝄫</td><td>非常紧张、戏剧化（老电影里的"危险来了"）</td><td class="c"><button data-play="C4 Eb4 Gb4 Bbb4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 Cdim7"></button></td></tr>
+  </tbody>
+</table>
+</div>
+
+<div data-staff="[C4 E4 G4 B4]:w^Cmaj7 | [C4 E4 G4 Bb4]:w^C7 | [C4 Eb4 G4 Bb4]:w^Cm7 | [C4 Eb4 Gb4 Bb4]:w^Cm7♭5 | [C4 Eb4 Gb4 Bbb4]:w^Cdim7 |]" data-caption="五种七和弦在五线谱上：四个音都“摞”在线上，最上面的七音决定了它们的差别。"></div>
+
+<div class="callout note">
+  <div class="callout-title">关于 B𝄫（重降 B）</div>
+  <p>减七和弦的七音比"小七度"再低半音，从 C 往上数正好是一个"减七度"，按音名必须写成 B𝄫（重降 B）。在键盘上它就是 <b>A 键</b>。减七和弦里每两个相邻的音都是小三度，正好把一个八度平均分成了 4 份，所以听起来格外"悬"。</p>
+</div>
+
+<div class="callout memory">
+  <div class="callout-title">只写一个 7，就是属七</div>
+  <p><b>C7 = C E G B♭</b>（小七度），而不是 C E G B。想表示大七度，必须写 <b>maj7</b>（或 M7、Δ7）。记住：<b>"7"默认就是"小七度"</b>。</p>
+</div>
+
+<h3>属七和弦：想"回家"的和弦</h3>
+<p>五种七和弦里最重要的是<b>属七和弦</b>。在 C 大调里，它长在第 5 级（"属音"G）上：<b>G7 = G B D F</b>——这也是它叫"属七"的原因。</p>
+<p>G7 里的 <b>B</b> 和 <b>F</b> 构成一个"三全音"（第 5 章），非常不稳定：B 想往上走半音到 C，F 想往下走半音到 E。它们一起"落地"，就回到了 C 和弦，带来强烈的"到家了"的感觉。</p>
+<div data-staff="grand" data-treble="[B3 F4 G4]:h^G7 [C4 E4 G4]:h^C |]" data-bass="G2:h C3:h |]" data-time="4/4" data-bpm="60" data-caption="G7 → C：B 上行半音到 C，F 下行半音到 E，G 保持不动，低音从 G 跳回 C。"></div>
+<p>
+  <button data-play="G2 B3 D4 G4 | C3 C4 E4 G4" data-mode="progression" data-bpm="60">G → C</button>
+  <button data-play="G2 B3 F4 G4 | C3 C4 E4 G4" data-mode="progression" data-bpm="60">G7 → C（"回家"感更强）</button>
+  <button data-play="G2 B3 F4 G4" data-mode="chord" data-dur="2.6">只弹 G7，不解决</button>
+</p>
+<p>听最后一个按钮：只弹 G7 就停下，是不是觉得"话没说完"、很想再听一个 C？这种"<b>紧张→解决</b>"的力量，正是和弦进行的核心，第 8 章会详细讲。</p>
+<div class="launch-row"><span class="lr-label">五种七和弦，挨个听：</span><button data-launch="dictionary" data-args="chord=C:maj7:0">Cmaj7</button><button data-launch="dictionary" data-args="chord=C:dom7:0">C7</button><button data-launch="dictionary" data-args="chord=C:min7:0">Cm7</button><button data-launch="dictionary" data-args="chord=C:m7b5:0">Cm7♭5</button><button data-launch="dictionary" data-args="chord=C:dim7:0">Cdim7</button></div>
+</section>
+
+<section>
+<h2 id="s7-5">7.5 和弦转位</h2>
+<p>到目前为止，和弦的根音都在最下面，这叫<span class="term">原位和弦</span>。但实际演奏时，最下面的音——也就是<span class="term">低音</span><span class="en">Bass</span>——不一定是根音。只要组成音不变，把它们的上下顺序换一换，和弦的名字（根音）不变，但"站姿"变了，这就是<span class="term">转位</span><span class="en">Inversion</span>。</p>
+
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>转位</th><th>谁在最下面</th><th>C 和弦的排列（从下往上）</th><th>写法</th></tr></thead>
+  <tbody>
+    <tr><td><b>原位</b></td><td>根音</td><td class="nn">C E G</td><td class="nn">C</td></tr>
+    <tr><td><b>第一转位</b></td><td>三音</td><td class="nn">E G C</td><td class="nn">C/E</td></tr>
+    <tr><td><b>第二转位</b></td><td>五音</td><td class="nn">G C E</td><td class="nn">C/G</td></tr>
+    <tr><td><b>第三转位</b>（只有七和弦才有）</td><td>七音</td><td class="nn">F G B D（G7）</td><td class="nn">G7/F</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>怎么得到转位？很简单：<b>把最下面的那个音搬到最上面</b>（升高一个八度）。搬一次是第一转位，搬两次是第二转位。</p>
+<div data-staff="[C4 E4 G4]:w^C_原位 | [E4 G4 C5]:w^C/E_第一转位 | [G4 C5 E5]:w^C/G_第二转位 |]" data-caption="C 和弦的三种排列。每次都把最下面的音搬到最上面。"></div>
+
+<div class="callout analogy">
+  <div class="callout-title">打个比方</div>
+  <p>转位就像一家三口拍照换了站位：人还是那三个人，这家还是姓"C"，只是谁站在最前面（最下面）不一样了。</p>
+</div>
+
+<h3>斜线和弦</h3>
+<p>和弦符号里的斜线专门用来表示转位：<span class="nn">C/E</span> 读作"C over E"，<b>斜线左边是和弦，右边是低音</b>。<span class="nn">C/E</span> 就是"弹 C 和弦，但让 E 在最下面"。</p>
+<p class="small muted">进阶一点：斜线右边的低音也可以不是和弦里的音，比如 C/D。这类用法以后遇到再学，入门阶段知道"斜线右边 = 低音"就够了。</p>
+
+<h3>转位实验室</h3>
+<div class="figure lab" id="inv-lab">
+  <div class="lab-row"><span class="lbl">和弦</span><div class="segmented" id="il-chord"></div></div>
+  <div class="lab-row"><span class="lbl">转位</span><div class="segmented" id="il-inv"></div></div>
+  <div class="lab-info">
+    <div class="lab-sym" id="il-sym">C</div>
+    <div class="lab-detail"><div><b id="il-name">C 大三和弦 · 原位</b></div><div id="il-desc">最下面是根音 C</div></div>
+    <div class="lab-btns"><button id="il-play" data-play="C4 E4 G4" data-mode="arp-chord" data-kb="#il-kb">播放</button></div>
+  </div>
+  <div id="il-kb"></div>
+  <div id="il-staff"></div>
+  <div class="caption">橙色的键是低音（最下面的音），紫色是和弦里的其他音；标签表示它是根音（R）、三音、五音还是七音。</div>
+</div>
+
+<h3>为什么要转位？</h3>
+<p><b>理由一：让低音线条更平滑。</b>原位和弦的低音总在根音上，常常跳来跳去；用上转位，低音可以像走楼梯一样一级一级地走。对比下面两段，和弦完全一样，只是低音不同：</p>
+<div class="figure">
+  <h4 style="margin-top:0">A. 全部用原位：低音 C – G – A – E – F，跳来跳去</h4>
+  <div data-staff="C3:h^C G2:h^G | A2:h^Am E2:h^Em | F2:w^F |]" data-clef="bass" data-time="4/4" data-playable="false"></div>
+  <p class="center" style="margin:4px 0 18px"><button data-play="C3 C4 E4 G4 | G2 B3 D4 G4 | A2 C4 E4 A4 | E2 B3 E4 G4 | F2 C4 F4 A4" data-mode="progression" data-bpm="76">听 A：全部原位</button></p>
+  <h4>B. 用上转位：低音 C – B – A – G – F，一级一级往下走</h4>
+  <div data-staff="C3:h^C B2:h^G/B | A2:h^Am G2:h^Em/G | F2:w^F |]" data-clef="bass" data-time="4/4" data-playable="false"></div>
+  <p class="center" style="margin:4px 0 0"><button data-play="C3 C4 E4 G4 | B2 B3 D4 G4 | A2 C4 E4 A4 | G2 B3 E4 G4 | F2 C4 F4 A4" data-mode="progression" data-bpm="76">听 B：用上转位</button></p>
+  <div class="caption">两段的和弦完全相同（C、G、Am、Em、F），右手部分也一样，只有低音不同。</div>
+</div>
+<p>B 段的低音 C–B–A–G–F 像下楼梯一样平稳，这种"下行低音"在流行歌和古典音乐里都非常常见。</p>
+
+<p><b>理由二：弹起来更省力。</b>钢琴上用原位弹 C → F → G，整只手要跟着跳；换成 C → F/C → G/B，手几乎不用移动，只要动一两个手指：</p>
+<div data-staff="[C4 E4 G4]:h^C [C4 F4 A4]:h^F/C | [B3 D4 G4]:h^G/B [C4 E4 G4]:h^C |]" data-time="4/4" data-bpm="76" data-caption="钢琴伴奏最常用的 C、F、G“就近指法”：音和音之间最多只移动一两个半音。"></div>
+<p>
+  <button data-play="C4 E4 G4 | F4 A4 C5 | G4 B4 D5 | C4 E4 G4" data-mode="progression" data-bpm="76">原位：C → F → G → C</button>
+  <button data-play="C4 E4 G4 | C4 F4 A4 | B3 D4 G4 | C4 E4 G4" data-mode="progression" data-bpm="76">转位：C → F/C → G/B → C</button>
+</p>
+<div class="callout tip">
+  <div class="callout-title">小贴士</div>
+  <p>右边这种排法让和弦之间的连接更顺滑，专业名词叫"声部进行"。原则很简单：<b>相邻两个和弦里的共同音尽量保持不动，其他音就近移动</b>。</p>
+</div>
+<div class="launch-row"><span class="lr-label">看看转位在键盘上的样子：</span><button data-launch="dictionary" data-args="chord=C:maj:0">C 原位</button><button data-launch="dictionary" data-args="chord=C:maj:1">C 第一转位</button><button data-launch="dictionary" data-args="chord=C:maj:2">C 第二转位</button></div>
+</section>
+
+<section>
+<h2 id="s7-6">7.6 调内和弦</h2>
+<p>回忆第 6 章：C 大调由 C D E F G A B 七个音组成。如果<b>只用这七个音</b>，在每个音上都"隔一个取一个"叠一个三和弦，就得到 7 个和弦。它们叫<span class="term">调内和弦</span><span class="en">Diatonic chords</span>，也叫"顺阶和弦"。一首 C 大调的歌，用到的大部分和弦都在这里面。</p>
+
+<div data-staff="[C4 E4 G4]:w^I_C | [D4 F4 A4]:w^ii_Dm | [E4 G4 B4]:w^iii_Em | [F4 A4 C5]:w^IV_F | [G4 B4 D5]:w^V_G | [A4 C5 E5]:w^vi_Am | [B4 D5 F5]:w^vii°_B° |]" data-bpm="70" data-spacing="even" data-note-space="52" data-caption="C 大调的 7 个调内和弦：上方是级数，下方是和弦符号。点“播放”从 I 一直听到 vii°。"></div>
+
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>级数</th><th class="c">I</th><th class="c">ii</th><th class="c">iii</th><th class="c">IV</th><th class="c">V</th><th class="c">vi</th><th class="c">vii°</th></tr></thead>
+  <tbody>
+    <tr><td>C 大调</td><td class="c nn">C</td><td class="c nn">Dm</td><td class="c nn">Em</td><td class="c nn">F</td><td class="c nn">G</td><td class="c nn">Am</td><td class="c nn">B°</td></tr>
+    <tr><td>性质</td><td class="c"><b>大</b></td><td class="c">小</td><td class="c">小</td><td class="c"><b>大</b></td><td class="c"><b>大</b></td><td class="c">小</td><td class="c">减</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout memory">
+  <div class="callout-title">口诀：大小小，大大小减</div>
+  <p>大调的 7 个调内三和弦，性质永远是<b>"大、小、小、大、大、小、减"</b>（I 大、ii 小、iii 小、IV 大、V 大、vi 小、vii° 减）。不管是 C 大调、G 大调还是 B♭ 大调，这个排列都一样！</p>
+  <p class="small">为什么？因为每个大调音阶的"全全半全全全半"结构都一样，两个半音（3→4、7→1）总落在相同的位置，叠出来的三度大小也就一样。</p>
+</div>
+
+<h3>调内和弦实验室</h3>
+<p>选一个调，点击和弦卡片试听；也可以一口气从 I 听到 vii°。</p>
+<div class="figure lab" id="dia-lab">
+  <div class="lab-row"><span class="lbl">调</span><div class="segmented" id="dl-key"></div></div>
+  <div class="dia-cards" id="dl-cards"></div>
+  <div class="btn-row" style="margin:0">
+    <button class="btn btn-sm" id="dl-all" type="button">▶ 依次播放 7 个和弦</button>
+    <button class="btn btn-sm" id="dl-145" type="button">▶ I – IV – V – I</button>
+    <span class="small muted" id="dl-note"></span>
+  </div>
+  <div id="dl-kb"></div>
+  <div id="dl-staff"></div>
+</div>
+
+<h3>主要三和弦：I、IV、V</h3>
+<p>7 个调内和弦里，<b>I、IV、V</b> 是三个大三和弦，叫<span class="term">主要三和弦</span>。在 C 大调里它们是 C（C E G）、F（F A C）、G（G B D）——合起来正好包含了音阶全部 7 个音！所以只用这三个和弦，就能给很多儿歌、民歌配上伴奏（第 8 章就会这样做）。</p>
+<p><button data-play="C3 C4 E4 G4 | F2 C4 F4 A4 | G2 B3 D4 G4 | C3 C4 E4 G4" data-mode="progression" data-bpm="80">C 大调 I – IV – V – I</button></p>
+
+<h3>小调的调内和弦</h3>
+<p>在 a 小调（自然小调 A B C D E F G）上用同样的方法叠三和弦，得到：</p>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>级数</th><th class="c">i</th><th class="c">ii°</th><th class="c">III</th><th class="c">iv</th><th class="c">v</th><th class="c">VI</th><th class="c">VII</th></tr></thead>
+  <tbody>
+    <tr><td>a 小调</td><td class="c nn">Am</td><td class="c nn">B°</td><td class="c nn">C</td><td class="c nn">Dm</td><td class="c nn">Em</td><td class="c nn">F</td><td class="c nn">G</td></tr>
+    <tr><td>性质</td><td class="c">小</td><td class="c">减</td><td class="c"><b>大</b></td><td class="c">小</td><td class="c">小</td><td class="c"><b>大</b></td><td class="c"><b>大</b></td></tr>
+  </tbody>
+</table>
+</div>
+<p>发现了吗？a 小调和 C 大调用的是<b>同一组和弦</b>（因为它们是关系大小调，用同样的 7 个音），只是"家"从 C 换成了 Am。</p>
+<p>不过，自然小调的 v 级（Em）是小三和弦，"想回家"的力量不够强。所以小调里常把第 7 级音升高半音（第 6 章的<b>和声小调</b>：G → G♯），让 v 级变成大三和弦 <b>E</b>（E G♯ B），回到 Am 时就有了强烈的"到家"感：</p>
+<p>
+  <button data-play="A2 C4 E4 A4 | D3 D4 F4 A4 | E3 B3 E4 G4 | A2 C4 E4 A4" data-mode="progression" data-bpm="76">Am – Dm – <b>Em</b> – Am（自然小调）</button>
+  <button data-play="A2 C4 E4 A4 | D3 D4 F4 A4 | E3 B3 E4 G#4 | A2 C4 E4 A4" data-mode="progression" data-bpm="76">Am – Dm – <b>E</b> – Am（和声小调）</button>
+</p>
+</section>
+
+<section>
+<h2 id="s7-7">7.7 挂留和弦与加音和弦</h2>
+<p>在流行音乐（尤其是吉他弹唱）里，还经常见到 sus4、add9 这样的和弦。它们都是在三和弦的基础上做了一点"小改动"：</p>
+<div class="table-wrap">
+<table class="table names">
+  <thead><tr><th>名称</th><th>符号</th><th>公式</th><th>组成音（C）</th><th>怎么来的</th><th>听感</th><th class="c">试听</th></tr></thead>
+  <tbody>
+    <tr><td><b>挂二和弦</b></td><td class="nn">Csus2</td><td class="formula">1 2 5</td><td class="nn">C D G</td><td>三音换成二度</td><td>空灵、开阔</td><td class="c"><button data-play="C4 D4 G4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 Csus2"></button></td></tr>
+    <tr><td><b>挂四和弦</b></td><td class="nn">Csus4</td><td class="formula">1 4 5</td><td class="nn">C F G</td><td>三音换成四度</td><td>悬而未决，想落回 C</td><td class="c"><button data-play="C4 F4 G4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 Csus4"></button></td></tr>
+    <tr><td><b>加九和弦</b></td><td class="nn">Cadd9</td><td class="formula">1 3 5 9</td><td class="nn">C E G D</td><td>大三和弦上加一个九度（高八度的 D）</td><td>清新、明亮</td><td class="c"><button data-play="C4 E4 G4 D5" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 Cadd9"></button></td></tr>
+    <tr><td><b>大六和弦</b></td><td class="nn">C6</td><td class="formula">1 3 5 6</td><td class="nn">C E G A</td><td>大三和弦上加一个大六度</td><td>甜美、复古</td><td class="c"><button data-play="C4 E4 G4 A4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 C6"></button></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><span class="term">挂留和弦</span><span class="en">Suspended chord</span>的意思是把三音"挂"起来，用二度或四度代替它。没有了三音，就听不出是"大"还是"小"，于是产生一种中性的、悬在半空的感觉。挂四和弦尤其喜欢"解决"到大三和弦——四度音（F）往下走一步到三音（E）：</p>
+<p>
+  <button data-play="C3 C4 F4 G4 | C3 C4 E4 G4" data-mode="progression" data-bpm="56">Csus4 → C</button>
+  <button data-play="C3 C4 D4 G4 | C3 C4 E4 G4" data-mode="progression" data-bpm="56">Csus2 → C</button>
+  <button data-play="G2 C4 D4 G4 | G2 B3 D4 G4 | C3 C4 E4 G4" data-mode="progression" data-bpm="64">Gsus4 → G → C</button>
+</p>
+
+<p><span class="term">加音和弦</span><span class="en">Added-tone chord</span>则是在三和弦上"添"一个音，三音还在，所以大小性质不变，只是多了一层色彩：</p>
+<p>
+  <button data-play="C3 C4 E4 G4 | C3 C4 E4 G4 D5" data-mode="progression" data-bpm="50">C → Cadd9（多了一点清新）</button>
+  <button data-play="C3 C4 E4 G4 | C3 C4 E4 G4 A4" data-mode="progression" data-bpm="50">C → C6（多了一点甜）</button>
+</p>
+
+<div class="callout warn">
+  <div class="callout-title">别混淆</div>
+  <ul>
+    <li><span class="nn">Cadd9</span>（C E G D）没有七音；<span class="nn">C9</span> 则是在 C7 上再加九度（C E G B♭ D），包含 ♭7。</li>
+    <li><span class="nn">C6</span>（C E G A）和 <span class="nn">Am7</span>（A C E G）的组成音完全一样！区别在于谁当低音、在调里扮演什么角色。</li>
+  </ul>
+</div>
+
+<div class="callout note">
+  <div class="callout-title">看到更复杂的和弦符号怎么办？</div>
+  <p>C9、C13、C7♭9、Cm(maj7)……和弦符号可以写得很复杂。别担心：入门阶段，<b>本章的三和弦、五种七和弦，加上 sus、add9、6</b>，已经足够应付绝大多数流行歌曲的和弦谱了。遇到不认识的，可以去 <a href="../tools/chord-scale.html">📖 和弦与音阶词典</a> 查一查。</p>
+</div>
+<div class="launch-row"><span class="lr-label">挂留与加音和弦：</span><button data-launch="dictionary" data-args="chord=C:sus2:0">Csus2</button><button data-launch="dictionary" data-args="chord=C:sus4:0">Csus4</button><button data-launch="dictionary" data-args="chord=C:add9:0">Cadd9</button></div>
+</section>
+
+<section>
+<h2 id="s7-summary">本章小结</h2>
+<div class="callout summary">
+  <div class="callout-title">要点回顾</div>
+  <ul>
+    <li>三个或以上的音同时发声叫<b>和弦</b>；最常见的和弦用<b>三度叠置</b>（隔一个音取一个）搭成，由<b>根音、三音、五音</b>组成。</li>
+    <li>四种三和弦：<b>大三</b>（大+小，明亮）、<b>小三</b>（小+大，忧伤）、<b>减三</b>（小+小，紧张）、<b>增三</b>（大+大，悬疑）。</li>
+    <li>和弦符号 = 根音 + 后缀：C、Cm、Cdim（C°）、Caug（C+）；<b>罗马数字</b>表示和弦在调里的级数，大写为大三、小写为小三。</li>
+    <li>七和弦 = 三和弦 + 七度：maj7、7（属七）、m7、m7♭5、dim7。<b>只写"7"就是属七</b>，属七和弦强烈地想"回家"（G7 → C）。</li>
+    <li><b>转位</b>改变的是最下面的音：原位、第一转位（C/E）、第二转位（C/G）。转位让低音更平滑、演奏更省力。</li>
+    <li>大调调内和弦口诀：<b>大小小，大大小减</b>。I、IV、V 是主要三和弦，包含音阶的全部 7 个音。</li>
+  </ul>
+</div>
+
+<h3>小测验</h3>
+<div class="quiz-set">
+  <div class="quiz" data-answer="1">
+    <p class="quiz-q">只用白键、以 D 为根音"隔一个取一个"，得到的三和弦是？</p>
+    <ol class="quiz-opts"><li>D – F – A</li><li>D – E – F</li><li>D – G – B</li><li>D – F♯ – A</li></ol>
+    <div class="quiz-explain">从 D 出发，跳过 E 取 F，跳过 G 取 A：<b>D–F–A</b>，这是 D 小三和弦（Dm）。D–F♯–A 是 D 大三和弦，要用到黑键 F♯。</div>
+  </div>
+  <div class="quiz" data-answer="2">
+    <p class="quiz-q">听一听：<button data-play="A3 C4 E4" data-mode="arp-chord" data-gap="0.25">播放和弦</button> 这个和弦是什么性质？</p>
+    <ol class="quiz-opts"><li>大三和弦</li><li>小三和弦</li><li>减三和弦</li><li>增三和弦</li></ol>
+    <div class="quiz-explain">这是 A–C–E（Am），根音到三音是小三度（3 个半音），是<b>小三和弦</b>，听起来柔和、带点忧伤。可以对比一下大三和弦 <button data-play="A3 C#4 E4" data-mode="chord">A 大三和弦</button>。</div>
+  </div>
+  <div class="quiz" data-answer="1">
+    <p class="quiz-q">和弦符号 <span class="nn">Am</span> 的组成音是？</p>
+    <ol class="quiz-opts"><li>A C E</li><li>A C♯ E</li><li>A C E♭</li><li>A B E</li></ol>
+    <div class="quiz-explain">m 表示小三和弦：根音 A，上方小三度 C，纯五度 E，所以是 <b>A C E</b>。A C♯ E 是 A 大三和弦。</div>
+  </div>
+  <div class="quiz" data-answer="1">
+    <p class="quiz-q">按照"大小小，大大小减"，大调的 V 级和弦是什么性质？在 G 大调中它是哪个和弦？</p>
+    <ol class="quiz-opts"><li>大三和弦，D</li><li>小三和弦，Dm</li><li>大三和弦，C</li><li>减三和弦，F♯°</li></ol>
+    <div class="quiz-explain">V 级是第 5 个，口诀里排第 5 的是"大"。G 大调音阶 G A B C D E F♯，第 5 个音是 D，所以 V 级是 <b>D 大三和弦</b>（D F♯ A）。</div>
+  </div>
+  <div class="quiz" data-answer="1">
+    <p class="quiz-q"><span class="nn">C/E</span> 表示什么？</p>
+    <ol class="quiz-opts"><li>C 和弦，低音是 E（第一转位）</li><li>C 和弦和 E 和弦同时弹</li><li>C 和弦与 E 和弦交替弹</li><li>E 小三和弦</li></ol>
+    <div class="quiz-explain">斜线左边是和弦，右边是低音。C/E 就是 C 和弦让三音 E 在最下面，即<b>第一转位</b>。</div>
+  </div>
+  <div class="quiz" data-answer="3">
+    <p class="quiz-q">下面哪一组是 <span class="nn">G7</span> 的组成音？</p>
+    <ol class="quiz-opts"><li>G B D F♯</li><li>G B♭ D F</li><li>G B D F</li><li>G B D E</li></ol>
+    <div class="quiz-explain">只写"7"就是属七和弦：大三和弦 G B D + 小七度 F，即 <b>G B D F</b>。G B D F♯ 是 Gmaj7，G B♭ D F 是 Gm7，G B D E 是 G6。</div>
+  </div>
+</div>
+
+<div class="callout tip">
+  <div class="callout-title">课后练一练</div>
+  <ul>
+    <li>打开 <a href="../tools/piano.html">🎹 在线钢琴</a>，随便按下"隔一个取一个"的三个键，看看信息面板识别出的是什么和弦；再试试把最下面的音移到最上面，观察转位的写法。</li>
+    <li>在 <a href="../tools/chord-scale.html">📖 和弦与音阶词典</a> 里查出 F 大调的 7 个调内和弦，验证一下"大小小，大大小减"。</li>
+    <li>去 <a href="../tools/ear-training.html">👂 练耳训练</a> 选"和弦性质"模式，练习听辨大三、小三、减三、增三和弦。</li>
+  </ul>
+</div>
+</section>
+
+</article>
+</main>
+
+<script src="../assets/js/theory.js"></script>
+<script src="../assets/js/audio.js"></script>
+<script src="../assets/js/keyboard.js"></script>
+<script src="../assets/js/staff.js"></script>
+<script src="../assets/js/jianpu.js"></script>
+<script src="../assets/js/site.js"></script>
+<script src="../assets/js/services.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script>
+(function () {
+  function $(s) { return document.querySelector(s); }
+  function ascii(n) { return MT.noteName(n, { ascii: true }); }
+  /** 显示用音名；重升重降或 E♯/B♯/F♭/C♭ 时附上实际按的键 */
+  function shown(n) {
+    var nm = MT.pcName(n);
+    if (Math.abs(n.acc) === 2 || /^(E♯|B♯|F♭|C♭)$/.test(nm)) return nm + '（=' + MT.pcName(MT.fromMidi(n.midi, n.acc < 0)) + ' 键）';
+    return nm;
+  }
+  function makeSegmented(el, items, current, onPick) {
+    el.innerHTML = '';
+    items.forEach(function (it) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = it[1];
+      b.dataset.v = it[0];
+      if (it[0] === current) b.classList.add('active');
+      b.addEventListener('click', function () {
+        el.querySelectorAll('button').forEach(function (x) { x.classList.toggle('active', x === b); });
+        onPick(it[0]);
+      });
+      el.appendChild(b);
+    });
+  }
+  function flash(kb, midis, ms) {
+    midis.forEach(function (m) { kb.press(m); });
+    setTimeout(function () { midis.forEach(function (m) { kb.release(m); }); }, ms || 900);
+  }
+
+  /* ---------- 7.2 三和弦实验室 ---------- */
+  var ROOTS = [['C', 'C'], ['Db', 'D♭'], ['D', 'D'], ['Eb', 'E♭'], ['E', 'E'], ['F', 'F'], ['F#', 'F♯'], ['G', 'G'], ['Ab', 'A♭'], ['A', 'A'], ['Bb', 'B♭'], ['B', 'B']];
+  var TYPES = [['maj', '大三和弦'], ['min', '小三和弦'], ['dim', '减三和弦'], ['aug', '增三和弦']];
+  var BADGES = { maj: ['R', '3', '5'], min: ['R', '♭3', '5'], dim: ['R', '♭3', '♭5'], aug: ['R', '3', '♯5'] };
+  var ALT = { maj: '', min: '也写作 {r}min、{r}−', dim: '也写作 {r}°', aug: '也写作 {r}+' };
+  var tl = { root: 'C', type: 'maj' };
+  var tlKbEl = $('#tl-kb');
+  var tlKb = new PianoKeyboard(tlKbEl, { start: 'C4', end: 'B5', labels: 'c' });
+  tlKbEl._kb = tlKb;
+  function renderTriad(play) {
+    var notes = MT.chord(tl.root + '4', tl.type);
+    var rootName = MT.pcName(notes[0]);
+    $('#tl-sym').textContent = MT.chordSymbol(tl.root, tl.type);
+    $('#tl-zh').textContent = rootName + ' ' + MT.CHORDS[tl.type].zh;
+    $('#tl-alt').textContent = ALT[tl.type] ? '（' + ALT[tl.type].replace(/\{r\}/g, rootName) + '）' : '';
+    $('#tl-notes').textContent = notes.map(shown).join('　');
+    $('#tl-struct').textContent = MT.interval(notes[0], notes[1]).zh + ' + ' + MT.interval(notes[1], notes[2]).zh + '（根音到五音：' + MT.interval(notes[0], notes[2]).zh + '）';
+    var names = notes.map(ascii);
+    tlKb.setHighlight(names, { badges: BADGES[tl.type] });
+    Staff.render($('#tl-staff'), { notes: names[0] + ':q ' + names[1] + ' ' + names[2] + ' [' + names.join(' ') + ']:h', names: 'name', playable: false });
+    $('#tl-block').dataset.play = names.join(' ');
+    $('#tl-arp').dataset.play = names.join(' ');
+    if (play) {
+      Sound.playChord(notes.map(function (n) { return n.midi; }), { duration: 1.5 });
+      flash(tlKb, notes.map(function (n) { return n.midi; }), 1300);
+    }
+  }
+  makeSegmented($('#tl-root'), ROOTS, tl.root, function (v) { tl.root = v; renderTriad(true); });
+  makeSegmented($('#tl-type'), TYPES, tl.type, function (v) { tl.type = v; renderTriad(true); });
+  renderTriad(false);
+
+  /* ---------- 7.5 转位实验室 ---------- */
+  var INV_CHORDS = [
+    { id: 'C', root: 'C4', type: 'maj' }, { id: 'F', root: 'F3', type: 'maj' }, { id: 'G', root: 'G3', type: 'maj' },
+    { id: 'Am', root: 'A3', type: 'min' }, { id: 'Dm', root: 'D4', type: 'min' }, { id: 'G7', root: 'G3', type: 'dom7' }, { id: 'Cmaj7', root: 'C4', type: 'maj7' }
+  ];
+  var DEG = { maj: ['R', '3', '5'], min: ['R', '♭3', '5'], dom7: ['R', '3', '5', '♭7'], maj7: ['R', '3', '5', '7'] };
+  var ROLE = ['根音', '三音', '五音', '七音'];
+  var INV_NAMES = [['0', '原位'], ['1', '第一转位'], ['2', '第二转位'], ['3', '第三转位']];
+  var il = { chord: INV_CHORDS[0], inv: 0 };
+  var ilKbEl = $('#il-kb');
+  var ilKb = new PianoKeyboard(ilKbEl, { start: 'F3', end: 'E6', labels: 'c' });
+  ilKbEl._kb = ilKb;
+  function renderInv(play) {
+    var c = il.chord;
+    var size = MT.CHORDS[c.type].intervals.length;
+    if (il.inv >= size) il.inv = 0;
+    // 转位按钮：三和弦没有第三转位
+    $('#il-inv').querySelectorAll('button').forEach(function (b) {
+      var v = +b.dataset.v;
+      b.disabled = v >= size;
+      b.style.opacity = v >= size ? '.4' : '';
+      b.classList.toggle('active', v === il.inv);
+    });
+    var base = MT.chord(c.root, c.type);
+    var notes = MT.chord(c.root, c.type, { inversion: il.inv });
+    var degs = DEG[c.type].slice(il.inv).concat(DEG[c.type].slice(0, il.inv));
+    var bass = notes[0];
+    var sym = il.inv ? MT.chordSymbol(base[0], c.type, bass) : MT.chordSymbol(base[0], c.type);
+    $('#il-sym').textContent = sym;
+    $('#il-name').textContent = MT.pcName(base[0]) + ' ' + MT.CHORDS[c.type].zh + ' · ' + INV_NAMES[il.inv][1];
+    $('#il-desc').innerHTML = '最下面是<b>' + ROLE[il.inv] + ' ' + MT.pcName(bass) + '</b>，从下往上：' + notes.map(function (n) { return MT.pcName(n); }).join(' – ') +
+      (il.inv ? '；写作 <span class="nn">' + sym + '</span>' : '；根音在最下面，直接写 <span class="nn">' + sym + '</span>');
+    var names = notes.map(ascii);
+    ilKb.clearHighlight();
+    ilKb.setHighlight(names.slice(1), { cls: 'hl', badges: degs.slice(1) });
+    ilKb.setHighlight([names[0]], { cls: 'hl2', badges: [degs[0]] }, true);
+    // 五线谱：列出该和弦的所有转位，高亮当前
+    var parts = [];
+    for (var i = 0; i < size; i++) {
+      var inv = MT.chord(c.root, c.type, { inversion: i });
+      var s = i ? MT.chordSymbol(base[0], c.type, inv[0]) : MT.chordSymbol(base[0], c.type);
+      parts.push('[' + inv.map(ascii).join(' ') + ']:w' + (i === il.inv ? '*2' : '') + '^' + s + '_' + INV_NAMES[i][1]);
+    }
+    Staff.render($('#il-staff'), { notes: parts.join(' | ') + ' |]', playable: false });
+    $('#il-play').dataset.play = names.join(' ');
+    if (play) {
+      Sound.playChord(notes.map(function (n) { return n.midi; }), { duration: 1.5 });
+      flash(ilKb, notes.map(function (n) { return n.midi; }), 1300);
+    }
+  }
+  makeSegmented($('#il-chord'), INV_CHORDS.map(function (c) { return [c.id, MT.pretty(c.id)]; }), il.chord.id, function (v) {
+    il.chord = INV_CHORDS.filter(function (c) { return c.id === v; })[0];
+    renderInv(true);
+  });
+  makeSegmented($('#il-inv'), INV_NAMES, '0', function (v) { il.inv = +v; renderInv(true); });
+  renderInv(false);
+
+  /* ---------- 7.6 调内和弦实验室 ---------- */
+  var KEYS = [['C', 'C 大调'], ['G', 'G 大调'], ['D', 'D 大调'], ['F', 'F 大调'], ['Bb', 'B♭ 大调'], ['Am', 'a 小调'], ['Em', 'e 小调'], ['Dm', 'd 小调']];
+  var QZH = { maj: '大三', min: '小三', dim: '减三', aug: '增三' };
+  var dl = { key: 'C', chords: [] };
+  var dlKbEl = $('#dl-kb');
+  var dlKb = new PianoKeyboard(dlKbEl, { start: 'F3', end: 'B5', labels: 'c' });
+  dlKbEl._kb = dlKb;
+  var seq = null;
+  function octaveFor(key) {
+    var k = MT.parseKey(key);
+    return MT.mod(MT.parseNote(k.tonic + '4').midi, 12) <= 6 ? 4 : 3;
+  }
+  function symOf(c) { return c.type === 'dim' ? MT.pcName(c.root) + '°' : c.symbol; }
+  function chordMidis(c) { return [c.root.midi - 12].concat(c.notes.map(function (n) { return n.midi; })); }
+  function showChord(i) {
+    var c = dl.chords[i];
+    document.querySelectorAll('#dl-cards .dia-card').forEach(function (el, k) { el.classList.toggle('on', k === i); });
+    dlKb.setHighlight(c.notes.map(ascii), { badges: 'name' });
+  }
+  function renderDia() {
+    var k = MT.parseKey(dl.key);
+    dl.chords = MT.diatonicChords(dl.key, { octave: octaveFor(dl.key) });
+    var cards = $('#dl-cards');
+    cards.innerHTML = '';
+    dl.chords.forEach(function (c, i) {
+      var el = document.createElement('div');
+      el.className = 'dia-card q-' + c.type;
+      el.innerHTML = '<div class="rn">' + c.roman + '</div><div class="sym">' + symOf(c) + '</div><div class="q">' + (QZH[c.type] || c.zh) + '</div>';
+      el.title = '点击试听 ' + c.symbol;
+      el.addEventListener('click', function () {
+        if (seq) seq.stop();
+        showChord(i);
+        var ms = chordMidis(c);
+        Sound.playChord(ms, { duration: 1.6 });
+        flash(dlKb, ms.slice(1), 1300);
+      });
+      cards.appendChild(el);
+    });
+    var parts = dl.chords.map(function (c) { return '[' + c.notes.map(ascii).join(' ') + ']:w^' + c.roman + '_' + symOf(c); });
+    Staff.render($('#dl-staff'), { notes: parts.join(' | ') + ' |]', key: dl.key, playable: false, spacing: 'even', noteSpace: 52 });
+    dlKb.clearHighlight();
+    $('#dl-note').textContent = k.mode === 'minor'
+      ? '小调口诀：小、减、大、小、小、大、大（自然小调）'
+      : '大调口诀：大、小、小、大、大、小、减';
+  }
+  function playList(idxs, bpm) {
+    if (seq) seq.stop();
+    var events = idxs.map(function (i) { return { notes: chordMidis(dl.chords[i]), beats: 2, ci: i }; });
+    seq = Sound.playSequence(events, {
+      bpm: bpm || 100,
+      onEvent: function (ev) { showChord(ev.ci); flash(dlKb, ev.notes.slice(1), 60000 / (bpm || 100) * 2 - 80); },
+      onEnd: function () { seq = null; }
+    });
+  }
+  $('#dl-all').addEventListener('click', function () { playList([0, 1, 2, 3, 4, 5, 6, 0], 110); });
+  $('#dl-145').addEventListener('click', function () { playList([0, 3, 4, 0], 90); });
+  makeSegmented($('#dl-key'), KEYS, dl.key, function (v) { dl.key = v; renderDia(); });
+  renderDia();
+})();
+</script>
+</body>
+</html>

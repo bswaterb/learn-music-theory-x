@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 3 章 看懂乐谱：五线谱与简谱 · 乐理入门</title>
+<script>try{var t=localStorage.getItem('mt-theme');document.documentElement.setAttribute('data-theme',t?JSON.parse(t):(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))}catch(e){}</script>
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+  /* 音名带数字时使用等高数字字体（Georgia 的 0 像 o） */
+  .doc .nn { font-family: "Times New Roman", "Songti SC", serif; font-variant-numeric: lining-nums; }
+  .doc .staff-svg { height: auto; }
+  .lines-svg { display: block; width: 100%; max-width: 560px; height: auto; margin: 0 auto; color: var(--text); }
+  .lines-svg text { font-family: var(--font); font-size: 15px; font-weight: 650; }
+  .clef-card { text-align: center; }
+  .clef-card h4 { margin: 0 0 4px; }
+  .clef-card p { margin: 0; font-size: 14px; color: var(--text-2); }
+  .mnemo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .mnemo .card { padding: 14px 16px 8px; }
+  .mnemo h4 { margin: 0 0 2px; font-size: 15px; }
+  .mnemo .rule { font-size: 13.5px; color: var(--text-2); margin: 0; }
+  .mnemo .rule b { color: var(--primary-ink); letter-spacing: .06em; }
+  .drill-box { display: grid; gap: 10px; }
+  .drill-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+  .drill-head .sp { flex: 1; }
+  .jp-sym { font: 700 20px var(--font); letter-spacing: .1em; white-space: nowrap; }
+  .compare-table td:first-child { font-weight: 650; white-space: nowrap; }
+  @media (max-width: 640px) { .mnemo { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body data-page="ch03" data-root="..">
+<main class="page">
+<article class="content doc">
+
+<header class="chapter-header">
+  <div class="chapter-kicker">第 3 章</div>
+  <h1>看懂乐谱：五线谱与简谱</h1>
+  <p class="lead">乐谱就是"把声音写在纸上"的方法：作曲家把脑子里的旋律记下来，演奏者照着谱子把它还原成声音。这一章学习两种最常用的乐谱——全世界通用的<strong>五线谱</strong>，和中国人最熟悉的<strong>简谱</strong>。学完以后，你就能认出谱上每个音的名字，并在键盘上把它弹出来。</p>
+  <div class="chapter-meta"><span>⏱ 预计 30 分钟</span><span>🎯 难度 ★★☆☆☆</span><span>🎼 会用到第 2 章的音名和键盘</span></div>
+  <div class="goals">
+    <h4>学完本章，你将能够：</h4>
+    <ul>
+      <li>说出五线谱的"线"和"间"，知道位置越高、音越高；</li>
+      <li>认识<b>高音谱号</b>和<b>低音谱号</b>，理解谱号如何决定每个位置的音名；</li>
+      <li>用<b>加线</b>读出五线谱外的音，知道中央 C 在大谱表中的位置；</li>
+      <li>用口诀和"地标音"快速认出谱上的音；</li>
+      <li>读懂简谱中的数字、高低音点、休止符和"1=C"；</li>
+      <li>比较五线谱和简谱的长处，知道什么时候用哪一种。</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+<h2 id="s3-1">3.1 五线谱：五条线、四个间</h2>
+<p><span class="term">五线谱</span><span class="en">staff</span>是由<b>五条等距的平行横线</b>组成的"格子"。线与线之间的空白叫作<span class="term">间</span><span class="en">space</span>。五条线之间正好有四个间，所以我们常说五线谱有"五线四间"。</p>
+
+<div class="figure">
+  <svg class="lines-svg" viewBox="0 0 560 200" role="img" aria-label="五线谱的线与间：从下往上数">
+    <g stroke="currentColor" stroke-width="1.6">
+      <line x1="140" y1="30" x2="400" y2="30"/>
+      <line x1="140" y1="60" x2="400" y2="60"/>
+      <line x1="140" y1="90" x2="400" y2="90"/>
+      <line x1="140" y1="120" x2="400" y2="120"/>
+      <line x1="140" y1="150" x2="400" y2="150"/>
+    </g>
+    <g style="fill:var(--primary)">
+      <text x="412" y="35">第五线</text>
+      <text x="412" y="65">第四线</text>
+      <text x="412" y="95">第三线</text>
+      <text x="412" y="125">第二线</text>
+      <text x="412" y="155">第一线</text>
+    </g>
+    <g style="fill:var(--accent)" text-anchor="end">
+      <text x="128" y="50">第四间</text>
+      <text x="128" y="80">第三间</text>
+      <text x="128" y="110">第二间</text>
+      <text x="128" y="140">第一间</text>
+    </g>
+    <ellipse cx="215" cy="150" rx="12.5" ry="9" transform="rotate(-20 215 150)" style="fill:var(--primary)"/>
+    <ellipse cx="325" cy="105" rx="12.5" ry="9" transform="rotate(-20 325 105)" style="fill:var(--accent)"/>
+    <g style="fill:var(--text-3)" font-size="13" text-anchor="middle">
+      <text x="215" y="182" style="font-size:13px">线上的音</text>
+      <text x="325" y="182" style="font-size:13px">间里的音</text>
+    </g>
+    <path d="M500 150 L500 40" stroke="currentColor" stroke-width="1.6" opacity=".45"/>
+    <path d="M493 48 L500 32 L507 48 Z" fill="currentColor" opacity=".45"/>
+    <text x="500" y="178" text-anchor="middle" style="fill:var(--text-3);font-size:13px">从下往上数</text>
+  </svg>
+  <div class="caption">线和间都是<b>从下往上</b>数：最下面的是第一线，最上面的是第五线；第一线和第二线之间是第一间。紫色音符"挂"在第一线上（线从符头中间穿过），橙色音符"坐"在第二间里（符头夹在两条线之间）。</div>
+</div>
+
+<p>音符的<b>符头</b>（那个椭圆形的"小圆点"）可以写在线上，也可以写在间里。位置决定音高：<strong>越往上，音越高；越往下，音越低</strong>。从一条线走到紧挨着的间（或者从间走到紧挨着的线），音名就前进一个。</p>
+
+<div class="figure">
+  <div data-staff="E4:w_一线 F4_一间 G4_二线 A4_二间 B4_三线 C5_三间 D5_四线 E5_四间 F5_五线" data-clef="none" data-spacing="even" data-playable="false"></div>
+  <div class="caption">九个位置像楼梯一样一级一级往上走：线、间、线、间……每上一级，就是下一个音名。</div>
+</div>
+
+<div class="callout analogy">
+  <div class="callout-title">打个比方</div>
+  <p>把五线谱想象成一座楼梯：线和间就是一级级台阶，而且<b>线和间交替出现</b>，一级都不能跳过。从第一线到第二线，中间其实还隔着"第一间"这一级台阶——所以它们相差两个音名，而不是一个。</p>
+</div>
+
+<div class="callout warn">
+  <div class="callout-title">常见误区</div>
+  <p>五线谱上相邻的位置相差"一个音名"，但<b>不一定</b>是一个全音。回忆第 2 章：E–F、B–C 只差半音。五线谱本身看不出半音还是全音，要靠音名来判断。</p>
+</div>
+</section>
+
+<section>
+<h2 id="s3-2">3.2 谱号：决定每个位置是什么音</h2>
+<p>光有五条线，我们还不知道每个位置叫什么名字——就像一张地图没有标注"北"在哪里。<span class="term">谱号</span><span class="en">clef</span>就是五线谱的"指北针"：它写在每行五线谱的最左边，<b>规定某一条线是哪个音</b>，其他位置再按"一级一个音名"推算出来。最常用的谱号有两种。</p>
+
+<h3>高音谱号（G 谱号）</h3>
+<p><span class="term">高音谱号</span><span class="en">treble clef</span>由字母 G 的花体演变而来，所以也叫 <b>G 谱号</b>。注意它中间的螺旋：螺旋的中心正好绕着<b>第二线</b>，意思是"第二线是 G"——准确地说，是中央 C 上方的 <span class="nn">G4</span>。</p>
+
+<div class="figure">
+  <div data-staff="E4:w F4 G4*2 A4 B4 C5 D5 E5 F5" data-spacing="even" data-names="octave" data-bpm="110"></div>
+  <div class="caption">高音谱表上的九个位置。紫色的 G4 就是谱号"圈住"的那条线；从它出发往上数 A、B、C……往下数 F、E。</div>
+</div>
+<p>使用高音谱号的五线谱叫<b>高音谱表</b>。钢琴的右手、小提琴、长笛、小号、吉他，以及女声和童声的歌谱，大多用高音谱表。</p>
+
+<h3>低音谱号（F 谱号）</h3>
+<p><span class="term">低音谱号</span><span class="en">bass clef</span>由字母 F 演变而来，也叫 <b>F 谱号</b>。它右边的<b>两个点夹住了第四线</b>，表示"第四线是 F"——中央 C 下方的 <span class="nn">F3</span>。谱号开头那个圆点，也正好落在第四线上。</p>
+
+<div class="figure">
+  <div data-staff="G2:w A2 B2 C3 D3 E3 F3*2 G3 A3" data-clef="bass" data-spacing="even" data-names="octave" data-bpm="110"></div>
+  <div class="caption">低音谱表上的九个位置。紫色的 F3 位于两个点之间的第四线上。</div>
+</div>
+<p>使用低音谱号的叫<b>低音谱表</b>，用于钢琴的左手、大提琴、低音提琴（贝斯）、长号、大号以及男低音等。</p>
+
+<div class="callout note">
+  <div class="callout-title">还有一种：中音谱号</div>
+  <p>此外还有 <b>C 谱号</b>，它的中心对准哪条线，哪条线就是中央 C。最常见的用法是<b>中音谱号</b>（中心对准第三线），中提琴的谱子就用它。入门阶段很少遇到，知道有这么一种就够了。</p>
+</div>
+
+<h3>同一个位置，不同的谱号，不同的音</h3>
+<p>这是初学者最容易混淆的地方：<b>谱号变了，同一个位置代表的音也变了</b>。比较一下：</p>
+<div class="figure">
+  <div class="figure-row">
+    <div data-staff="G4:w*2 B4:w*3" data-names="octave" data-spacing="even" data-bpm="80" data-caption="高音谱表：第二线 G4、第三线 B4"></div>
+    <div data-staff="B2:w*2 D3:w*3" data-clef="bass" data-names="octave" data-spacing="even" data-bpm="80" data-caption="低音谱表：第二线 B2、第三线 D3"></div>
+  </div>
+  <div class="caption">两个音符的位置一模一样，听起来却相差很远（点击"播放"对比一下）。所以看谱的第一步永远是：<b>先看谱号</b>。</div>
+</div>
+
+<div class="callout tip">
+  <div class="callout-title">小技巧</div>
+  <p>同一个位置上，低音谱表的音名 = 高音谱表的音名<b>往后数两个字母</b>（八度不同）。比如第一线：高音谱表是 E，往后数两个是 G，低音谱表就是 G。第二线：G → B。熟悉了一种谱表，另一种就好记多了。</p>
+</div>
+</section>
+
+<section>
+<h2 id="s3-3">3.3 加线与大谱表</h2>
+<p>五线四间只有 9 个位置，可音乐里的音远不止 9 个。比五线谱更高或更低的音怎么写呢？办法是临时在五线谱的上方或下方画几条短横线，叫作<span class="term">加线</span><span class="en">ledger lines</span>。加线只在需要的地方画，长度刚好比符头宽一点。</p>
+<ul>
+  <li>在五线谱<b>上方</b>的叫<b>上加线</b>：靠近五线谱的第一条是<b>上加一线</b>，再往上是<b>上加二线</b>……</li>
+  <li>在五线谱<b>下方</b>的叫<b>下加线</b>：靠近五线谱的是<b>下加一线</b>，再往下是<b>下加二线</b>……</li>
+  <li>加线旁边、加线之间的空位（间）同样可以写音符，规则和五线谱内部完全一样：线、间交替，一级一个音名。</li>
+</ul>
+
+<div class="figure">
+  <div data-staff="A3:w B3 C4*2 D4 E4 F5 G5 A5*2 B5 C6" data-names="octave" data-spacing="even" data-bpm="120"></div>
+  <div class="caption">高音谱表上下的加线。紫色的 <b>C4 写在下加一线上</b>，A5 写在上加一线上。加线越多，离五线谱越远，读起来也越费劲。</div>
+</div>
+
+<h3>中央 C 的两种写法</h3>
+<p>还记得第 2 章的中央 C（C4）吗？它正好在两种谱表的"交界处"：在高音谱表里写在<b>下加一线</b>，在低音谱表里写在<b>上加一线</b>。两种写法弹出来是同一个键、同一个声音。</p>
+<div class="figure">
+  <div class="figure-row">
+    <div data-staff="C4:w*2" data-names="octave" data-caption="高音谱表：下加一线"></div>
+    <div data-staff="C4:w*2" data-clef="bass" data-names="octave" data-caption="低音谱表：上加一线"></div>
+  </div>
+</div>
+
+<h3>大谱表：钢琴谱的样子</h3>
+<p>钢琴的音域非常宽，一行谱表装不下。所以钢琴谱把<b>高音谱表放在上面、低音谱表放在下面</b>，左边用一个花括号连起来，这就是<span class="term">大谱表</span><span class="en">grand staff</span>。一般来说，右手弹上面的谱，左手弹下面的谱，中央 C 就像连接上下两层楼的"桥"。</p>
+<div class="figure">
+  <div data-staff="grand" data-treble="R:w | R:w | C4:q D4 E4 F4 | G4 A4 B4 C5 |]" data-bass="C3:q D3 E3 F3 | G3 A3 B3 C4 | R:w | R:w |]" data-names="octave" data-bpm="120"></div>
+  <div class="caption">从 C3 一直"爬"到 C5：前两小节写在低音谱表，后两小节写在高音谱表（另一行的方块是休止符，表示这只手休息，第 4 章会讲）。第二小节最后的 C4 和第三小节开头的 C4，位置不同，却是同一个音。</div>
+</div>
+</section>
+
+<section>
+<h2 id="s3-4">3.4 快速识谱的三个方法</h2>
+<p>读谱就像认字：一开始要一个个"拼"，熟练以后一眼就能认出来。下面三个方法搭配使用，能让你更快地度过"拼读"阶段。</p>
+
+<h3>方法一：口诀记忆</h3>
+<p>把每种谱表的"线上的音"和"间里的音"分别记住。英语国家的孩子用句子的首字母来记，我们也可以借用，同时配上唱名：</p>
+<div class="mnemo">
+  <div class="card">
+    <h4>高音谱表 · 五条线</h4>
+    <p class="rule"><b>E G B D F</b>（mi sol si re fa）<br>口诀：<i>Every Good Boy Does Fine</i></p>
+    <div data-staff="E4:w G4 B4 D5 F5" data-names="name" data-spacing="even" data-note-space="32" data-wrap="false" data-bpm="100"></div>
+  </div>
+  <div class="card">
+    <h4>高音谱表 · 四个间</h4>
+    <p class="rule"><b>F A C E</b>（fa la do mi）<br>正好拼成英文单词 <i>FACE</i>（脸）</p>
+    <div data-staff="F4:w A4 C5 E5" data-names="name" data-spacing="even" data-note-space="32" data-wrap="false" data-bpm="100"></div>
+  </div>
+  <div class="card">
+    <h4>低音谱表 · 五条线</h4>
+    <p class="rule"><b>G B D F A</b>（sol si re fa la）<br>口诀：<i>Good Boys Do Fine Always</i></p>
+    <div data-staff="G2:w B2 D3 F3 A3" data-clef="bass" data-names="name" data-spacing="even" data-note-space="32" data-wrap="false" data-bpm="100"></div>
+  </div>
+  <div class="card">
+    <h4>低音谱表 · 四个间</h4>
+    <p class="rule"><b>A C E G</b>（la do mi sol）<br>口诀：<i>All Cows Eat Grass</i>（所有的牛都吃草）</p>
+    <div data-staff="A2:w C3 E3 G3" data-clef="bass" data-names="name" data-spacing="even" data-note-space="32" data-wrap="false" data-bpm="100"></div>
+  </div>
+</div>
+
+<div class="callout memory">
+  <div class="callout-title">记忆口诀</div>
+  <p>高音谱表：<b>线 EGBDF，间 FACE</b>；低音谱表：<b>线 GBDFA，间 ACEG</b>。<br>发现规律了吗？每一组都是"隔一个字母取一个"（E-<s>F</s>-G-<s>A</s>-B…），因为相邻的线之间还隔着一个间。</p>
+</div>
+
+<h3>方法二：地标音法</h3>
+<p>与其死记 18 个位置，不如先牢牢记住几个"地标"，遇到不认识的音，就从最近的地标出发去数。推荐这 5 个地标：</p>
+<div class="figure">
+  <div class="figure-row">
+    <div data-staff="C3:w*2 F3*2 C4*2" data-clef="bass" data-names="octave" data-spacing="even" data-bpm="90" data-caption="低音谱表：C3（第二间）、F3（第四线）、中央 C（上加一线）"></div>
+    <div data-staff="C4:w*2 G4*2 C5*2" data-names="octave" data-spacing="even" data-bpm="90" data-caption="高音谱表：中央 C（下加一线）、G4（第二线）、C5（第三间）"></div>
+  </div>
+</div>
+<p>这几个地标都很好记：G4 和 F3 就是两个谱号"标注"的那条线；中央 C 是两张谱表之间的"桥"；C3 和 C5 分别是低音谱表的第二间和高音谱表的第三间，正好和中央 C 相差一个八度。</p>
+
+<h3>方法三：一格一格地数</h3>
+<p>从一个认识的音出发，每往上走一格（线→间，或间→线），音名就往后数一个；往下走则往前数一个。比如在高音谱表上，已知第二线是 G，想知道第四线是什么：</p>
+<div class="figure">
+  <div data-staff="G4:q*2 A4 B4 C5 D5*3" data-names="name" data-time="" data-bpm="100"></div>
+  <div class="caption">第二线 G → 第二间 A → 第三线 B → 第三间 C → <b>第四线 D</b>。数熟了，就不用再数了。</div>
+</div>
+
+<div class="callout try">
+  <div class="callout-title">动手试试：遮住音名读一读</div>
+  <div class="drill-box">
+    <div class="drill-head">
+      <div class="segmented" id="drill-clef">
+        <button type="button" class="active" data-clef="treble">高音谱表</button>
+        <button type="button" data-clef="bass">低音谱表</button>
+      </div>
+      <span class="sp"></span>
+      <button class="btn btn-sm" id="drill-new" type="button">🔀 换一组</button>
+      <button class="btn btn-sm btn-primary" id="drill-show" type="button">👀 显示答案</button>
+    </div>
+    <div id="drill-staff"></div>
+    <p class="small muted" style="margin:0">先自己从左到右读出每个音的名字（可以借助地标），再点"显示答案"核对。点击单个音符可以听它的声音。</p>
+  </div>
+</div>
+</section>
+
+<section>
+<h2 id="s3-5">3.5 简谱入门</h2>
+<p><span class="term">简谱</span><span class="en">numbered musical notation</span>用数字来记录音高，在中国非常普及：歌本、合唱谱、民乐谱、吉他弹唱谱里随处可见。它的核心就是第 2 章学过的那七个数字：</p>
+
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>写法</th><th>含义</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td class="jp-sym">1 2 3 4 5 6 7</td><td>do re mi fa sol la si</td><td>七个基本音，读的时候念唱名</td></tr>
+    <tr><td class="jp-sym">0</td><td>休止</td><td>这一拍不发声（安静）</td></tr>
+    <tr><td>数字<b>上方</b>加点</td><td>高八度</td><td>点越多越高，两个点就是高两个八度</td></tr>
+    <tr><td>数字<b>下方</b>加点</td><td>低八度</td><td>点越多越低</td></tr>
+    <tr><td class="jp-sym">1=C</td><td>调号</td><td>表示"1（do）这个音唱/弹作 C"</td></tr>
+    <tr><td class="jp-sym">4/4</td><td>拍号</td><td>每小节有几拍，第 4 章详细讲</td></tr>
+    <tr><td>短横线 <span class="jp-sym">-</span> 与下划线</td><td>音的长短</td><td>横线让音变长、下划线让音变短，第 4 章详细讲</td></tr>
+    <tr><td class="jp-sym">|</td><td>小节线</td><td>和五线谱一样，把音乐分成一小节一小节</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>高音点与低音点</h3>
+<p>和五线谱用"位置高低"表示音高不同，简谱用<b>数字上下的小圆点</b>来区分八度。下面是"1=C"时从低到高的一串音（下方小字是对应的音名）：</p>
+<div class="figure">
+  <div data-jianpu="5, 6, 7, 1 2 3 4 5 6 7 1' 2' 3'" data-key="C" data-lyrics="G3 A3 B3 C4 D4 E4 F4 G4 A4 B4 C5 D5 E5" data-bpm="120"></div>
+  <div class="caption">不带点的 1～7 是中音区（从中央 C 开始）；数字下面有点的 5 6 7 比中音区低一个八度，上面有点的 1 2 3 高一个八度。</div>
+</div>
+
+<h3>休止符 0</h3>
+<p>数字 <b>0</b> 表示"这里停一下，不发声"。休止也是音乐的一部分，就像说话时的停顿。</p>
+<div class="figure">
+  <div data-jianpu="1 3 5 0 | 5 3 1 0 |]" data-key="C" data-time="4/4" data-bpm="96"></div>
+  <div class="caption">每小节第四拍的 0，都是安静的一拍。</div>
+</div>
+
+<h3>"1=C"是什么意思？</h3>
+<p>简谱开头的 <b>1=C</b> 告诉你：数字 1 对应的是 C（do = C）。本章的例子都是 1=C，这时简谱数字和音名是一一对应的：1=C、2=D、3=E……如果写的是 <b>1=G</b>，那么 1 就要唱/弹成 G，整首歌会整体升高。听听同一串数字在两个调里的样子：</p>
+<div class="figure">
+  <div class="figure-row">
+    <div data-jianpu="1 2 3 4 5 - |]" data-key="C" data-bpm="100" data-caption="1=C：从 C 开始"></div>
+    <div data-jianpu="1 2 3 4 5 - |]" data-key="G" data-bpm="100" data-caption="1=G：同样的数字，从 G 开始"></div>
+  </div>
+  <div class="caption">旋律的"样子"完全一样，只是整体变高了。这种"数字跟着调走"的读法叫<b>首调</b>，第 6 章会详细讲。</div>
+</div>
+
+<h3>例子：《小星星》</h3>
+<p>来看一首最熟悉的儿歌（法国民歌）。上面是简谱（下方小字是唱名），下面是同一段旋律的五线谱，两者都可以播放、点击单个音符试听。对照着看，你会发现两种谱表达的是同一件事：</p>
+<div class="figure">
+  <div data-jianpu="1 1 5 5 | 6 6 5 - | 4 4 3 3 | 2 2 1 - |]" data-key="C" data-time="4/4" data-bpm="100" data-lyrics="do do sol sol la la sol fa fa mi mi re re do"></div>
+  <div data-staff="C4:q C4 G4 G4 | A4 A4 G4:h | F4:q F4 E4 E4 | D4 D4 C4:h |]" data-time="4/4" data-names="number" data-bpm="100"></div>
+  <div class="caption">五线谱下方标出了对应的简谱数字。简谱里的"5 -"（5 后面跟一条横线）和五线谱里的空心音符（二分音符），都表示这个音要唱两拍。</div>
+</div>
+
+<details class="fold">
+  <summary>展开：《小星星》完整版（简谱 + 五线谱）</summary>
+  <div class="fold-body">
+    <div data-jianpu="1 1 5 5 | 6 6 5 - | 4 4 3 3 | 2 2 1 - | 5 5 4 4 | 3 3 2 - | 5 5 4 4 | 3 3 2 - | 1 1 5 5 | 6 6 5 - | 4 4 3 3 | 2 2 1 - |]" data-key="C" data-time="4/4" data-bpm="100"></div>
+    <div data-staff="C4:q C4 G4 G4 | A4 A4 G4:h | F4:q F4 E4 E4 | D4 D4 C4:h | G4:q G4 F4 F4 | E4 E4 D4:h | G4:q G4 F4 F4 | E4 E4 D4:h | C4:q C4 G4 G4 | A4 A4 G4:h | F4:q F4 E4 E4 | D4 D4 C4:h |]" data-time="4/4" data-bpm="100"></div>
+  </div>
+</details>
+
+<h3>读谱练习：《欢乐颂》</h3>
+<p>贝多芬《第九交响曲》中的《欢乐颂》旋律家喻户晓。先只看简谱，试着唱一唱（3 是 mi、4 是 fa、5 是 sol）；再展开下面的五线谱对照，并在键盘上弹出来。（"3." 和 "2_" 这类写法表示音的长短，下一章就会学到，现在先跟着播放感受。）</p>
+<div class="figure">
+  <div data-jianpu="3 3 4 5 | 5 4 3 2 | 1 1 2 3 | 3. 2_ 2 - | 3 3 4 5 | 5 4 3 2 | 1 1 2 3 | 2. 1_ 1 - |]" data-key="C" data-time="4/4" data-bpm="100"></div>
+</div>
+<details class="fold">
+  <summary>展开：《欢乐颂》的五线谱（带音名）</summary>
+  <div class="fold-body">
+    <div data-staff="E4:q E4 F4 G4 | G4 F4 E4 D4 | C4 C4 D4 E4 | E4:q. D4:8 D4:h | E4:q E4 F4 G4 | G4 F4 E4 D4 | C4 C4 D4 E4 | D4:q. C4:8 C4:h |]" data-time="4/4" data-names="name" data-bpm="100"></div>
+  </div>
+</details>
+</section>
+
+<section>
+<h2 id="s3-6">3.6 五线谱 vs 简谱：各有所长</h2>
+<p>两种乐谱没有绝对的好坏，只是擅长的事情不同：</p>
+<div class="table-wrap">
+<table class="table compare-table">
+  <thead><tr><th>对比项</th><th>五线谱</th><th>简谱</th></tr></thead>
+  <tbody>
+    <tr><td>怎么表示音高</td><td>用<b>位置</b>：一眼就能看出旋律的起伏</td><td>用<b>数字</b>：需要逐个读数字</td></tr>
+    <tr><td>入门难度</td><td>稍高：要认谱号、线间、加线</td><td>很低：会数数就能读</td></tr>
+    <tr><td>音高是否固定</td><td><b>绝对音高</b>：写的是哪个音就是哪个音</td><td><b>相对音高</b>：同样的数字，换个"1=?"就变调</td></tr>
+    <tr><td>转调</td><td>需要重新写谱（调号、位置都会变）</td><td>只改"1=?"，数字不用动</td></tr>
+    <tr><td>多声部、和弦</td><td>非常方便，钢琴谱、乐队总谱都用它</td><td>写多个声部比较拥挤</td></tr>
+    <tr><td>使用范围</td><td>全世界通用，器乐（尤其钢琴、管弦乐）的标准</td><td>主要在中国：歌曲、合唱、民乐、弹唱</td></tr>
+  </tbody>
+</table>
+</div>
+<p>建议是：<b>两种都学</b>。唱歌、看歌本时用简谱很方便；弹钢琴、学乐理、和世界接轨，离不开五线谱。在 1=C 时，两者的换算非常简单——五线谱上的 C D E F G A B 就是简谱的 1 2 3 4 5 6 7：</p>
+<div class="figure">
+  <div data-staff="C4:q D4 E4 F4 G4 A4 B4 C5:h" data-names="number" data-bpm="110"></div>
+  <div class="caption">五线谱下方标出了简谱数字（1=C）。最后的 C5 比开头的 C4 高一个八度，在简谱中应写作上方带点的 1。</div>
+</div>
+<p>本教程后面的章节以五线谱为主，同时在合适的地方给出简谱对照。</p>
+</section>
+
+<section>
+<h2 id="s3-summary">本章小结</h2>
+<div class="callout summary">
+  <div class="callout-title">要点回顾</div>
+  <ul>
+    <li>五线谱有<b>五线四间</b>，都<b>从下往上</b>数；位置越高，音越高；相邻的线和间相差一个音名。</li>
+    <li><b>谱号</b>决定每个位置的音名：<b>高音谱号</b>（G 谱号）规定第二线是 <b>G4</b>；<b>低音谱号</b>（F 谱号）规定第四线是 <b>F3</b>。看谱先看谱号。</li>
+    <li>超出五线谱的音写在<b>加线</b>上；<b>中央 C</b> 在高音谱表的<b>下加一线</b>、低音谱表的<b>上加一线</b>；钢琴用<b>大谱表</b>。</li>
+    <li>口诀：高音谱表<b>线 EGBDF、间 FACE</b>；低音谱表<b>线 GBDFA、间 ACEG</b>。配合"地标音"和"一格一格数"，识谱越来越快。</li>
+    <li>简谱用 <b>1～7</b> 表示 do～si，<b>0</b> 是休止，<b>上点高八度、下点低八度</b>，<b>1=C</b> 表示 do 是 C。</li>
+    <li>五线谱擅长表现<b>绝对音高和多声部</b>，简谱<b>易学、转调方便</b>，两种都值得掌握。</li>
+  </ul>
+</div>
+
+<h3>小测验</h3>
+<div class="quiz-set">
+  <div class="quiz" data-answer="2">
+    <p class="quiz-q">高音谱号又叫 G 谱号，它的螺旋中心圈住的第二线是哪个音？</p>
+    <ol class="quiz-opts"><li>C4</li><li>G4</li><li>F3</li><li>E4</li></ol>
+    <div class="quiz-explain">高音谱号由字母 G 演变而来，它"标注"的第二线是 <b>G4</b>。低音谱号（F 谱号）标注的是第四线 F3。</div>
+  </div>
+  <div class="quiz" data-answer="3">
+    <p class="quiz-q">中央 C（C4）在高音谱表上写在什么位置？</p>
+    <ol class="quiz-opts"><li>第一线</li><li>第三间</li><li>下加一线</li><li>上加一线</li></ol>
+    <div class="quiz-explain">高音谱表第一线是 E4，往下数 D4（第一线下方紧挨着的位置）、<b>C4（下加一线）</b>。在低音谱表上，中央 C 则写在上加一线。</div>
+  </div>
+  <div class="quiz" data-answer="1">
+    <p class="quiz-q">高音谱表四个间里的音，从下往上依次是？</p>
+    <ol class="quiz-opts"><li>F A C E</li><li>E G B D</li><li>G B D F</li><li>A C E G</li></ol>
+    <div class="quiz-explain">高音谱表的四个间拼起来正好是单词 <b>FACE</b>。E G B D F 是高音谱表的五条线；A C E G 是低音谱表的四个间。</div>
+  </div>
+  <div class="quiz" data-answer="4">
+    <p class="quiz-q">下面低音谱表上的这个音是？</p>
+    <div data-staff="G3:w" data-clef="bass" data-playable="false" data-min-width="140"></div>
+    <ol class="quiz-opts"><li>E3</li><li>B3</li><li>F3</li><li>G3</li></ol>
+    <div class="quiz-explain">低音谱表四个间从下往上是 A C E G，这个音在<b>第四间</b>，所以是 <b>G3</b>。也可以用地标数：第四线是 F3，往上一格就是 G3。</div>
+  </div>
+  <div class="quiz" data-answer="2">
+    <p class="quiz-q">简谱中，数字<b>下方</b>加一个小圆点表示？</p>
+    <ol class="quiz-opts"><li>高八度</li><li>低八度</li><li>延长一拍</li><li>休止</li></ol>
+    <div class="quiz-explain">上方加点 = 高八度，<b>下方加点 = 低八度</b>。延长用短横线"-"，休止用数字 0。</div>
+  </div>
+  <div class="quiz" data-answer="1">
+    <p class="quiz-q">听一听：<button data-play="C4 D4 E4 C4" data-bpm="96">播放旋律</button> 这段旋律对应哪一段简谱？（1=C）</p>
+    <ol class="quiz-opts"><li>1 2 3 1</li><li>1 1 5 5</li><li>3 2 1 2</li><li>5 4 3 2</li></ol>
+    <div class="quiz-explain">听到的是 C D E C，也就是 do re mi do，简谱写作 <b>1 2 3 1</b>——这是法国民歌《两只老虎》（Frère Jacques）的开头。</div>
+  </div>
+</div>
+
+<div class="callout tip">
+  <div class="callout-title">课后练一练</div>
+  <ul style="margin:0">
+    <li>打开 <a href="../tools/note-reading.html">🎼 识谱练习</a>，先选"高音谱表 + 谱内"，每天练 5 分钟，再逐步加入低音谱表和加线。</li>
+    <li>打开 <a href="../tools/piano.html">🎹 在线钢琴</a>，照着本章《小星星》《欢乐颂》的五线谱弹一遍，一边弹一边唱出唱名。</li>
+    <li>找一份你喜欢的歌的简谱，试着把前两句改写成五线谱（1=C 时，1 2 3 4 5 6 7 就是 C D E F G A B）。</li>
+  </ul>
+</div>
+</section>
+
+</article>
+</main>
+
+<script src="../assets/js/theory.js"></script>
+<script src="../assets/js/audio.js"></script>
+<script src="../assets/js/keyboard.js"></script>
+<script src="../assets/js/staff.js"></script>
+<script src="../assets/js/jianpu.js"></script>
+<script src="../assets/js/site.js"></script>
+<script src="../assets/js/services.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script>
+(function () {
+  // site.js 在 DOMContentLoaded 时初始化声明式组件；本页脚本需在其之后运行
+  function init() {
+    /* ---- 3.4 遮住音名读一读 ---- */
+    var POOLS = {
+      treble: ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5', 'G5', 'A5'],
+      bass: ['E2', 'F2', 'G2', 'A2', 'B2', 'C3', 'D3', 'E3', 'F3', 'G3', 'A3', 'B3', 'C4']
+    };
+    var clef = 'treble', show = false, notes = [];
+    var box = document.getElementById('drill-staff');
+    var showBtn = document.getElementById('drill-show');
+    function generate() {
+      var pool = POOLS[clef];
+      notes = [];
+      while (notes.length < 8) {
+        var n = MT.pick(pool);
+        if (notes.length && notes[notes.length - 1] === n) continue;
+        notes.push(n);
+      }
+    }
+    function draw() {
+      Staff.render(box, {
+        clef: clef, notes: notes.map(function (n, i) { return n + (i === 0 ? ':w' : ''); }).join(' '),
+        spacing: 'even', names: show ? 'name' : false, bpm: 110, playLabel: '播放这组音'
+      });
+      showBtn.textContent = show ? '🙈 隐藏答案' : '👀 显示答案';
+      showBtn.classList.toggle('btn-primary', !show);
+    }
+    document.querySelectorAll('#drill-clef button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        document.querySelectorAll('#drill-clef button').forEach(function (x) { x.classList.toggle('active', x === b); });
+        clef = b.dataset.clef; show = false; generate(); draw();
+      });
+    });
+    document.getElementById('drill-new').addEventListener('click', function () { show = false; generate(); draw(); });
+    showBtn.addEventListener('click', function () { show = !show; draw(); });
+    generate(); draw();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>

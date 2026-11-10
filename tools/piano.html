@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>在线钢琴 · 乐理入门</title>
+<meta name="description" content="浏览器里的在线钢琴：电脑键盘弹奏、延音踏板、音程与和弦识别、音阶/和弦高亮、跟弹儿歌、录音回放、MIDI 键盘输入。">
+<script>try{var t=localStorage.getItem('mt-theme');document.documentElement.setAttribute('data-theme',t?JSON.parse(t):(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))}catch(e){}</script>
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+  .piano-main { padding: 18px 20px 20px; }
+  .display { display: grid; grid-template-columns: minmax(200px, 290px) minmax(0, 1fr); gap: 14px; margin-bottom: 16px; }
+  .lcd { border-radius: 14px; padding: 14px 18px; background: var(--bg-sunken); border: 1px solid var(--border); min-height: 118px; position: relative; }
+  .lcd .label { font-size: 11.5px; font-weight: 700; color: var(--text-3); letter-spacing: .1em; }
+  .lcd .big { font: 800 42px/1.15 var(--font-mono); color: var(--primary); letter-spacing: -.01em; margin-top: 2px; }
+  .lcd .big.idle { color: var(--text-3); }
+  .lcd .alt { font: 600 16px var(--font-mono); color: var(--text-3); margin-left: 4px; }
+  .lcd .sub { color: var(--text-2); font-size: 13.5px; margin-top: 4px; }
+  .lcd .ana-title { font: 800 27px/1.25 var(--font); margin: 4px 0 2px; }
+  .lcd .ana-title .sym { font-family: var(--font-mono); color: var(--primary); margin-right: 10px; }
+  .lcd .ana-sub { color: var(--text-2); font-size: 14px; }
+  .lcd .hint { color: var(--text-3); font-size: 14px; margin-top: 8px; line-height: 1.7; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip { padding: 1px 10px; border-radius: 99px; background: var(--bg-elev); border: 1px solid var(--border); font: 650 13px/1.8 var(--font-mono); color: var(--text); }
+  .chip.root { border-color: var(--primary); color: var(--primary-ink); background: var(--primary-soft); }
+  .ctrl-bar { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin-bottom: 12px; }
+  .grp { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--text-2); }
+  .grp > .lbl { font-weight: 600; white-space: nowrap; }
+  .oct-nav { display: inline-flex; align-items: center; gap: 4px; }
+  .oct-nav .range { font: 700 13px var(--font-mono); min-width: 92px; text-align: center; color: var(--text); }
+  .pedal-btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .pedal-btn.on:hover { background: var(--accent); }
+  .vol { width: 110px; }
+  .qwerty-tip { font-size: 13px; color: var(--text-3); margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; }
+  .tool-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+  .tool-grid .panel + .panel { margin-top: 0; }
+  .panel .desc { font-size: 13.5px; color: var(--text-3); margin: -4px 0 10px; }
+  .hl-info { margin-top: 10px; font-size: 14px; color: var(--text-2); min-height: 22px; }
+  .hl-info b { color: var(--text); }
+  .follow-head { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+  .follow-progress { height: 8px; border-radius: 99px; background: var(--bg-sunken); overflow: hidden; margin: 12px 0 4px; }
+  .follow-progress i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--green), #34d399); transition: width .2s; }
+  .follow-status { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; color: var(--text-2); }
+  .follow-msg { min-height: 26px; font-weight: 650; margin-top: 6px; }
+  .follow-msg.ok { color: var(--green); }
+  .follow-msg.bad { color: var(--red); }
+  .follow-msg.shake { animation: shake .35s; }
+  @keyframes shake { 0%, 100% { transform: none; } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+  #follow-staff { margin: 12px 0 0; }
+  #follow-staff:empty { display: none; }
+  .rec-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--red); margin-right: 6px; vertical-align: 1px; animation: blink 1s infinite; }
+  @keyframes blink { 50% { opacity: .2; } }
+  .rec-status { font-size: 14px; color: var(--text-2); margin-top: 10px; min-height: 22px; }
+  .midi-status { font-size: 13.5px; color: var(--text-3); margin-top: 10px; }
+  .kbd-table td:first-child { white-space: nowrap; font-weight: 600; }
+  /* 跟弹提示徽章放高一点，避免和音阶/和弦级数徽章重叠 */
+  #piano-kb .pk-white .pk-badge[data-cls="hl2"] { bottom: 50px; box-shadow: 0 0 0 2px rgba(255, 255, 255, .85); }
+  #piano-kb .pk-black .pk-badge[data-cls="hl2"] { bottom: 30px; background: var(--key-hl-2); color: #fff; }
+  #piano-kb .pk.compact .pk-white .pk-badge[data-cls="hl2"] { bottom: 42px; }
+  @media (max-width: 860px) {
+    .tool-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .display { grid-template-columns: 1fr; }
+    .piano-main { padding: 14px 12px 16px; }
+    .lcd .big { font-size: 34px; }
+    .lcd .ana-title { font-size: 22px; }
+  }
+</style>
+</head>
+<body data-page="piano" data-root="..">
+<main class="page">
+<div class="content wide tool-page">
+
+  <div class="tool-header">
+    <div>
+      <h1><span class="tool-icon">🎹</span>在线钢琴</h1>
+      <p>用鼠标、触屏、电脑键盘或 MIDI 键盘弹奏。同时按下几个键，它会告诉你这是什么音程、什么和弦。</p>
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="midi-btn" type="button">🎛️ 连接 MIDI 键盘</button>
+    </div>
+  </div>
+
+  <div class="panel piano-main">
+    <div class="display">
+      <div class="lcd" aria-live="polite">
+        <div class="label">当前的音</div>
+        <div class="big idle" id="lcd-note">—</div>
+        <div class="sub" id="lcd-note-sub">按下任意琴键</div>
+      </div>
+      <div class="lcd" aria-live="polite">
+        <div class="label" id="lcd-ana-label">音程 / 和弦识别</div>
+        <div id="lcd-ana"><div class="hint">💡 同时按住 <b>2 个音</b>会显示它们的<b>音程</b>；按住 <b>3 个或更多</b>的音会识别<b>和弦</b>及其转位。<br>试试按住 <kbd>A</kbd> <kbd>D</kbd> <kbd>G</kbd>（C、E、G）。</div></div>
+      </div>
+    </div>
+
+    <div class="ctrl-bar">
+      <div class="grp">
+        <span class="lbl">音域</span>
+        <span class="oct-nav">
+          <button class="btn btn-sm" id="oct-down" type="button" title="降低一个八度（Z）">◀</button>
+          <span class="range" id="range-label">C3 – C6</span>
+          <button class="btn btn-sm" id="oct-up" type="button" title="升高一个八度（X）">▶</button>
+        </span>
+      </div>
+      <div class="grp">
+        <span class="lbl">八度数</span>
+        <div class="segmented" id="seg-oct">
+          <button type="button" data-v="auto">自动</button><button type="button" data-v="1">1</button><button type="button" data-v="2">2</button><button type="button" data-v="3">3</button><button type="button" data-v="4">4</button><button type="button" data-v="5">5</button>
+        </div>
+      </div>
+      <div class="grp">
+        <span class="lbl">标签</span>
+        <div class="segmented" id="seg-labels">
+          <button type="button" data-v="name">音名</button><button type="button" data-v="solfege">唱名</button><button type="button" data-v="number">简谱</button><button type="button" data-v="c">只标 C</button><button type="button" data-v="none">无</button>
+        </div>
+      </div>
+    </div>
+    <div class="ctrl-bar">
+      <label class="switch"><input type="checkbox" id="sw-black">黑键音名</label>
+      <label class="switch"><input type="checkbox" id="sw-hints">电脑键盘提示</label>
+      <button class="btn btn-sm pedal-btn" id="pedal-btn" type="button" title="延音踏板：开启后松开琴键声音也会继续（按住空格键临时开启）">🦶 延音踏板：关</button>
+      <div class="grp"><span class="lbl">音色</span><select id="inst-sel" aria-label="音色"></select></div>
+      <div class="grp"><span class="lbl">音量</span><input type="range" class="vol" id="vol" min="0" max="1" step="0.01" aria-label="音量"></div>
+    </div>
+
+    <div id="piano-kb"></div>
+
+    <div class="qwerty-tip">
+      <span>⌨️ 电脑键盘：<kbd>A</kbd><kbd>W</kbd><kbd>S</kbd><kbd>E</kbd><kbd>D</kbd> … <kbd>;</kbd><kbd>'</kbd> 从 <b id="qwerty-base">C4</b> 开始弹奏</span>
+      <span><kbd>Z</kbd> / <kbd>X</kbd> 移动八度</span>
+      <span>按住 <kbd>空格</kbd> = 延音踏板</span>
+      <span>按住 <kbd>Shift</kbd> 弹得更响</span>
+    </div>
+  </div>
+
+  <div class="tool-grid">
+    <div class="panel">
+      <div class="panel-title">🎯 音阶 / 和弦高亮</div>
+      <p class="desc">选一个根音和类型，键盘上会标出所有组成音，数字表示它是第几级（音阶）或和弦中的第几音。</p>
+      <div class="control-row">
+        <div class="control"><span class="lbl">根音</span><select id="hl-root" aria-label="根音"></select></div>
+        <div class="control"><span class="lbl">类型</span><select id="hl-type" aria-label="类型"></select></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" id="hl-show" type="button">显示在键盘上</button>
+        <button class="btn btn-sm" id="hl-play" type="button">▶ 播放</button>
+        <button class="btn btn-sm btn-ghost" id="hl-clear" type="button">清除高亮</button>
+      </div>
+      <div class="hl-info" id="hl-info"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">⏺ 录音与回放</div>
+      <p class="desc">把你弹的内容录下来再听一遍（包括延音踏板）。录音会保存在本机浏览器里。</p>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" id="rec-btn" type="button">⏺ 开始录音</button>
+        <button class="btn btn-sm" id="rec-play" type="button">▶ 回放</button>
+        <button class="btn btn-sm btn-ghost" id="rec-clear" type="button">🗑 清除</button>
+      </div>
+      <div class="rec-status" id="rec-status"></div>
+      <div class="midi-status" id="midi-status">🎛️ MIDI：未连接。有 MIDI 键盘的话，插上后点右上角"连接 MIDI 键盘"。</div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:16px">
+    <div class="panel-title">🎵 跟弹模式</div>
+    <p class="desc">选一首曲子，键盘上<b style="color:var(--accent)">橙色</b>的键就是下一个要弹的音（键上的字母是对应的电脑按键），弹对了才会前进。先点"示范"听一遍吧！</p>
+    <div class="follow-head">
+      <select id="song-sel" aria-label="选择曲目"></select>
+      <button class="btn btn-primary btn-sm" id="follow-start" type="button">▶ 开始跟弹</button>
+      <button class="btn btn-sm" id="follow-demo" type="button">🔊 示范</button>
+      <button class="btn btn-sm" id="follow-restart" type="button">↺ 从头开始</button>
+      <button class="btn btn-sm btn-ghost" id="follow-exit" type="button">退出</button>
+    </div>
+    <div class="follow-progress"><i id="follow-bar"></i></div>
+    <div class="follow-status"><span id="follow-count">还没有开始</span><span id="follow-errors"></span><span id="follow-next"></span></div>
+    <div class="follow-msg" id="follow-msg"></div>
+    <div id="follow-staff"></div>
+  </div>
+
+  <section class="how-to">
+    <h2 class="toc-anchor" id="how">使用说明</h2>
+    <div class="table-wrap">
+      <table class="table kbd-table">
+        <thead><tr><th>操作</th><th>方法</th></tr></thead>
+        <tbody>
+          <tr><td>弹奏</td><td>鼠标点击琴键（按住拖动可以"刮奏"）；手机/平板可以多指同时按；电脑键盘 <kbd>A</kbd> <kbd>W</kbd> <kbd>S</kbd> <kbd>E</kbd> <kbd>D</kbd> <kbd>F</kbd> <kbd>T</kbd> <kbd>G</kbd> <kbd>Y</kbd> <kbd>H</kbd> <kbd>U</kbd> <kbd>J</kbd> <kbd>K</kbd> <kbd>O</kbd> <kbd>L</kbd> <kbd>P</kbd> <kbd>;</kbd> <kbd>'</kbd> 依次对应从 C 开始的 18 个半音（中间一排是白键，上面一排是黑键）。</td></tr>
+          <tr><td>移动八度</td><td><kbd>Z</kbd> 降低、<kbd>X</kbd> 升高，或点击音域两侧的 ◀ ▶。</td></tr>
+          <tr><td>延音踏板</td><td>按住 <kbd>空格</kbd> 临时踩下；或点击"延音踏板"按钮常开。踩着踏板时，松开琴键声音也会继续。</td></tr>
+          <tr><td>力度</td><td>鼠标点在琴键越靠下的位置声音越响；电脑键盘按住 <kbd>Shift</kbd> 弹奏会更响；MIDI 键盘按实际力度。</td></tr>
+          <tr><td>识别和弦</td><td>同时按住 3 个以上的音（例如 <kbd>A</kbd> + <kbd>D</kbd> + <kbd>G</kbd>），上方会显示和弦名称和转位；按 2 个音显示音程。</td></tr>
+          <tr><td>MIDI 键盘</td><td>用 USB 连接 MIDI 键盘后，点击右上角"连接 MIDI 键盘"并允许访问（Chrome / Edge 支持）；支持力度与延音踏板。</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>配合教程学习</h3>
+    <ul>
+      <li><a href="../chapters/02-keyboard.html">第 2 章 音名、唱名与键盘</a>：把"标签"切换成音名 / 唱名 / 简谱，熟悉每个键的名字。</li>
+      <li><a href="../chapters/05-intervals.html">第 5 章 音程</a>：同时按两个键，看看它们是几度。</li>
+      <li><a href="../chapters/06-scales-keys.html">第 6 章 音阶与调</a>：用"音阶高亮"找出任意大调、小调的音。</li>
+      <li><a href="../chapters/07-chords.html">第 7 章 和弦</a>：用"和弦高亮"找到和弦，再按住它们看看识别结果和转位。</li>
+    </ul>
+  </section>
+
+</div>
+</main>
+
+<script src="../assets/js/theory.js"></script>
+<script src="../assets/js/audio.js"></script>
+<script src="../assets/js/keyboard.js"></script>
+<script src="../assets/js/staff.js"></script>
+<script src="../assets/js/jianpu.js"></script>
+<script src="../assets/js/site.js"></script>
+<script src="../assets/js/services.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script>
+(function () {
+  'use strict';
+  function $(s, el) { return (el || document).querySelector(s); }
+  function $$(s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); }
+  function mod(n, m) { return ((n % m) + m) % m; }
+  var esc = MTSite.esc, store = MTSite.store;
+
+  var cfg = Object.assign({ octaves: 'auto', pos: 4, labels: 'name', blackLabels: false, hints: true }, store.get('mt-piano', {}));
+  cfg.pos = Math.max(1, Math.min(7, +cfg.pos || 4));
+  function save() { store.set('mt-piano', cfg); }
+
+  /* ====================== 键盘与音域 ====================== */
+  var kbBox = $('#piano-kb');
+  var kb = null;
+  var view = { n: 3, startOct: 3, start: 48, end: 84 };
+
+  function effectiveOctaves() {
+    if (cfg.octaves !== 'auto') return +cfg.octaves;
+    var w = kbBox.clientWidth || window.innerWidth;
+    return w >= 700 ? 3 : w >= 420 ? 2 : 1;
+  }
+  function computeView() {
+    var n = effectiveOctaves();
+    var startOct = cfg.pos - Math.floor((n - 1) / 2);
+    startOct = Math.max(1, Math.min(8 - n, startOct));
+    view = { n: n, startOct: startOct, start: (startOct + 1) * 12, end: (startOct + 1 + n) * 12 };
+  }
+  function qBase() { return (cfg.pos + 1) * 12; }
+
+  function buildKeyboard() {
+    computeView();
+    var size = window.innerWidth < 640 ? 'normal' : 'tall';
+    if (!kb) {
+      kb = new PianoKeyboard(kbBox, {
+        start: view.start, end: view.end, labels: cfg.labels, blackLabels: cfg.blackLabels, size: size,
+        onNoteOn: onNoteOn, onNoteOff: onNoteOff
+      });
+    } else {
+      kb.opts.size = size;
+      kb.setRange(view.start, view.end);
+    }
+    applyHints();
+    $('#range-label').textContent = MT.noteName(MT.fromMidi(view.start)) + ' – ' + MT.noteName(MT.fromMidi(view.end));
+    $('#qwerty-base').textContent = MT.noteName(MT.fromMidi(qBase()));
+    applyHL();
+    showFollowTarget();
+  }
+
+  var QWERTY = ['KeyA', 'KeyW', 'KeyS', 'KeyE', 'KeyD', 'KeyF', 'KeyT', 'KeyG', 'KeyY', 'KeyH', 'KeyU', 'KeyJ', 'KeyK', 'KeyO', 'KeyL', 'KeyP', 'Semicolon', 'Quote'];
+  var QLABEL = ['A', 'W', 'S', 'E', 'D', 'F', 'T', 'G', 'Y', 'H', 'U', 'J', 'K', 'O', 'L', 'P', ';', "'"];
+  function qwertyLabel(m) { var i = m - qBase(); return i >= 0 && i < QLABEL.length ? QLABEL[i] : ''; }
+  function applyHints() {
+    var map = {};
+    if (cfg.hints) QWERTY.forEach(function (c, i) { map[qBase() + i] = QLABEL[i]; });
+    kb.setKeyHints(map);
+  }
+
+  function shiftOctave(d) {
+    var np = Math.max(1, Math.min(7, cfg.pos + d));
+    if (np === cfg.pos) { MTSite.toast(d < 0 ? '已经是最低的八度了' : '已经是最高的八度了'); return; }
+    cfg.pos = np; save();
+    buildKeyboard();
+  }
+  $('#oct-down').addEventListener('click', function () { shiftOctave(-1); });
+  $('#oct-up').addEventListener('click', function () { shiftOctave(1); });
+
+  function bindSegmented(el, value, onChange) {
+    var btns = $$('button', el);
+    function mark(v) { btns.forEach(function (b) { b.classList.toggle('active', b.dataset.v === String(v)); }); }
+    mark(value);
+    btns.forEach(function (b) { b.addEventListener('click', function () { mark(b.dataset.v); onChange(b.dataset.v); }); });
+    return mark;
+  }
+  bindSegmented($('#seg-oct'), cfg.octaves, function (v) { cfg.octaves = v; save(); buildKeyboard(); });
+  bindSegmented($('#seg-labels'), cfg.labels, function (v) { cfg.labels = v; save(); kb.setLabels(v, cfg.blackLabels); });
+  var swBlack = $('#sw-black'), swHints = $('#sw-hints');
+  swBlack.checked = !!cfg.blackLabels; swHints.checked = !!cfg.hints;
+  swBlack.addEventListener('change', function () { cfg.blackLabels = swBlack.checked; save(); kb.setLabels(cfg.labels, cfg.blackLabels); });
+  swHints.addEventListener('change', function () { cfg.hints = swHints.checked; save(); applyHints(); showFollowTarget(); });
+
+  var lastAuto = null;
+  window.addEventListener('resize', function () {
+    if (cfg.octaves !== 'auto') return;
+    var n = effectiveOctaves();
+    if (n !== lastAuto) { lastAuto = n; buildKeyboard(); }
+  });
+
+  /* ====================== 音色 / 音量 / 踏板 ====================== */
+  var instSel = $('#inst-sel'), vol = $('#vol');
+  Sound.INSTRUMENTS.forEach(function (i) { var o = document.createElement('option'); o.value = i.id; o.textContent = i.zh; instSel.appendChild(o); });
+  instSel.value = Sound.settings.instrument;
+  vol.value = Sound.settings.volume;
+  instSel.addEventListener('change', function () { Sound.setInstrument(instSel.value); });
+  vol.addEventListener('input', function () { Sound.setVolume(+vol.value); });
+  Sound.on(function (type) { if (type === 'settings') { instSel.value = Sound.settings.instrument; vol.value = Sound.settings.volume; } });
+
+  var pedal = { key: false, toggle: false, midi: false }, pedalActive = false;
+  var pedalBtn = $('#pedal-btn');
+  function setPedal(on, src) {
+    pedal[src] = on;
+    var active = pedal.key || pedal.toggle || pedal.midi;
+    if (active === pedalActive) return;
+    pedalActive = active;
+    Sound.setSustain(active);
+    pedalBtn.classList.toggle('on', active);
+    pedalBtn.textContent = '🦶 延音踏板：' + (active ? (pedal.toggle ? '开' : '踩下') : '关');
+    recEvent('pedal', active ? 1 : 0);
+  }
+  pedalBtn.addEventListener('click', function () { setPedal(!pedal.toggle, 'toggle'); pedalBtn.blur(); });
+
+  /* ====================== 电脑键盘 ====================== */
+  var held = {};
+  function isTyping(el) {
+    el = el || document.activeElement;
+    if (!el || !el.tagName) return false;
+    var t = el.tagName;
+    if (t === 'TEXTAREA' || t === 'SELECT') return true;
+    if (t === 'INPUT') return !/^(range|checkbox|radio|button|submit|reset|color)$/i.test(el.type || '');
+    return !!el.isContentEditable;
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey || isTyping(e.target)) return;
+    var code = e.code;
+    if (code === 'Space') {
+      e.preventDefault();
+      if (!held.Space) { held.Space = true; setPedal(true, 'key'); }
+      return;
+    }
+    if (code === 'KeyZ' || code === 'KeyX') { e.preventDefault(); if (!e.repeat) shiftOctave(code === 'KeyZ' ? -1 : 1); return; }
+    var i = QWERTY.indexOf(code);
+    if (i < 0) return;
+    e.preventDefault();
+    if (e.repeat || held[code] != null) return;
+    var m = qBase() + i;
+    held[code] = m;
+    kb.noteOn(m, e.shiftKey ? 1 : 0.8);
+  });
+  document.addEventListener('keyup', function (e) {
+    var code = e.code;
+    if (code === 'Space') {
+      if (held.Space) { e.preventDefault(); delete held.Space; setPedal(false, 'key'); }
+      return;
+    }
+    if (held[code] != null) { var m = held[code]; delete held[code]; kb.noteOff(m); }
+  });
+  function releaseHeld() {
+    Object.keys(held).forEach(function (code) {
+      if (code === 'Space') setPedal(false, 'key');
+      else kb.noteOff(held[code]);
+    });
+    held = {};
+  }
+  window.addEventListener('blur', releaseHeld);
+  document.addEventListener('visibilitychange', function () { if (document.hidden) releaseHeld(); });
+
+  /* ====================== 显示屏：音 / 音程 / 和弦 ====================== */
+  var lastNote = null;
+  var lcdNote = $('#lcd-note'), lcdSub = $('#lcd-note-sub'), lcdAna = $('#lcd-ana'), lcdAnaLabel = $('#lcd-ana-label');
+  var idleHint = lcdAna.innerHTML;
+
+  function noteLabel(m) { return MT.noteName(MT.fromMidi(m)); }
+  function flatLabel(m) { return MT.noteName(MT.fromMidi(m, true)); }
+
+  function intervalText(lo, hi) {
+    var semis = hi - lo;
+    if (semis <= 12) {
+      var iv = MT.INTERVALS[semis];
+      var name = iv.zh + (iv.alt ? ' / ' + iv.alt : '');
+      return { title: name, sub: semis + ' 个半音' + (iv.aka ? '（' + iv.aka + '）' : '') + ' · ' + iv.feel };
+    }
+    var oct = Math.floor(semis / 12), rem = semis % 12;
+    var r = MT.INTERVALS[rem];
+    return {
+      title: '复音程',
+      sub: semis + ' 个半音 = ' + (oct > 1 ? oct + ' 个八度' : '一个八度') + (rem ? ' + ' + r.zh + (r.alt ? '/' + r.alt : '') : '') + '。复音程的性质和它去掉八度后的单音程相同。'
+    };
+  }
+
+  function updateDisplay() {
+    var notes = kb.pressedNotes();
+    var m = notes.length ? notes[notes.length - 1] : lastNote;
+    if (m == null) return;
+    var n = MT.fromMidi(m);
+    lcdNote.classList.toggle('idle', !notes.length);
+    lcdNote.innerHTML = esc(noteLabel(m)) + (MT.isBlack(m) ? '<span class="alt">/ ' + esc(flatLabel(m)) + '</span>' : '');
+    lcdSub.textContent = '唱名 ' + MT.solfege(n) + ' · 简谱 ' + MT.jianpuNumber(n) + ' · ' + MT.midiToFreq(m).toFixed(2) + ' Hz';
+
+    if (notes.length <= 1) {
+      lcdAnaLabel.textContent = '音程 / 和弦识别';
+      lcdAna.innerHTML = notes.length === 1
+        ? '<div class="ana-title">单音</div><div class="ana-sub">再同时按住另一个键，看看它们相差几度。</div>'
+        : idleHint;
+      return;
+    }
+    var chips = '<div class="chips">' + notes.map(function (x, i) { return '<span class="chip' + (i === 0 ? ' root' : '') + '">' + esc(noteLabel(x)) + '</span>'; }).join('') + '</div>';
+    if (notes.length === 2) {
+      var it = intervalText(notes[0], notes[1]);
+      lcdAnaLabel.textContent = '音程';
+      lcdAna.innerHTML = '<div class="ana-title">' + esc(it.title) + '</div><div class="ana-sub">' + esc(it.sub) + '</div>' + chips;
+      return;
+    }
+    lcdAnaLabel.textContent = '和弦识别';
+    var cands = MT.detectChord(notes);
+    if (!cands.length) {
+      lcdAna.innerHTML = '<div class="ana-title">未识别的组合</div><div class="ana-sub">这几个音不构成常见和弦（也可能是"音簇"或多个和弦叠在一起）。</div>' + chips;
+      return;
+    }
+    var c = cands[0];
+    var alts = [];
+    cands.slice(1).forEach(function (x) { if (alts.indexOf(x.symbol) < 0 && x.symbol !== c.symbol && alts.length < 2) alts.push(x.symbol); });
+    lcdAna.innerHTML = '<div class="ana-title"><span class="sym">' + esc(c.symbol) + '</span>' + esc(c.zh) + '</div>' +
+      '<div class="ana-sub">' + esc(c.inversionZh) + ' · 公式 ' + esc(c.def.formula) + ' · ' + esc(c.def.feel) +
+      (alts.length ? '<br>也可以理解为：' + esc(alts.join('、')) : '') + '</div>' + chips;
+  }
+
+  function onNoteOn(m, vel) {
+    lastNote = m;
+    updateDisplay();
+    recEvent('on', m, vel);
+    followInput(m);
+  }
+  function onNoteOff(m) {
+    updateDisplay();
+    recEvent('off', m);
+  }
+
+  /* ====================== 音阶 / 和弦高亮 ====================== */
+  var ROOTS = [['C', 'C'], ['C#', 'C♯'], ['Db', 'D♭'], ['D', 'D'], ['Eb', 'E♭'], ['E', 'E'], ['F', 'F'], ['F#', 'F♯'], ['Gb', 'G♭'], ['G', 'G'], ['Ab', 'A♭'], ['A', 'A'], ['Bb', 'B♭'], ['B', 'B']];
+  var hlRoot = $('#hl-root'), hlType = $('#hl-type'), hlInfo = $('#hl-info');
+  ROOTS.forEach(function (r) { var o = document.createElement('option'); o.value = r[0]; o.textContent = r[1]; hlRoot.appendChild(o); });
+  (function () {
+    var g1 = document.createElement('optgroup'); g1.label = '音阶';
+    Object.keys(MT.SCALES).forEach(function (k) { var o = document.createElement('option'); o.value = 'scale:' + k; o.textContent = MT.SCALES[k].zh; g1.appendChild(o); });
+    var g2 = document.createElement('optgroup'); g2.label = '和弦';
+    Object.keys(MT.CHORDS).forEach(function (k) { var o = document.createElement('option'); o.value = 'chord:' + k; o.textContent = MT.CHORDS[k].zh + '（' + (MT.CHORDS[k].symbol || '大三') + '）'; g2.appendChild(o); });
+    hlType.appendChild(g1); hlType.appendChild(g2);
+  })();
+  var hl = Object.assign({ root: 'C', type: 'scale:major', on: false }, store.get('mt-piano-hl', {}));
+  hlRoot.value = hl.root; hlType.value = hl.type;
+  if (!hlType.value) hlType.value = 'scale:major';
+
+  function degreeLabel(iv) {
+    var p = MT.parseInterval(iv);
+    var num = p.num > 8 ? p.num : p.simple;
+    var perfect = p.simple === 1 || p.simple === 4 || p.simple === 5;
+    var pre = '';
+    if (p.quality === 'm') pre = '♭';
+    else if (p.quality === 'd') pre = perfect ? '♭' : '𝄫';
+    else if (p.quality === 'A') pre = '♯';
+    return pre + num;
+  }
+  function hlNotes() {
+    var parts = hl.type.split(':');
+    var def = (parts[0] === 'scale' ? MT.SCALES : MT.CHORDS)[parts[1]];
+    var root = MT.parseNote(hl.root + '4');
+    return { kind: parts[0], key: parts[1], def: def, root: root, notes: def.intervals.map(function (iv) { return MT.transpose(root, iv); }), labels: def.intervals.map(degreeLabel) };
+  }
+  function applyHL() {
+    if (!kb) return;
+    if (!hl.on) { kb.clearHighlight('hl'); hlInfo.innerHTML = ''; return; }
+    var h = hlNotes();
+    var pcs = h.notes.map(function (n) { return mod(n.midi, 12); });
+    var list = [], badges = [];
+    for (var m = view.start; m <= view.end; m++) {
+      var k = pcs.indexOf(mod(m, 12));
+      if (k >= 0) { list.push(m); badges.push(h.labels[k]); }
+    }
+    kb.setHighlight(list, { cls: 'hl', badges: badges });
+    var names = h.notes.map(function (n) { return MT.pcName(n); });
+    var title = MT.pcName(h.root) + ' ' + h.def.zh;
+    if (h.kind === 'scale') {
+      hlInfo.innerHTML = '<b>' + esc(title) + '</b>：' + esc(names.join(' ')) + '<br><span class="muted small">结构：' + esc(MT.scaleSteps(h.key).join(' ')) + (h.def.feel ? ' · ' + esc(h.def.feel) : '') + '</span>';
+    } else {
+      hlInfo.innerHTML = '<b>' + esc(MT.pcName(h.root) + h.def.symbol) + '</b>（' + esc(title) + '）：' + esc(names.join(' ')) + '<br><span class="muted small">公式 ' + esc(h.def.formula) + ' · ' + esc(h.def.feel || '') + '</span>';
+    }
+  }
+  function saveHL() { store.set('mt-piano-hl', hl); }
+  hlRoot.addEventListener('change', function () { hl.root = hlRoot.value; hl.on = true; saveHL(); applyHL(); });
+  hlType.addEventListener('change', function () { hl.type = hlType.value; hl.on = true; saveHL(); applyHL(); });
+  $('#hl-show').addEventListener('click', function () { hl.on = true; saveHL(); applyHL(); });
+  $('#hl-clear').addEventListener('click', function () { hl.on = false; saveHL(); applyHL(); });
+
+  var hlHandle = null;
+  $('#hl-play').addEventListener('click', function () {
+    var btn = this;
+    if (hlHandle) { hlHandle.stop(); return; }
+    hl.on = true; saveHL(); applyHL();
+    var h = hlNotes();
+    var root = h.notes[0];
+    // 让音高落在键盘可见范围的中间附近
+    var shift = 0;
+    var center = (view.start + view.end) / 2;
+    while (root.midi + shift + 12 <= center - 3) shift += 12;
+    while (root.midi + shift > center + 3 && root.midi + shift - 12 >= view.start) shift -= 12;
+    var midis = h.notes.map(function (n) { return n.midi + shift; });
+    var events;
+    if (h.kind === 'scale') {
+      var up = midis.concat([midis[0] + 12]);
+      var down = up.slice(0, -1).reverse();
+      events = up.concat(down).map(function (x) { return { notes: [x], beats: 1 }; });
+    } else {
+      events = midis.map(function (x) { return { notes: [x], beats: 1 }; });
+      events.push({ notes: [], beats: 0.5 });
+      events.push({ notes: midis, beats: 4 });
+    }
+    var bpm = h.kind === 'scale' ? 150 : 120;
+    btn.textContent = '■ 停止';
+    hlHandle = Sound.playSequence(events, {
+      bpm: bpm,
+      onEvent: function (ev) { (ev.notes || []).forEach(function (x) { kb.flash(x, ev.beats * 60000 / bpm * 0.9); }); },
+      onEnd: function () { hlHandle = null; btn.textContent = '▶ 播放'; }
+    });
+  });
+
+  /* ====================== 录音与回放 ====================== */
+  var rec = { on: false, t0: 0, events: [], data: store.get('mt-piano-rec', null), player: null };
+  var recBtn = $('#rec-btn'), recPlay = $('#rec-play'), recStatus = $('#rec-status');
+  function recEvent(type, m, vel) {
+    if (!rec.on) return;
+    rec.events.push({ t: (performance.now() - rec.t0) / 1000, type: type, m: m, v: vel == null ? 0.8 : vel });
+  }
+  function processRecording(events) {
+    var open = {}, notes = [], pedalOn = false, pedalHeld = [];
+    var endT = events.length ? events[events.length - 1].t : 0;
+    function close(m, t) { var o = open[m]; if (!o) return; delete open[m]; notes.push({ m: m, s: o.s, d: Math.max(0.05, t - o.s), v: o.v }); }
+    events.forEach(function (e) {
+      if (e.type === 'pedal') {
+        pedalOn = !!e.m;
+        if (!pedalOn) { pedalHeld.forEach(function (m) { close(m, e.t); }); pedalHeld = []; }
+        return;
+      }
+      if (e.type === 'on') {
+        if (open[e.m]) close(e.m, e.t);
+        pedalHeld = pedalHeld.filter(function (x) { return x !== e.m; });
+        open[e.m] = { s: e.t, v: e.v };
+      } else if (e.type === 'off') {
+        if (pedalOn) { if (pedalHeld.indexOf(e.m) < 0) pedalHeld.push(e.m); }
+        else close(e.m, e.t);
+      }
+    });
+    Object.keys(open).forEach(function (m) { close(+m, endT + 0.6); });
+    notes.sort(function (a, b) { return a.s - b.s; });
+    if (!notes.length) return null;
+    var first = notes[0].s;
+    notes.forEach(function (n) { n.s = Math.round((n.s - first) * 1000) / 1000; n.d = Math.round(n.d * 1000) / 1000; });
+    var length = 0;
+    notes.forEach(function (n) { length = Math.max(length, n.s + n.d); });
+    return { notes: notes.slice(0, 3000), length: length, date: Date.now() };
+  }
+  function recInfo() {
+    if (rec.on) { recStatus.innerHTML = '<span class="rec-dot"></span>正在录音…已记录 ' + rec.events.filter(function (e) { return e.type === 'on'; }).length + ' 个音'; return; }
+    if (rec.data) recStatus.textContent = '已有录音：' + rec.data.notes.length + ' 个音，时长 ' + rec.data.length.toFixed(1) + ' 秒。';
+    else recStatus.textContent = '还没有录音。点"开始录音"，然后弹奏，结束时再点一次。';
+    recPlay.disabled = !rec.data;
+  }
+  var recTimer = null;
+  recBtn.addEventListener('click', function () {
+    if (rec.player) rec.player.stop();
+    if (!rec.on) {
+      rec.on = true; rec.t0 = performance.now(); rec.events = [];
+      if (pedalActive) rec.events.push({ t: 0, type: 'pedal', m: 1 });
+      recBtn.textContent = '⏹ 停止录音'; recBtn.classList.remove('btn-primary');
+      recTimer = setInterval(recInfo, 300);
+      recInfo();
+    } else {
+      rec.on = false; clearInterval(recTimer);
+      recBtn.textContent = '⏺ 开始录音'; recBtn.classList.add('btn-primary');
+      var data = processRecording(rec.events);
+      if (data) { rec.data = data; store.set('mt-piano-rec', data); MTSite.toast('录好了，点"回放"听听看'); }
+      else MTSite.toast('没有录到任何音符');
+      recInfo();
+    }
+  });
+  recPlay.addEventListener('click', function () {
+    if (rec.player) { rec.player.stop(); return; }
+    if (!rec.data || rec.on) return;
+    var t0 = Sound.now() + 0.15;
+    var voices = [], cancels = [], pressed = [];
+    rec.data.notes.forEach(function (n) {
+      voices.push(Sound.playNote(n.m, { at: t0 + n.s, duration: n.d, velocity: n.v }));
+      cancels.push(Sound.at(t0 + n.s, function () { kb.press(n.m); pressed.push(n.m); }));
+      cancels.push(Sound.at(t0 + n.s + Math.max(0.08, n.d), function () { kb.release(n.m); var i = pressed.indexOf(n.m); if (i >= 0) pressed.splice(i, 1); }));
+    });
+    var handle = {
+      stop: function () {
+        if (rec.player !== handle) return;
+        rec.player = null;
+        cancels.forEach(function (f) { f(); });
+        voices.forEach(function (v) { if (v) v.release(); });
+        pressed.forEach(function (m) { kb.release(m); }); pressed = [];
+        recPlay.textContent = '▶ 回放';
+        Sound.unclaim(handle);
+      }
+    };
+    cancels.push(Sound.at(t0 + rec.data.length + 0.3, function () { handle.stop(); }));
+    Sound.claim(handle, '录音回放');
+    rec.player = handle;
+    recPlay.textContent = '■ 停止回放';
+  });
+  var clearArmed = null;
+  $('#rec-clear').addEventListener('click', function () {
+    var btn = this;
+    if (rec.player) rec.player.stop();
+    if (!rec.data) return;
+    if (!clearArmed) {
+      btn.textContent = '⚠️ 再点一次确认清除';
+      clearArmed = setTimeout(function () { clearArmed = null; btn.textContent = '🗑 清除'; }, 3000);
+      return;
+    }
+    clearTimeout(clearArmed); clearArmed = null; btn.textContent = '🗑 清除';
+    rec.data = null; store.set('mt-piano-rec', null); recInfo();
+    MTSite.toast('录音已清除');
+  });
+  recInfo();
+
+  /* ====================== MIDI ====================== */
+  var midiStatus = $('#midi-status'), midiAccess = null;
+  function bindMIDI() {
+    var names = [];
+    midiAccess.inputs.forEach(function (input) { input.onmidimessage = onMIDI; names.push(input.name || 'MIDI 设备'); });
+    midiStatus.textContent = names.length ? '🎛️ MIDI：已连接 ' + names.join('、') + '（支持力度与延音踏板）' : '🎛️ MIDI：已授权，但没有发现设备。插上 MIDI 键盘后会自动识别。';
+    $('#midi-btn').textContent = names.length ? '🎛️ MIDI 已连接' : '🎛️ 连接 MIDI 键盘';
+  }
+  function onMIDI(e) {
+    var d = e.data;
+    if (!d || d.length < 2) return;
+    var st = d[0] & 0xf0, n = d[1], v = d[2] || 0;
+    if (st === 0x90 && v > 0) kb.noteOn(n, Math.max(0.12, v / 127));
+    else if (st === 0x80 || (st === 0x90 && v === 0)) kb.noteOff(n);
+    else if (st === 0xB0 && n === 64) setPedal(v >= 64, 'midi');
+  }
+  function connectMIDI(auto) {
+    if (!navigator.requestMIDIAccess) { if (!auto) midiStatus.textContent = '🎛️ MIDI：当前浏览器不支持 Web MIDI（可以试试 Chrome 或 Edge）。'; return; }
+    navigator.requestMIDIAccess({ sysex: false }).then(function (acc) {
+      midiAccess = acc; bindMIDI(); acc.onstatechange = bindMIDI;
+    }).catch(function () { if (!auto) midiStatus.textContent = '🎛️ MIDI：无法访问 MIDI 设备（可能被拒绝了权限）。'; });
+  }
+  $('#midi-btn').addEventListener('click', function () { connectMIDI(false); });
+  try {
+    if (navigator.permissions && navigator.permissions.query && navigator.requestMIDIAccess) {
+      navigator.permissions.query({ name: 'midi' }).then(function (p) { if (p.state === 'granted') connectMIDI(true); }).catch(function () { /* */ });
+    }
+  } catch (e) { /* 静默 */ }
+
+  /* ====================== 跟弹模式 ====================== */
+  var SONGS = [
+    { id: 'twinkle', title: '小星星', time: '4/4', bpm: 100, desc: '法国民歌，只用到 C D E F G A 六个白键，最适合第一次跟弹。',
+      notes: 'C4:q C4 G4 G4 | A4 A4 G4:h | F4:q F4 E4 E4 | D4 D4 C4:h | G4:q G4 F4 F4 | E4 E4 D4:h | G4:q G4 F4 F4 | E4 E4 D4:h | C4:q C4 G4 G4 | A4 A4 G4:h | F4:q F4 E4 E4 | D4 D4 C4:h |]' },
+    { id: 'tigers', title: '两只老虎', time: '4/4', bpm: 110, desc: '法国民歌《雅克兄弟》，注意第 5、6 小节的八分音符。',
+      notes: 'C4:q D4 E4 C4 | C4 D4 E4 C4 | E4 F4 G4:h | E4:q F4 G4:h | G4:8 A4 G4 F4 E4:q C4 | G4:8 A4 G4 F4 E4:q C4 | C4 G3 C4:h | C4:q G3 C4:h |]' },
+    { id: 'ode', title: '欢乐颂（简化版）', time: '4/4', bpm: 110, desc: '贝多芬《第九交响曲》终曲主题，几乎都是相邻的音（级进），右手五个手指就能弹。',
+      notes: 'E4:q E4 F4 G4 | G4 F4 E4 D4 | C4 C4 D4 E4 | E4:q. D4:8 D4:h | E4:q E4 F4 G4 | G4 F4 E4 D4 | C4 C4 D4 E4 | D4:q. C4:8 C4:h | D4:q D4 E4 C4 | D4 E4:8 F4 E4:q C4 | D4 E4:8 F4 E4:q D4 | C4 D4 G3:h | E4:q E4 F4 G4 | G4 F4 E4 D4 | C4 C4 D4 E4 | D4:q. C4:8 C4:h |]' },
+    { id: 'jingle', title: '铃儿响叮当（副歌）', time: '4/4', bpm: 120, desc: '美国作曲家皮尔庞特 1857 年的作品，开头连续三个 E，节奏很好记。',
+      notes: 'E4:q E4 E4:h | E4:q E4 E4:h | E4:q G4 C4:q. D4:8 | E4:w | F4:q F4 F4:q. F4:8 | F4:q E4 E4 E4:8 E4 | E4:q D4 D4 E4 | D4:h G4:h | E4:q E4 E4:h | E4:q E4 E4:h | E4:q G4 C4:q. D4:8 | E4:w | F4:q F4 F4:q. F4:8 | F4:q E4 E4 E4:8 E4 | G4:q G4 F4 D4 | C4:w |]' },
+    { id: 'birthday', title: '生日快乐', time: '3/4', bpm: 100, desc: '3/4 拍，从弱拍开始（弱起）。第三句有一个八度的大跳（G4 → G5）。',
+      notes: 'G4:8. G4:16 | A4:q G4 C5 | B4:h G4:8. G4:16 | A4:q G4 D5 | C5:h G4:8. G4:16 | G5:q E5 C5 | B4 A4 F5:8. F5:16 | E5:q C5 D5 | C5:h. |]' },
+    { id: 'farewell', title: '送别（前两句）', time: '4/4', bpm: 76, desc: '旋律来自美国作曲家奥德威 1851 年的歌曲，李叔同 1915 年填词。注意附点节奏。',
+      notes: 'G4:q E4:8 G4 C5:h | A4:q C5:8 A4 G4:h | G4:q C4:8 D4 E4:q D4:8 C4 | D4:w | G4:q E4:8 G4 C5:q. B4:8 | A4:q C5 G4:h | G4:q D4:8 E4 F4:q. B3:8 | C4:w |]' },
+    { id: 'jasmine', title: '茉莉花（前四句）', time: '2/4', bpm: 66, desc: '江苏民歌，只用到 do re mi sol la 五个音——典型的中国五声音阶旋律。',
+      notes: 'E4:q E4:8 G4 | A4:8 C5 C5 A4 | G4:q G4:8 A4 | G4:h | E4:q E4:8 G4 | A4:8 C5 C5 A4 | G4:q G4:8 A4 | G4:h | G4:q G4 | G4 E4:8 G4 | A4:q A4 | G4:h | E4:q D4:8 E4 | G4:q E4:8 D4 | C4:q C4:8 D4 | C4:h |]' },
+    { id: 'elise', title: '致爱丽丝（开头）', time: '3/8', bpm: 66, desc: '贝多芬钢琴小品的开头（右手部分），用到黑键 D♯ 和 G♯，难度最高。',
+      notes: 'E5:16 D#5 | E5 D#5 E5 B4 D5 C5 | A4:8 R:16 C4 E4 A4 | B4:8 R:16 E4 G#4 B4 | C5:8 R:16 E4 E5 D#5 | E5 D#5 E5 B4 D5 C5 | A4:8 R:16 C4 E4 A4 | B4:8 R:16 E4 C5 B4 | A4:q. |]' }
+  ];
+  var songSel = $('#song-sel');
+  SONGS.forEach(function (s, i) { var o = document.createElement('option'); o.value = s.id; o.textContent = (i + 1) + '. ' + s.title; songSel.appendChild(o); });
+  var follow = { song: null, targets: [], pos: 0, errors: 0, active: false, view: null, t0: 0, demo: false };
+  var fMsg = $('#follow-msg'), fCount = $('#follow-count'), fErr = $('#follow-errors'), fNext = $('#follow-next'), fBar = $('#follow-bar');
+  var demoBtn = $('#follow-demo');
+  songSel.value = store.get('mt-piano-song', 'twinkle');
+
+  function loadSong(id) {
+    var s = SONGS.filter(function (x) { return x.id === id; })[0] || SONGS[0];
+    follow.song = s;
+    store.set('mt-piano-song', s.id);
+    var v = Staff.parseVoice(s.notes);
+    var idx = 0;
+    follow.targets = [];
+    v.items.forEach(function (it) {
+      if (it.t !== 'ev') return;
+      if (!it.rest) follow.targets.push({ midi: it.notes[0].midi, ev: idx });
+      idx++;
+    });
+    follow.view = Staff.render($('#follow-staff'), {
+      notes: s.notes, time: s.time, names: 'name', playable: false, bpm: s.bpm,
+      onSlot: function (slot) {
+        slot.evs.forEach(function (ev) {
+          if (!ev || ev.rest) return;
+          ev.notes.forEach(function (n) { kb.flash(n.midi, Math.max(120, ev.dur.value * 60000 / s.bpm * 0.85)); });
+        });
+      },
+      onEnd: function () { follow.demo = false; demoBtn.textContent = '🔊 示范'; }
+    });
+    // 让键盘覆盖整首曲子
+    var lo = Infinity, hi = -Infinity;
+    follow.targets.forEach(function (t) { lo = Math.min(lo, t.midi); hi = Math.max(hi, t.midi); });
+    var pos = Math.floor(lo / 12) - 1;
+    if (pos !== cfg.pos || lo < view.start || hi > view.end) { cfg.pos = Math.max(1, Math.min(7, pos)); save(); buildKeyboard(); }
+  }
+
+  function setMsg(text, cls) {
+    fMsg.className = 'follow-msg' + (cls ? ' ' + cls : '');
+    fMsg.textContent = text;
+    if (cls === 'bad') { void fMsg.offsetWidth; fMsg.classList.add('shake'); }
+  }
+
+  function showFollowTarget() {
+    if (!kb) return;
+    if (!follow.active || !follow.song) { kb.clearHighlight('hl2'); return; }
+    var t = follow.targets[follow.pos];
+    if (!t) { kb.clearHighlight('hl2'); return; }
+    var q = cfg.hints ? qwertyLabel(t.midi) : '';
+    kb.setHighlight([t.midi], { cls: 'hl2', badges: [q || '●'] });
+    if (t.midi < view.start || t.midi > view.end) {
+      var np = Math.max(1, Math.min(7, Math.floor(t.midi / 12) - 1));
+      if (np !== cfg.pos) { cfg.pos = np; save(); buildKeyboard(); return; }
+    }
+    kb.scrollTo(t.midi);
+  }
+
+  function renderFollow() {
+    var total = follow.targets.length;
+    fBar.style.width = (total ? follow.pos / total * 100 : 0) + '%';
+    if (!follow.active) { fCount.textContent = follow.song ? '《' + follow.song.title + '》共 ' + total + ' 个音。' + follow.song.desc : '还没有开始'; fErr.textContent = ''; fNext.textContent = ''; }
+    else {
+      fCount.textContent = '进度：' + follow.pos + ' / ' + total;
+      fErr.textContent = '弹错：' + follow.errors + ' 次';
+      var t = follow.targets[follow.pos];
+      if (t) {
+        var q = qwertyLabel(t.midi);
+        fNext.innerHTML = '下一个：<b class="nn">' + esc(noteLabel(t.midi)) + '</b>（' + esc(MT.solfege(MT.fromMidi(t.midi))) + (q ? '，电脑键盘 <kbd>' + esc(q) + '</kbd>' : '') + '）';
+      } else fNext.textContent = '';
+    }
+    if (follow.view) {
+      var done = follow.targets.slice(0, follow.pos).map(function (t) { return t.ev; });
+      follow.view.highlightEvents(follow.active ? done : [], 'hl3');
+      var cur = follow.targets[follow.pos];
+      follow.view.highlightEvents(follow.active && cur ? [cur.ev] : [], 'hl');
+    }
+    showFollowTarget();
+  }
+
+  function startFollow() {
+    loadSong(songSel.value);
+    follow.active = true; follow.pos = 0; follow.errors = 0; follow.t0 = 0;
+    setMsg('准备好了！弹橙色的键开始。', '');
+    renderFollow();
+  }
+
+  function followInput(m) {
+    if (!follow.active || follow.demo) return;
+    var t = follow.targets[follow.pos];
+    if (!t) return;
+    if (!follow.t0) follow.t0 = performance.now();
+    if (m === t.midi) {
+      follow.pos++;
+      if (follow.pos >= follow.targets.length) {
+        var sec = (performance.now() - follow.t0) / 1000;
+        follow.active = false;
+        renderFollow();
+        fBar.style.width = '100%';
+        fCount.textContent = '《' + follow.song.title + '》弹完了！';
+        setMsg('🎉 太棒了！用时 ' + sec.toFixed(1) + ' 秒，弹错 ' + follow.errors + ' 次。' + (follow.errors === 0 ? '一次都没错，完美！' : '再来一遍会更熟练～'), 'ok');
+        if (follow.view) follow.view.highlightEvents(follow.targets.map(function (x) { return x.ev; }), 'hl3');
+        return;
+      }
+      setMsg(['✓ 对了！', '✓ 很好！', '✓ 继续！', '✓ 漂亮！'][follow.pos % 4], 'ok');
+    } else {
+      follow.errors++;
+      var msg;
+      if (mod(m, 12) === mod(t.midi, 12)) msg = '音名对了，但是' + (m > t.midi ? '高' : '低') + '了' + (Math.abs(m - t.midi) === 12 ? '一个八度' : Math.round(Math.abs(m - t.midi) / 12) + ' 个八度') + '：要弹的是 ' + noteLabel(t.midi);
+      else msg = '✗ 你弹的是 ' + noteLabel(m) + '，下一个音是 ' + noteLabel(t.midi) + '（橙色的键）';
+      setMsg(msg, 'bad');
+    }
+    renderFollow();
+  }
+
+  $('#follow-start').addEventListener('click', startFollow);
+  $('#follow-restart').addEventListener('click', function () {
+    if (!follow.song || follow.song.id !== songSel.value) loadSong(songSel.value);
+    follow.active = true; follow.pos = 0; follow.errors = 0; follow.t0 = 0;
+    setMsg('从头开始！', ''); renderFollow();
+  });
+  $('#follow-exit').addEventListener('click', function () {
+    follow.active = false; setMsg('', '');
+    if (follow.view) follow.view.stop();
+    renderFollow();
+  });
+  demoBtn.addEventListener('click', function () {
+    if (!follow.song || follow.song.id !== songSel.value) { follow.active = false; loadSong(songSel.value); renderFollow(); }
+    if (follow.demo) { follow.view.stop(); return; }
+    follow.demo = true;
+    demoBtn.textContent = '■ 停止示范';
+    follow.view.play();
+  });
+  songSel.addEventListener('change', function () {
+    follow.active = false; setMsg('', '');
+    if (follow.view) follow.view.stop();
+    loadSong(songSel.value);
+    renderFollow();
+  });
+
+  /* ====================== 启动 ====================== */
+  buildKeyboard();
+  lastAuto = effectiveOctaves();
+  loadSong(songSel.value);
+  renderFollow();
+  applyHL();
+
+  // 调试/测试用
+  window.MTPiano = { kb: kb, cfg: cfg, follow: follow, songs: SONGS, getKb: function () { return kb; }, processRecording: processRecording };
+})();
+</script>
+</body>
+</html>

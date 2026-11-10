@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>附录：速查手册 · 乐理入门</title>
+<script>try{var t=localStorage.getItem('mt-theme');document.documentElement.setAttribute('data-theme',t?JSON.parse(t):(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))}catch(e){}</script>
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+  .group-row td { background: var(--bg-soft); font-weight: 700; color: var(--primary-ink); font-size: 13.5px; letter-spacing: .04em; }
+  .key-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; margin: 18px 0; }
+  .key-card { background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px 10px; box-shadow: var(--shadow-sm); }
+  .key-card .kc-head { display: flex; justify-content: space-between; align-items: baseline; }
+  .key-card .kc-head span { color: var(--text-3); font-size: 13.5px; }
+  .key-card .staff-box { margin: 4px 0; }
+  .key-card .kc-foot { font-size: 13px; color: var(--text-2); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: space-between; }
+  .glossary { columns: 2; column-gap: 28px; }
+  .glossary div { break-inside: avoid; padding: 6px 0; border-bottom: 1px dashed var(--border); display: flex; justify-content: space-between; gap: 12px; font-size: 14.5px; }
+  .glossary div span:last-child { color: var(--text-3); text-align: right; }
+  .sym { font-family: var(--font-serif); font-weight: 700; font-size: 18px; white-space: nowrap; }
+  .sym i { font-style: italic; }
+  @media (max-width: 640px) { .glossary { columns: 1; } }
+  @media print { .play-btn { display: none !important; } }
+</style>
+</head>
+<body data-page="appendix" data-root="..">
+<main class="page">
+<article class="content doc">
+
+<header class="chapter-header">
+  <div class="chapter-kicker">附录</div>
+  <h1>速查手册</h1>
+  <p class="lead">把全书最常用的知识浓缩成几张表：忘了某个音程有几个半音、某个调有几个升号、某个记号是什么意思时，来这里一查就知道。表格里的 ▶ 都可以点击试听。</p>
+  <div class="chapter-meta"><span>📌 建议收藏</span><span>🖨️ 可直接打印（Ctrl/⌘ + P）</span></div>
+</header>
+
+<section>
+<h2 id="a-1">A.1 音名、唱名与简谱</h2>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>音名</th><th class="c">C</th><th class="c">D</th><th class="c">E</th><th class="c">F</th><th class="c">G</th><th class="c">A</th><th class="c">B</th></tr></thead>
+  <tbody>
+    <tr><td>唱名</td><td class="c">do</td><td class="c">re</td><td class="c">mi</td><td class="c">fa</td><td class="c">sol</td><td class="c">la</td><td class="c">si</td></tr>
+    <tr><td>简谱（C 大调）</td><td class="c">1</td><td class="c">2</td><td class="c">3</td><td class="c">4</td><td class="c">5</td><td class="c">6</td><td class="c">7</td></tr>
+    <tr><td>五声（宫调式）</td><td class="c">宫</td><td class="c">商</td><td class="c">角</td><td class="c">—</td><td class="c">徵</td><td class="c">羽</td><td class="c">—</td></tr>
+    <tr><td>与下一个音的距离</td><td class="c">全</td><td class="c">全</td><td class="c">半</td><td class="c">全</td><td class="c">全</td><td class="c">全</td><td class="c">半</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>记号</th><th>名称</th><th>英文</th><th>作用</th></tr></thead>
+  <tbody>
+    <tr><td class="sym">♯</td><td>升号</td><td>sharp</td><td>升高半音</td></tr>
+    <tr><td class="sym">♭</td><td>降号</td><td>flat</td><td>降低半音</td></tr>
+    <tr><td class="sym">♮</td><td>还原号</td><td>natural</td><td>取消之前的升降，回到"本来的音"</td></tr>
+    <tr><td class="sym">𝄪</td><td>重升号</td><td>double sharp</td><td>升高两个半音（一个全音）</td></tr>
+    <tr><td class="sym">𝄫</td><td>重降号</td><td>double flat</td><td>降低两个半音（一个全音）</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="small muted">科学音高记号：中央 C = C4，标准音 A4 = 440 Hz；每到 C 换一个八度编号（B3 的上方是 C4）。88 键钢琴从 A0 到 C8。</p>
+</section>
+
+<section>
+<h2 id="a-2">A.2 音程速查表</h2>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>半音数</th><th>名称</th><th>英文 / 缩写</th><th>以 C 为根</th><th>转位后</th><th>协和程度</th><th class="c">试听</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td><b>纯一度</b></td><td>Perfect Unison · P1</td><td class="nn">C – C</td><td>纯八度</td><td>完全协和</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 C4" data-mode="chord" aria-label="播放纯一度"></button></td></tr>
+    <tr><td>1</td><td><b>小二度</b></td><td>minor 2nd · m2</td><td class="nn">C – D♭</td><td>大七度</td><td>不协和</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 Db4" data-mode="arp-chord" data-gap="0.45" aria-label="播放小二度"></button></td></tr>
+    <tr><td>2</td><td><b>大二度</b></td><td>Major 2nd · M2</td><td class="nn">C – D</td><td>小七度</td><td>不协和</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 D4" data-mode="arp-chord" data-gap="0.45" aria-label="播放大二度"></button></td></tr>
+    <tr><td>3</td><td><b>小三度</b></td><td>minor 3rd · m3</td><td class="nn">C – E♭</td><td>大六度</td><td>不完全协和</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 Eb4" data-mode="arp-chord" data-gap="0.45" aria-label="播放小三度"></button></td></tr>
+    <tr><td>4</td><td><b>大三度</b></td><td>Major 3rd · M3</td><td class="nn">C – E</td><td>小六度</td><td>不完全协和</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 E4" data-mode="arp-chord" data-gap="0.45" aria-label="播放大三度"></button></td></tr>
+    <tr><td>5</td><td><b>纯四度</b></td><td>Perfect 4th · P4</td><td class="nn">C – F</td><td>纯五度</td><td>协和（和声中有时视为不协和）</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 F4" data-mode="arp-chord" data-gap="0.45" aria-label="播放纯四度"></button></td></tr>
+    <tr><td>6</td><td><b>增四度 / 减五度</b><div class="en">三全音</div></td><td>Aug 4th · A4 / dim 5th · d5</td><td class="nn">C – F♯ / C – G♭</td><td>减五度 / 增四度</td><td>不协和</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 F#4" data-mode="arp-chord" data-gap="0.45" aria-label="播放增四度"></button></td></tr>
+    <tr><td>7</td><td><b>纯五度</b></td><td>Perfect 5th · P5</td><td class="nn">C – G</td><td>纯四度</td><td>完全协和</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 G4" data-mode="arp-chord" data-gap="0.45" aria-label="播放纯五度"></button></td></tr>
+    <tr><td>8</td><td><b>小六度</b></td><td>minor 6th · m6</td><td class="nn">C – A♭</td><td>大三度</td><td>不完全协和</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 Ab4" data-mode="arp-chord" data-gap="0.45" aria-label="播放小六度"></button></td></tr>
+    <tr><td>9</td><td><b>大六度</b></td><td>Major 6th · M6</td><td class="nn">C – A</td><td>小三度</td><td>不完全协和</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 A4" data-mode="arp-chord" data-gap="0.45" aria-label="播放大六度"></button></td></tr>
+    <tr><td>10</td><td><b>小七度</b></td><td>minor 7th · m7</td><td class="nn">C – B♭</td><td>大二度</td><td>不协和</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 Bb4" data-mode="arp-chord" data-gap="0.45" aria-label="播放小七度"></button></td></tr>
+    <tr><td>11</td><td><b>大七度</b></td><td>Major 7th · M7</td><td class="nn">C – B</td><td>小二度</td><td>不协和</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 B4" data-mode="arp-chord" data-gap="0.45" aria-label="播放大七度"></button></td></tr>
+    <tr><td>12</td><td><b>纯八度</b></td><td>Perfect Octave · P8</td><td class="nn">C – C¹</td><td>纯一度</td><td>完全协和</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 C5" data-mode="arp-chord" data-gap="0.45" aria-label="播放纯八度"></button></td></tr>
+  </tbody>
+</table>
+</div>
+<div class="callout memory">
+  <div class="callout-title">三条规则记住音程</div>
+  <ul>
+    <li><b>度数看音名：</b>从下面的音数到上面的音，包含两端（C→E：C、D、E，是三度）。</li>
+    <li><b>性质看半音：</b>一、四、五、八度用"纯"；二、三、六、七度分"大""小"；比大/纯多半音为"增"，比小/纯少半音为"减"。</li>
+    <li><b>转位和为九：</b>三度 ↔ 六度、二度 ↔ 七度、四度 ↔ 五度；大 ↔ 小、增 ↔ 减、纯 ↔ 纯。</li>
+  </ul>
+</div>
+</section>
+
+<section>
+<h2 id="a-3">A.3 和弦速查表</h2>
+<p>以 C 为根音举例。换成别的根音时，"公式"不变：例如 G 大三和弦 = G B D，A 小七和弦 = A C E G。</p>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>类型</th><th>符号</th><th>公式</th><th>组成音</th><th>相邻音程</th><th class="c">试听</th></tr></thead>
+  <tbody>
+<!--GEN:chords-->
+<tr class="group-row"><td colspan="6">三和弦</td></tr>
+<tr><td><b>大三和弦</b></td><td class="nn">C</td><td>1 3 5</td><td class="nn">C E G</td><td class="small">大三度 + 小三度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 E4 G4" data-mode="arp-chord" data-gap="0.18" aria-label="播放 C"></button></td></tr>
+<tr><td><b>小三和弦</b></td><td class="nn">Cm</td><td>1 ♭3 5</td><td class="nn">C E♭ G</td><td class="small">小三度 + 大三度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 Eb4 G4" data-mode="arp-chord" data-gap="0.18" aria-label="播放 Cm"></button></td></tr>
+<tr><td><b>减三和弦</b></td><td class="nn">Cdim</td><td>1 ♭3 ♭5</td><td class="nn">C E♭ G♭</td><td class="small">小三度 + 小三度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 Eb4 Gb4" data-mode="arp-chord" data-gap="0.18" aria-label="播放 Cdim"></button></td></tr>
+<tr><td><b>增三和弦</b></td><td class="nn">Caug</td><td>1 3 ♯5</td><td class="nn">C E G♯</td><td class="small">大三度 + 大三度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 E4 G#4" data-mode="arp-chord" data-gap="0.18" aria-label="播放 Caug"></button></td></tr>
+<tr class="group-row"><td colspan="6">七和弦</td></tr>
+<tr><td><b>大七和弦</b></td><td class="nn">Cmaj7</td><td>1 3 5 7</td><td class="nn">C E G B</td><td class="small">大三度 + 小三度 + 大三度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 E4 G4 B4" data-mode="arp-chord" data-gap="0.18" aria-label="播放 Cmaj7"></button></td></tr>
+<tr><td><b>属七和弦</b></td><td class="nn">C7</td><td>1 3 5 ♭7</td><td class="nn">C E G B♭</td><td class="small">大三度 + 小三度 + 小三度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 E4 G4 Bb4" data-mode="arp-chord" data-gap="0.18" aria-label="播放 C7"></button></td></tr>
+<tr><td><b>小七和弦</b></td><td class="nn">Cm7</td><td>1 ♭3 5 ♭7</td><td class="nn">C E♭ G B♭</td><td class="small">小三度 + 大三度 + 小三度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 Eb4 G4 Bb4" data-mode="arp-chord" data-gap="0.18" aria-label="播放 Cm7"></button></td></tr>
+<tr><td><b>半减七和弦</b></td><td class="nn">Cm7♭5</td><td>1 ♭3 ♭5 ♭7</td><td class="nn">C E♭ G♭ B♭</td><td class="small">小三度 + 小三度 + 大三度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 Eb4 Gb4 Bb4" data-mode="arp-chord" data-gap="0.18" aria-label="播放 Cm7♭5"></button></td></tr>
+<tr><td><b>减七和弦</b></td><td class="nn">Cdim7</td><td>1 ♭3 ♭5 𝄫7</td><td class="nn">C E♭ G♭ B𝄫</td><td class="small">小三度 + 小三度 + 小三度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 Eb4 Gb4 Bbb4" data-mode="arp-chord" data-gap="0.18" aria-label="播放 Cdim7"></button></td></tr>
+<tr><td><b>小大七和弦</b></td><td class="nn">Cm(maj7)</td><td>1 ♭3 5 7</td><td class="nn">C E♭ G B</td><td class="small">小三度 + 大三度 + 大三度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 Eb4 G4 B4" data-mode="arp-chord" data-gap="0.18" aria-label="播放 Cm(maj7)"></button></td></tr>
+<tr class="group-row"><td colspan="6">挂留、加音与其他</td></tr>
+<tr><td><b>挂二和弦</b></td><td class="nn">Csus2</td><td>1 2 5</td><td class="nn">C D G</td><td class="small">大二度 + 纯四度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 D4 G4" data-mode="arp-chord" data-gap="0.18" aria-label="播放 Csus2"></button></td></tr>
+<tr><td><b>挂四和弦</b></td><td class="nn">Csus4</td><td>1 4 5</td><td class="nn">C F G</td><td class="small">纯四度 + 大二度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 F4 G4" data-mode="arp-chord" data-gap="0.18" aria-label="播放 Csus4"></button></td></tr>
+<tr><td><b>大六和弦</b></td><td class="nn">C6</td><td>1 3 5 6</td><td class="nn">C E G A</td><td class="small">大三度 + 小三度 + 大二度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 E4 G4 A4" data-mode="arp-chord" data-gap="0.18" aria-label="播放 C6"></button></td></tr>
+<tr><td><b>小六和弦</b></td><td class="nn">Cm6</td><td>1 ♭3 5 6</td><td class="nn">C E♭ G A</td><td class="small">小三度 + 大三度 + 大二度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 Eb4 G4 A4" data-mode="arp-chord" data-gap="0.18" aria-label="播放 Cm6"></button></td></tr>
+<tr><td><b>加九和弦</b></td><td class="nn">Cadd9</td><td>1 3 5 9</td><td class="nn">C E G D</td><td class="small">大三度 + 小三度 + 纯五度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 E4 G4 D5" data-mode="arp-chord" data-gap="0.18" aria-label="播放 Cadd9"></button></td></tr>
+<tr><td><b>属九和弦</b></td><td class="nn">C9</td><td>1 3 5 ♭7 9</td><td class="nn">C E G B♭ D</td><td class="small">大三度 + 小三度 + 小三度 + 大三度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 E4 G4 Bb4 D5" data-mode="arp-chord" data-gap="0.18" aria-label="播放 C9"></button></td></tr>
+<tr><td><b>大九和弦</b></td><td class="nn">Cmaj9</td><td>1 3 5 7 9</td><td class="nn">C E G B D</td><td class="small">大三度 + 小三度 + 大三度 + 小三度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 E4 G4 B4 D5" data-mode="arp-chord" data-gap="0.18" aria-label="播放 Cmaj9"></button></td></tr>
+<tr><td><b>小九和弦</b></td><td class="nn">Cm9</td><td>1 ♭3 5 ♭7 9</td><td class="nn">C E♭ G B♭ D</td><td class="small">小三度 + 大三度 + 小三度 + 大三度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 Eb4 G4 Bb4 D5" data-mode="arp-chord" data-gap="0.18" aria-label="播放 Cm9"></button></td></tr>
+<tr><td><b>强力和弦</b></td><td class="nn">C5</td><td>1 5</td><td class="nn">C G</td><td class="small">纯五度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 G4" data-mode="arp-chord" data-gap="0.18" aria-label="播放 C5"></button></td></tr>
+<!--/GEN:chords-->
+  </tbody>
+</table>
+</div>
+<div class="callout memory">
+  <div class="callout-title">调内三和弦口诀</div>
+  <p>大调里，在 1～7 级上叠三和弦，性质依次是 <b>"大 小 小 大 大 小 减"</b>（I ii iii IV V vi vii°）；自然小调依次是 <b>"小 减 大 小 小 大 大"</b>（i ii° III iv v VI VII）。</p>
+</div>
+<div class="launch-row"><span class="lr-label">查任意根音的和弦：</span><button data-launch="dictionary" data-args="chord=C:maj:0">和弦词典</button></div>
+</section>
+
+<section>
+<h2 id="a-4">A.4 音阶速查表</h2>
+<p>"全"= 全音（2 个半音），"半"= 半音，"全半"= 增二度（3 个半音）。点击 ▶ 听 C 为主音的上行音阶。</p>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>音阶</th><th>结构</th><th>以 C 为例</th><th>听感</th><th class="c">试听</th></tr></thead>
+  <tbody>
+<!--GEN:scales-->
+<tr><td><b>自然大调</b><div class="en">Major</div></td><td>全 全 半 全 全 全 半</td><td class="nn">C D E F G A B C</td><td class="small">明亮、稳定、开朗</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 D4 E4 F4 G4 A4 B4 C5" data-bpm="200" aria-label="播放自然大调"></button></td></tr>
+<tr><td><b>自然小调</b><div class="en">Natural Minor</div></td><td>全 半 全 全 半 全 全</td><td class="nn">C D E♭ F G A♭ B♭ C</td><td class="small">柔和、忧伤</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 D4 Eb4 F4 G4 Ab4 Bb4 C5" data-bpm="200" aria-label="播放自然小调"></button></td></tr>
+<tr><td><b>和声小调</b><div class="en">Harmonic Minor</div></td><td>全 半 全 全 半 全半 半</td><td class="nn">C D E♭ F G A♭ B C</td><td class="small">带异域色彩，第 6→7 级有增二度</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 D4 Eb4 F4 G4 Ab4 B4 C5" data-bpm="200" aria-label="播放和声小调"></button></td></tr>
+<tr><td><b>旋律小调（上行）</b><div class="en">Melodic Minor</div></td><td>全 半 全 全 全 全 半</td><td class="nn">C D E♭ F G A B C</td><td class="small">上行流畅，下行通常还原为自然小调</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 D4 Eb4 F4 G4 A4 B4 C5" data-bpm="200" aria-label="播放旋律小调（上行）"></button></td></tr>
+<tr><td><b>大调五声音阶（宫调式）</b><div class="en">Major Pentatonic</div></td><td>全 全 全半 全 全半</td><td class="nn">C D E G A C</td><td class="small">中国风、民歌感，没有半音</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 D4 E4 G4 A4 C5" data-bpm="200" aria-label="播放大调五声音阶（宫调式）"></button></td></tr>
+<tr><td><b>小调五声音阶（羽调式）</b><div class="en">Minor Pentatonic</div></td><td>全半 全 全 全半 全</td><td class="nn">C E♭ F G B♭ C</td><td class="small">摇滚/布鲁斯独奏常用</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 Eb4 F4 G4 Bb4 C5" data-bpm="200" aria-label="播放小调五声音阶（羽调式）"></button></td></tr>
+<tr><td><b>布鲁斯音阶</b><div class="en">Blues</div></td><td>全半 全 半 半 全半 全</td><td class="nn">C E♭ F G♭ G B♭ C</td><td class="small">蓝调味道，加入了"蓝调音"♭5</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 Eb4 F4 Gb4 G4 Bb4 C5" data-bpm="200" aria-label="播放布鲁斯音阶"></button></td></tr>
+<tr><td><b>多利亚调式</b><div class="en">Dorian</div></td><td>全 半 全 全 全 半 全</td><td class="nn">C D E♭ F G A B♭ C</td><td class="small">小调但带一点明亮（第 6 级是大六度）</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 D4 Eb4 F4 G4 A4 Bb4 C5" data-bpm="200" aria-label="播放多利亚调式"></button></td></tr>
+<tr><td><b>弗里几亚调式</b><div class="en">Phrygian</div></td><td>半 全 全 全 半 全 全</td><td class="nn">C D♭ E♭ F G A♭ B♭ C</td><td class="small">西班牙/弗拉门戈风味</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 Db4 Eb4 F4 G4 Ab4 Bb4 C5" data-bpm="200" aria-label="播放弗里几亚调式"></button></td></tr>
+<tr><td><b>利底亚调式</b><div class="en">Lydian</div></td><td>全 全 全 半 全 全 半</td><td class="nn">C D E F♯ G A B C</td><td class="small">梦幻、飘浮（升高的第 4 级）</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 D4 E4 F#4 G4 A4 B4 C5" data-bpm="200" aria-label="播放利底亚调式"></button></td></tr>
+<tr><td><b>混合利底亚调式</b><div class="en">Mixolydian</div></td><td>全 全 半 全 全 半 全</td><td class="nn">C D E F G A B♭ C</td><td class="small">大调但更"布鲁斯/摇滚"</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 D4 E4 F4 G4 A4 Bb4 C5" data-bpm="200" aria-label="播放混合利底亚调式"></button></td></tr>
+<tr><td><b>洛克里亚调式</b><div class="en">Locrian</div></td><td>半 全 全 半 全 全 全</td><td class="nn">C D♭ E♭ F G♭ A♭ B♭ C</td><td class="small">极不稳定，很少单独使用</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 Db4 Eb4 F4 Gb4 Ab4 Bb4 C5" data-bpm="200" aria-label="播放洛克里亚调式"></button></td></tr>
+<tr><td><b>半音阶</b><div class="en">Chromatic</div></td><td>全部半音</td><td class="nn">C C♯ D D♯ E F F♯ G G♯ A A♯ B C</td><td class="small">包含全部 12 个半音</td><td class="c"><button class="play-btn sm icon-only" data-play="C4 C#4 D4 D#4 E4 F4 F#4 G4 G#4 A4 A#4 B4 C5" data-bpm="200" aria-label="播放半音阶"></button></td></tr>
+<!--/GEN:scales-->
+  </tbody>
+</table>
+</div>
+<div class="launch-row"><span class="lr-label">查任意主音的音阶：</span><button data-launch="dictionary" data-args="scale=C:major">音阶词典</button></div>
+</section>
+
+<section>
+<h2 id="a-5">A.5 调号速查表</h2>
+<p>每张卡片：大调与关系小调共用同一个调号。升号顺序 <b>F C G D A E B</b>，降号顺序 <b>B E A D G C F</b>（正好相反）。</p>
+<div class="callout memory">
+  <div class="callout-title">看调号认调</div>
+  <ul>
+    <li><b>升号调：</b>最后一个升号再往上一个半音（小二度），就是大调的主音。例：两个升号 F♯ C♯ → C♯ 上方小二度是 D → <b>D 大调</b>。</li>
+    <li><b>降号调：</b>倒数第二个降号就是大调的主音。例：三个降号 B♭ E♭ A♭ → 倒数第二个是 E♭ → <b>E♭ 大调</b>。（只有一个降号的是 F 大调，要单独记。）</li>
+    <li><b>关系小调：</b>大调主音往下数三个半音（小三度）。</li>
+  </ul>
+</div>
+<div class="key-grid">
+<!--GEN:keys-->
+<div class="key-card"><div class="kc-head"><b>C 大调</b><span>a 小调</span></div><div data-staff="" data-key="C" data-playable="false" data-scale="0.9" data-min-width="90"></div><div class="kc-foot">无升降号 <button class="play-btn sm icon-only" data-play="C4 D4 E4 F4 G4 A4 B4 C5" data-bpm="220" aria-label="播放 C 大调音阶"></button></div></div>
+<div class="key-card"><div class="kc-head"><b>G 大调</b><span>e 小调</span></div><div data-staff="" data-key="G" data-playable="false" data-scale="0.9" data-min-width="90"></div><div class="kc-foot">1 个升号：F♯ <button class="play-btn sm icon-only" data-play="G4 A4 B4 C5 D5 E5 F#5 G5" data-bpm="220" aria-label="播放 G 大调音阶"></button></div></div>
+<div class="key-card"><div class="kc-head"><b>D 大调</b><span>b 小调</span></div><div data-staff="" data-key="D" data-playable="false" data-scale="0.9" data-min-width="90"></div><div class="kc-foot">2 个升号：F♯ C♯ <button class="play-btn sm icon-only" data-play="D4 E4 F#4 G4 A4 B4 C#5 D5" data-bpm="220" aria-label="播放 D 大调音阶"></button></div></div>
+<div class="key-card"><div class="kc-head"><b>A 大调</b><span>f♯ 小调</span></div><div data-staff="" data-key="A" data-playable="false" data-scale="0.9" data-min-width="97"></div><div class="kc-foot">3 个升号：F♯ C♯ G♯ <button class="play-btn sm icon-only" data-play="A4 B4 C#5 D5 E5 F#5 G#5 A5" data-bpm="220" aria-label="播放 A 大调音阶"></button></div></div>
+<div class="key-card"><div class="kc-head"><b>E 大调</b><span>c♯ 小调</span></div><div data-staff="" data-key="E" data-playable="false" data-scale="0.9" data-min-width="106"></div><div class="kc-foot">4 个升号：F♯ C♯ G♯ D♯ <button class="play-btn sm icon-only" data-play="E4 F#4 G#4 A4 B4 C#5 D#5 E5" data-bpm="220" aria-label="播放 E 大调音阶"></button></div></div>
+<div class="key-card"><div class="kc-head"><b>B 大调</b><span>g♯ 小调</span></div><div data-staff="" data-key="B" data-playable="false" data-scale="0.9" data-min-width="115"></div><div class="kc-foot">5 个升号：F♯ C♯ G♯ D♯ A♯ <button class="play-btn sm icon-only" data-play="B4 C#5 D#5 E5 F#5 G#5 A#5 B5" data-bpm="220" aria-label="播放 B 大调音阶"></button></div></div>
+<div class="key-card"><div class="kc-head"><b>F♯ 大调</b><span>d♯ 小调</span></div><div data-staff="" data-key="F#" data-playable="false" data-scale="0.9" data-min-width="124"></div><div class="kc-foot">6 个升号：F♯ C♯ G♯ D♯ A♯ E♯ <button class="play-btn sm icon-only" data-play="F#4 G#4 A#4 B4 C#5 D#5 E#5 F#5" data-bpm="220" aria-label="播放 F♯ 大调音阶"></button></div></div>
+<div class="key-card"><div class="kc-head"><b>C♯ 大调</b><span>a♯ 小调</span></div><div data-staff="" data-key="C#" data-playable="false" data-scale="0.9" data-min-width="133"></div><div class="kc-foot">7 个升号：F♯ C♯ G♯ D♯ A♯ E♯ B♯ <button class="play-btn sm icon-only" data-play="C#4 D#4 E#4 F#4 G#4 A#4 B#4 C#5" data-bpm="220" aria-label="播放 C♯ 大调音阶"></button></div></div>
+<div class="key-card"><div class="kc-head"><b>F 大调</b><span>d 小调</span></div><div data-staff="" data-key="F" data-playable="false" data-scale="0.9" data-min-width="90"></div><div class="kc-foot">1 个降号：B♭ <button class="play-btn sm icon-only" data-play="F4 G4 A4 Bb4 C5 D5 E5 F5" data-bpm="220" aria-label="播放 F 大调音阶"></button></div></div>
+<div class="key-card"><div class="kc-head"><b>B♭ 大调</b><span>g 小调</span></div><div data-staff="" data-key="Bb" data-playable="false" data-scale="0.9" data-min-width="90"></div><div class="kc-foot">2 个降号：B♭ E♭ <button class="play-btn sm icon-only" data-play="Bb4 C5 D5 Eb5 F5 G5 A5 Bb5" data-bpm="220" aria-label="播放 B♭ 大调音阶"></button></div></div>
+<div class="key-card"><div class="kc-head"><b>E♭ 大调</b><span>c 小调</span></div><div data-staff="" data-key="Eb" data-playable="false" data-scale="0.9" data-min-width="97"></div><div class="kc-foot">3 个降号：B♭ E♭ A♭ <button class="play-btn sm icon-only" data-play="Eb4 F4 G4 Ab4 Bb4 C5 D5 Eb5" data-bpm="220" aria-label="播放 E♭ 大调音阶"></button></div></div>
+<div class="key-card"><div class="kc-head"><b>A♭ 大调</b><span>f 小调</span></div><div data-staff="" data-key="Ab" data-playable="false" data-scale="0.9" data-min-width="106"></div><div class="kc-foot">4 个降号：B♭ E♭ A♭ D♭ <button class="play-btn sm icon-only" data-play="Ab4 Bb4 C5 Db5 Eb5 F5 G5 Ab5" data-bpm="220" aria-label="播放 A♭ 大调音阶"></button></div></div>
+<div class="key-card"><div class="kc-head"><b>D♭ 大调</b><span>b♭ 小调</span></div><div data-staff="" data-key="Db" data-playable="false" data-scale="0.9" data-min-width="115"></div><div class="kc-foot">5 个降号：B♭ E♭ A♭ D♭ G♭ <button class="play-btn sm icon-only" data-play="Db4 Eb4 F4 Gb4 Ab4 Bb4 C5 Db5" data-bpm="220" aria-label="播放 D♭ 大调音阶"></button></div></div>
+<div class="key-card"><div class="kc-head"><b>G♭ 大调</b><span>e♭ 小调</span></div><div data-staff="" data-key="Gb" data-playable="false" data-scale="0.9" data-min-width="124"></div><div class="kc-foot">6 个降号：B♭ E♭ A♭ D♭ G♭ C♭ <button class="play-btn sm icon-only" data-play="Gb4 Ab4 Bb4 Cb5 Db5 Eb5 F5 Gb5" data-bpm="220" aria-label="播放 G♭ 大调音阶"></button></div></div>
+<div class="key-card"><div class="kc-head"><b>C♭ 大调</b><span>a♭ 小调</span></div><div data-staff="" data-key="Cb" data-playable="false" data-scale="0.9" data-min-width="133"></div><div class="kc-foot">7 个降号：B♭ E♭ A♭ D♭ G♭ C♭ F♭ <button class="play-btn sm icon-only" data-play="Cb4 Db4 Eb4 Fb4 Gb4 Ab4 Bb4 Cb5" data-bpm="220" aria-label="播放 C♭ 大调音阶"></button></div></div>
+<!--/GEN:keys-->
+</div>
+<div class="launch-row"><span class="lr-label">调号和关系大小调：</span><button data-launch="circle" data-args="key=C">五度圈</button></div>
+</section>
+
+<section>
+<h2 id="a-6">A.6 节拍与时值</h2>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>音符</th><th>休止符</th><th>以四分音符为一拍时</th><th>简谱写法</th></tr></thead>
+  <tbody>
+    <tr><td>全音符</td><td>全休止符</td><td>4 拍</td><td><code>1 - - -</code> / <code>0 0 0 0</code></td></tr>
+    <tr><td>二分音符</td><td>二分休止符</td><td>2 拍</td><td><code>1 -</code> / <code>0 0</code></td></tr>
+    <tr><td>四分音符</td><td>四分休止符</td><td>1 拍</td><td><code>1</code> / <code>0</code></td></tr>
+    <tr><td>八分音符</td><td>八分休止符</td><td>1/2 拍</td><td>数字下加一条线</td></tr>
+    <tr><td>十六分音符</td><td>十六分休止符</td><td>1/4 拍</td><td>数字下加两条线</td></tr>
+    <tr><td>附点（任意音符）</td><td>—</td><td>原时值 × 1.5</td><td>数字右边加 <code>·</code></td></tr>
+  </tbody>
+</table>
+</div>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>拍号</th><th>含义</th><th>强弱规律</th><th>常见于</th></tr></thead>
+  <tbody>
+    <tr><td class="sym">2/4</td><td>以四分音符为一拍，每小节 2 拍</td><td>强 弱</td><td>进行曲、儿歌</td></tr>
+    <tr><td class="sym">3/4</td><td>以四分音符为一拍，每小节 3 拍</td><td>强 弱 弱</td><td>圆舞曲（华尔兹）</td></tr>
+    <tr><td class="sym">4/4</td><td>以四分音符为一拍，每小节 4 拍（也写作 C）</td><td>强 弱 次强 弱</td><td>绝大多数流行歌曲</td></tr>
+    <tr><td class="sym">6/8</td><td>以八分音符为一拍，每小节 6 拍（两大拍）</td><td>强 弱 弱 次强 弱 弱</td><td>摇篮曲、船歌、抒情歌</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<section>
+<h2 id="a-7">A.7 速度术语</h2>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>意大利文</th><th>中文</th><th>大约速度（BPM）</th><th>感觉</th></tr></thead>
+  <tbody>
+<!--GEN:tempo-->
+<tr><td><b>Grave</b></td><td>庄板</td><td>40 以下</td><td>极慢、庄严</td></tr>
+<tr><td><b>Largo</b></td><td>广板</td><td>40 ～ 60</td><td>宽广、缓慢</td></tr>
+<tr><td><b>Larghetto</b></td><td>小广板</td><td>60 ～ 66</td><td>比广板稍快</td></tr>
+<tr><td><b>Adagio</b></td><td>柔板</td><td>66 ～ 76</td><td>舒缓、从容</td></tr>
+<tr><td><b>Andante</b></td><td>行板</td><td>76 ～ 108</td><td>像散步一样</td></tr>
+<tr><td><b>Moderato</b></td><td>中板</td><td>108 ～ 120</td><td>不快不慢</td></tr>
+<tr><td><b>Allegro</b></td><td>快板</td><td>120 ～ 168</td><td>快速、活泼</td></tr>
+<tr><td><b>Presto</b></td><td>急板</td><td>168 ～ 200</td><td>非常快</td></tr>
+<tr><td><b>Prestissimo</b></td><td>最急板</td><td>200 以上</td><td>极快</td></tr>
+<!--/GEN:tempo-->
+    <tr class="group-row"><td colspan="4">速度变化</td></tr>
+    <tr><td><b>ritardando（rit.）/ rallentando（rall.）</b></td><td>渐慢</td><td>—</td><td>逐渐放慢</td></tr>
+    <tr><td><b>accelerando（accel.）</b></td><td>渐快</td><td>—</td><td>逐渐加快</td></tr>
+    <tr><td><b>a tempo</b></td><td>回原速</td><td>—</td><td>回到变化之前的速度</td></tr>
+    <tr><td><b>rubato</b></td><td>自由速度</td><td>—</td><td>速度可以有弹性地伸缩</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="launch-row"><span class="lr-label">用节拍器感受速度：</span><button data-launch="metronome" data-args="bpm=50&play=1">Largo 50</button><button data-launch="metronome" data-args="bpm=70&play=1">Adagio 70</button><button data-launch="metronome" data-args="bpm=92&play=1">Andante 92</button><button data-launch="metronome" data-args="bpm=112&play=1">Moderato 112</button><button data-launch="metronome" data-args="bpm=140&play=1">Allegro 140</button><button data-launch="metronome" data-args="bpm=180&play=1">Presto 180</button></div>
+</section>
+
+<section>
+<h2 id="a-8">A.8 力度与常用记号</h2>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>记号</th><th>原文</th><th>中文</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td class="sym"><i>pp</i></td><td>pianissimo</td><td>很弱</td><td rowspan="6">从弱到强依次排列；p = 弱（piano），f = 强（forte），m = 中等（mezzo）</td></tr>
+    <tr><td class="sym"><i>p</i></td><td>piano</td><td>弱</td></tr>
+    <tr><td class="sym"><i>mp</i></td><td>mezzo piano</td><td>中弱</td></tr>
+    <tr><td class="sym"><i>mf</i></td><td>mezzo forte</td><td>中强</td></tr>
+    <tr><td class="sym"><i>f</i></td><td>forte</td><td>强</td></tr>
+    <tr><td class="sym"><i>ff</i></td><td>fortissimo</td><td>很强</td></tr>
+    <tr><td class="sym">&lt;　<i>cresc.</i></td><td>crescendo</td><td>渐强</td><td>逐渐变响</td></tr>
+    <tr><td class="sym">&gt;　<i>dim.</i></td><td>diminuendo / decrescendo</td><td>渐弱</td><td>逐渐变轻</td></tr>
+    <tr><td class="sym"><i>sfz</i></td><td>sforzando</td><td>突强</td><td>突然加强某一个音</td></tr>
+    <tr><td class="sym"><i>fp</i></td><td>forte-piano</td><td>强后即弱</td><td>先强奏，马上转弱</td></tr>
+    <tr class="group-row"><td colspan="4">演奏法</td></tr>
+    <tr><td>音符上下的圆弧（连接不同音）</td><td>slur / legato</td><td>圆滑线 / 连奏</td><td>弧线内的音连贯地演奏</td></tr>
+    <tr><td>音符上下的圆弧（连接相同音）</td><td>tie</td><td>延音线</td><td>两个音合成一个长音，只弹一次</td></tr>
+    <tr><td>音符上下的小圆点</td><td>staccato</td><td>跳音 / 断奏</td><td>短促、断开</td></tr>
+    <tr><td class="sym">&gt;</td><td>accent</td><td>重音</td><td>这个音要奏得更重</td></tr>
+    <tr><td class="sym">—</td><td>tenuto</td><td>保持音</td><td>把时值奏满，略带强调</td></tr>
+    <tr><td class="sym">𝄐</td><td>fermata</td><td>延长记号</td><td>自由延长这个音（或休止）</td></tr>
+    <tr class="group-row"><td colspan="4">反复与跳跃</td></tr>
+    <tr><td class="sym">𝄆 𝄇</td><td>repeat</td><td>反复记号</td><td>两个记号之间的部分演奏两遍（只有结束记号时从头反复）</td></tr>
+    <tr><td class="sym">1. 2.</td><td>1st / 2nd ending</td><td>第一、第二房子</td><td>第一遍奏"1."，反复后跳过"1."直接奏"2."</td></tr>
+    <tr><td><b>D.C.</b></td><td>Da Capo</td><td>从头反复</td><td>回到乐曲开头再奏</td></tr>
+    <tr><td><b>D.S.</b>（𝄋）</td><td>Dal Segno</td><td>从记号处反复</td><td>回到 𝄋 记号处再奏</td></tr>
+    <tr><td><b>Fine</b></td><td>Fine</td><td>结束</td><td>反复后在这里结束</td></tr>
+    <tr><td><b>Coda</b>（⊕）</td><td>Coda</td><td>尾声</td><td>反复后遇到 ⊕ 跳到尾声部分</td></tr>
+    <tr><td><b>8va</b></td><td>ottava</td><td>移高八度</td><td>虚线范围内的音高八度演奏</td></tr>
+    <tr><td><b>Ped. ✱</b></td><td>pedal</td><td>踏板</td><td>钢琴踩下 / 放开延音踏板</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<section>
+<h2 id="a-9">A.9 术语中英对照</h2>
+<div class="glossary">
+  <div><span>音高</span><span>pitch</span></div>
+  <div><span>频率</span><span>frequency</span></div>
+  <div><span>音色</span><span>timbre / tone color</span></div>
+  <div><span>音名</span><span>note name</span></div>
+  <div><span>唱名</span><span>solfège</span></div>
+  <div><span>八度</span><span>octave</span></div>
+  <div><span>半音 / 全音</span><span>semitone / whole tone（half / whole step）</span></div>
+  <div><span>等音</span><span>enharmonic</span></div>
+  <div><span>五线谱</span><span>staff / stave</span></div>
+  <div><span>谱号</span><span>clef</span></div>
+  <div><span>高音谱号 / 低音谱号</span><span>treble clef / bass clef</span></div>
+  <div><span>大谱表</span><span>grand staff</span></div>
+  <div><span>加线</span><span>ledger line</span></div>
+  <div><span>简谱</span><span>numbered musical notation（jianpu）</span></div>
+  <div><span>拍 / 拍子</span><span>beat</span></div>
+  <div><span>节拍</span><span>meter</span></div>
+  <div><span>节奏</span><span>rhythm</span></div>
+  <div><span>速度</span><span>tempo</span></div>
+  <div><span>小节 / 小节线</span><span>measure（bar）/ bar line</span></div>
+  <div><span>拍号</span><span>time signature</span></div>
+  <div><span>音符 / 休止符</span><span>note / rest</span></div>
+  <div><span>附点</span><span>dot（dotted note）</span></div>
+  <div><span>三连音</span><span>triplet</span></div>
+  <div><span>切分音</span><span>syncopation</span></div>
+  <div><span>弱起</span><span>anacrusis / pickup</span></div>
+  <div><span>音程</span><span>interval</span></div>
+  <div><span>纯 / 大 / 小 / 增 / 减</span><span>perfect / major / minor / augmented / diminished</span></div>
+  <div><span>协和 / 不协和</span><span>consonance / dissonance</span></div>
+  <div><span>转位</span><span>inversion</span></div>
+  <div><span>音阶</span><span>scale</span></div>
+  <div><span>调 / 调号</span><span>key / key signature</span></div>
+  <div><span>主音 / 属音 / 下属音</span><span>tonic / dominant / subdominant</span></div>
+  <div><span>导音</span><span>leading tone</span></div>
+  <div><span>大调 / 小调</span><span>major / minor key</span></div>
+  <div><span>关系大小调</span><span>relative major / minor</span></div>
+  <div><span>同主音大小调</span><span>parallel major / minor</span></div>
+  <div><span>五度圈</span><span>circle of fifths</span></div>
+  <div><span>五声音阶</span><span>pentatonic scale</span></div>
+  <div><span>调式</span><span>mode</span></div>
+  <div><span>移调 / 转调</span><span>transposition / modulation</span></div>
+  <div><span>首调 / 固定调唱名</span><span>movable do / fixed do</span></div>
+  <div><span>和弦</span><span>chord</span></div>
+  <div><span>三和弦 / 七和弦</span><span>triad / seventh chord</span></div>
+  <div><span>根音 / 三音 / 五音</span><span>root / third / fifth</span></div>
+  <div><span>和弦进行</span><span>chord progression</span></div>
+  <div><span>终止式</span><span>cadence</span></div>
+  <div><span>和声 / 旋律</span><span>harmony / melody</span></div>
+  <div><span>伴奏织体</span><span>accompaniment texture</span></div>
+  <div><span>力度</span><span>dynamics</span></div>
+  <div><span>渐强 / 渐弱</span><span>crescendo / diminuendo</span></div>
+  <div><span>连奏 / 断奏</span><span>legato / staccato</span></div>
+  <div><span>曲式</span><span>musical form</span></div>
+  <div><span>动机 / 乐句 / 乐段</span><span>motif / phrase / period</span></div>
+  <div><span>主歌 / 副歌 / 桥段</span><span>verse / chorus / bridge</span></div>
+  <div><span>前奏 / 尾奏</span><span>intro / outro</span></div>
+</div>
+</section>
+
+<section>
+<h2 id="a-10">A.10 学完之后，下一步学什么？</h2>
+<div class="grid-2">
+  <div class="card">
+    <h4>🎹 把乐理用在乐器上</h4>
+    <p class="small">选一件乐器（钢琴、吉他、尤克里里都很适合），用学过的和弦知识给喜欢的歌弹伴奏。乐理在指尖上用起来，才会真正变成你的东西。</p>
+  </div>
+  <div class="card">
+    <h4>👂 视唱练耳</h4>
+    <p class="small">每天 10 分钟：用<a href="../tools/ear-training.html">练耳训练</a>听音程和和弦，用<a href="../tools/note-reading.html">识谱练习</a>提高读谱速度，再试着把简单的旋律唱出来、记下来。</p>
+  </div>
+  <div class="card">
+    <h4>🎼 和声与编曲</h4>
+    <p class="small">在掌握调内和弦之后，可以继续学习副属和弦、借用和弦、转调、声部进行，以及鼓、贝斯、和声乐器如何分工合作。</p>
+  </div>
+  <div class="card">
+    <h4>💻 用电脑做音乐</h4>
+    <p class="small">尝试一款编曲软件（DAW），在钢琴卷帘里摆音符、配和弦、加鼓点。你会发现这本手册里的每一个概念都能直接派上用场。</p>
+  </div>
+</div>
+</section>
+
+</article>
+</main>
+<script src="../assets/js/theory.js"></script>
+<script src="../assets/js/audio.js"></script>
+<script src="../assets/js/keyboard.js"></script>
+<script src="../assets/js/staff.js"></script>
+<script src="../assets/js/jianpu.js"></script>
+<script src="../assets/js/site.js"></script>
+<script src="../assets/js/services.js"></script>
+<script src="../assets/js/search-index.js"></script>
+</body>
+</html>

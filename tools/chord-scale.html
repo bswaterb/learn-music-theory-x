@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>和弦与音阶词典 · 乐理入门</title>
+<script>try{var t=localStorage.getItem('mt-theme');document.documentElement.setAttribute('data-theme',t?JSON.parse(t):(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))}catch(e){}</script>
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+  [hidden] { display: none !important; }
+  .step-title { font-size: 13.5px; font-weight: 700; color: var(--text-3); margin: 16px 0 8px; letter-spacing: .04em; }
+  .step-title:first-child { margin-top: 0; }
+  /* 根音选择：按钢琴键位排列 */
+  .root-picker { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 6px; }
+  .rp-cell { display: flex; flex-direction: column; gap: 4px; }
+  .rp-cell.white { justify-content: flex-end; }
+  .rp-spacer { display: block; height: 32px; }
+  .rp-btn {
+    border: 1px solid var(--border-strong); background: var(--bg-elev); border-radius: 8px; padding: 5px 0; font-weight: 700;
+    font-size: 14px; color: var(--text); min-width: 0; transition: background .12s, border-color .12s, color .12s;
+  }
+  .rp-cell.black .rp-btn { background: var(--bg-sunken); font-size: 12.5px; padding: 4px 0; }
+  .rp-btn:hover { border-color: var(--primary); }
+  .root-picker .rp-cell .rp-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .type-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 6px 0; }
+  .type-group .g-label { font-size: 12.5px; color: var(--text-3); width: 76px; flex: none; }
+  .type-btn { border: 1px solid var(--border-strong); background: var(--bg-elev); border-radius: 99px; padding: 4px 12px; font-size: 13.5px; }
+  .type-btn:hover { border-color: var(--primary); }
+  .type-btn.active { background: var(--primary-soft); border-color: var(--primary); color: var(--primary-ink); font-weight: 650; }
+  .type-btn small { color: var(--text-3); margin-left: 4px; font-size: 12px; }
+  .result-head { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: flex-end; justify-content: space-between; margin-bottom: 16px; }
+  .big-symbol { font: 800 44px/1.1 var(--font-serif); color: var(--primary-ink); letter-spacing: .01em; }
+  .big-name { font-size: 18px; font-weight: 650; margin-top: 4px; }
+  .alt-names { font-size: 13px; color: var(--text-3); margin-top: 2px; }
+  .info-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+  .kv { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 8px 12px; font-size: 14.5px; align-items: baseline; }
+  .kv .k { color: var(--text-3); font-size: 13px; }
+  .note-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .note-chip { display: inline-flex; flex-direction: column; align-items: center; min-width: 44px; padding: 4px 8px; border-radius: 10px; background: var(--bg-soft); border: 1px solid var(--border); cursor: pointer; }
+  .note-chip:hover { border-color: var(--primary); }
+  .note-chip b { font: 700 18px var(--font-serif); color: var(--text); }
+  .note-chip span { font-size: 11.5px; color: var(--text-3); font-weight: 650; }
+  .note-chip.root { background: var(--primary-soft); border-color: color-mix(in srgb, var(--primary) 40%, transparent); }
+  .note-chip.root b { color: var(--primary-ink); }
+  .note-chip.on { background: var(--primary); border-color: var(--primary); }
+  .note-chip.on b, .note-chip.on span { color: #fff; }
+  .iv-chain { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-size: 13.5px; }
+  .iv-chain .n { font: 700 15px var(--font-serif); }
+  .iv-chain .iv { font-size: 12px; color: var(--text-2); background: var(--bg-sunken); padding: 1px 7px; border-radius: 99px; }
+  .step-chain { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+  .step-chain .n { font: 700 16px var(--font-serif); min-width: 28px; text-align: center; }
+  .step-chain .st { font-size: 12px; font-weight: 700; padding: 1px 7px; border-radius: 99px; }
+  .st.half { background: var(--accent-soft); color: var(--accent); }
+  .st.whole { background: var(--blue-soft); color: var(--blue); }
+  .st.other { background: var(--purple-soft); color: #7c4ddb; }
+  .keys-found { display: flex; flex-wrap: wrap; gap: 6px; }
+  .keys-found .tag { font-size: 12.5px; }
+  .dia-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+  .dia-card { border: 1px solid var(--border); background: var(--bg-elev); border-radius: 12px; padding: 8px 6px; text-align: center; cursor: pointer; transition: border-color .12s, transform .08s; }
+  .dia-card:hover { border-color: var(--primary); }
+  .dia-card:active { transform: translateY(1px); }
+  .dia-card.on { border-color: var(--primary); background: var(--primary-soft); }
+  .dia-card .rn { font: 800 17px var(--font-serif); color: var(--primary-ink); }
+  .dia-card .sym { font: 700 15px var(--font-serif); margin-top: 2px; }
+  .dia-card .zh { font-size: 11.5px; color: var(--text-3); line-height: 1.3; margin-top: 2px; }
+  .dia-card .fn { font-size: 11px; font-weight: 700; margin-top: 4px; display: inline-block; padding: 0 6px; border-radius: 99px; }
+  .fn.T { background: var(--green-soft); color: var(--green); }
+  .fn.S { background: var(--blue-soft); color: var(--blue); }
+  .fn.D { background: var(--accent-soft); color: var(--accent); }
+  .kb-box { margin-top: 18px; }
+  .staff-area { min-height: 110px; }
+  @media (max-width: 900px) {
+    .info-grid { grid-template-columns: minmax(0, 1fr); }
+    .dia-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  @media (max-width: 640px) {
+    .root-picker { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .big-symbol { font-size: 36px; }
+    .type-group .g-label { width: 100%; }
+  }
+</style>
+</head>
+<body data-page="dictionary" data-root="..">
+<main class="page">
+<div class="content wide tool-page">
+
+  <div class="tool-header">
+    <div>
+      <h1><span class="tool-icon">📖</span>和弦与音阶词典</h1>
+      <p>任选根音和类型，立刻看到它由哪些音组成、在五线谱和键盘上长什么样，并且可以听一听。</p>
+    </div>
+    <div class="segmented" id="tabs" role="tablist">
+      <button type="button" data-tab="chord" class="active" role="tab">🎹 查和弦</button>
+      <button type="button" data-tab="scale" role="tab">🎼 查音阶</button>
+    </div>
+  </div>
+
+  <!-- ===================== 和弦 ===================== -->
+  <section class="tab-pane" id="pane-chord">
+    <div class="panel">
+      <div class="step-title">① 选择根音</div>
+      <div class="root-picker" id="chord-roots"></div>
+      <div class="step-title">② 选择和弦类型</div>
+      <div id="chord-types"></div>
+      <div class="step-title">③ 转位（哪个音放在最低）</div>
+      <div class="segmented" id="chord-inv"></div>
+    </div>
+
+    <div class="panel">
+      <div class="result-head">
+        <div>
+          <div class="big-symbol" id="c-symbol">C</div>
+          <div class="big-name" id="c-name">C 大三和弦</div>
+          <div class="alt-names" id="c-alt"></div>
+        </div>
+        <div class="btn-row" style="margin:0">
+          <button class="btn btn-primary" id="c-play-block" type="button">▶ 柱式（同时弹）</button>
+          <button class="btn" id="c-play-arp" type="button">▶ 琶音（逐个弹）</button>
+          <button class="btn" id="c-play-both" type="button">▶ 琶音 + 柱式</button>
+        </div>
+      </div>
+      <div class="info-grid">
+        <div class="kv">
+          <div class="k">组成音</div><div class="note-chips" id="c-notes"></div>
+          <div class="k">公式</div><div id="c-formula"></div>
+          <div class="k">叠置结构</div><div class="iv-chain" id="c-stack"></div>
+          <div class="k">根音到各音</div><div id="c-from-root"></div>
+          <div class="k">听感</div><div id="c-feel"></div>
+          <div class="k">出现在</div><div class="keys-found" id="c-keys"></div>
+        </div>
+        <div class="staff-area" id="c-staff"></div>
+      </div>
+      <div class="kb-box" id="c-kb"></div>
+      <p class="small muted" style="margin:8px 0 0">键盘上的小标签：<b>R</b> = 根音（Root），3 / 5 / 7 / 9 = 三音、五音、七音、九音，♭ / ♯ 表示比大调音阶里的同级音低 / 高半音。点击组成音或五线谱上的音符可以单独试听。</p>
+    </div>
+  </section>
+
+  <!-- ===================== 音阶 ===================== -->
+  <section class="tab-pane" id="pane-scale" hidden>
+    <div class="panel">
+      <div class="step-title">① 选择主音（音阶的起点）</div>
+      <div class="root-picker" id="scale-roots"></div>
+      <div class="step-title">② 选择音阶类型</div>
+      <div id="scale-types"></div>
+    </div>
+
+    <div class="panel">
+      <div class="result-head">
+        <div>
+          <div class="big-symbol" id="s-symbol">C 大调</div>
+          <div class="big-name" id="s-name"></div>
+          <div class="alt-names" id="s-alt"></div>
+        </div>
+        <div class="btn-row" style="margin:0">
+          <button class="btn btn-primary" id="s-play-up" type="button">▶ 上行</button>
+          <button class="btn" id="s-play-down" type="button">▶ 下行</button>
+          <button class="btn" id="s-play-both" type="button">▶ 上行 + 下行</button>
+          <label class="control" style="margin-left:6px"><span class="lbl">速度</span>
+            <select id="s-speed"><option value="80">慢</option><option value="120" selected>中</option><option value="180">快</option></select>
+          </label>
+        </div>
+      </div>
+      <div class="info-grid">
+        <div class="kv">
+          <div class="k">组成音</div><div class="note-chips" id="s-notes"></div>
+          <div class="k">全音 / 半音</div><div class="step-chain" id="s-steps"></div>
+          <div class="k">听感</div><div id="s-feel"></div>
+          <div class="k">说明</div><div id="s-desc" class="small"></div>
+        </div>
+        <div class="staff-area" id="s-staff"></div>
+      </div>
+      <div class="kb-box" id="s-kb"></div>
+      <div id="s-dia-box" style="margin-top:20px">
+        <div class="result-head" style="margin-bottom:10px;align-items:center">
+          <div class="panel-title" style="margin:0">调内和弦 <span class="small muted" style="font-weight:500">（在音阶的每个音上，隔一个音取一个叠起来）</span></div>
+          <div class="segmented" id="s-dia-mode"><button type="button" data-v="3" class="active">三和弦</button><button type="button" data-v="4">七和弦</button></div>
+        </div>
+        <div class="dia-grid" id="s-dia"></div>
+        <p class="small muted" style="margin:10px 0 0" id="s-dia-note"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="how-to">
+    <h2 class="toc-anchor" id="how">使用说明</h2>
+    <ol class="steps">
+      <li><b>先选标签页</b>：查和弦，或者查音阶。</li>
+      <li><b>选根音</b>：按钮按钢琴键位排列，上排是黑键。黑键有两个名字（如 C♯ 和 D♭），听起来一样，但写法不同——选哪一个取决于你在哪个调里用它。</li>
+      <li><b>选类型</b>：页面会立刻显示组成音（拼写严格按乐理规则，比如 E♭ 小七和弦是 E♭ G♭ B♭ D♭，而不是 E♭ F♯ A♯ C♯）、公式、五线谱和键盘位置。</li>
+      <li><b>听一听</b>：用"柱式"听整体色彩，用"琶音"听清每一个音。音阶可以上行、下行播放，播放时音符会同步高亮。</li>
+      <li><b>分享</b>：地址栏会随你的选择自动变化（例如 <code>#chord=Bb:min7:0</code>、<code>#scale=D:dorian</code>），复制网址就能把这个和弦/音阶发给别人。</li>
+    </ol>
+    <h3>配合哪一章学习？</h3>
+    <ul>
+      <li>和弦的结构、七和弦与转位：<a href="../chapters/07-chords.html">第 7 章 和弦</a></li>
+      <li>大调、小调、五声音阶、教会调式：<a href="../chapters/06-scales-keys.html">第 6 章 音阶与调</a></li>
+      <li>"大三度""小三度"这些音程名称：<a href="../chapters/05-intervals.html">第 5 章 音程</a></li>
+      <li>调内和弦怎么串成好听的进行：<a href="../chapters/08-progressions.html">第 8 章 和弦进行</a>，再去 <a href="progression.html">🎶 和弦进行播放器</a> 动手试试。</li>
+    </ul>
+    <div class="callout tip">
+      <div class="callout-title">小技巧</div>
+      <p>选一个和弦后，看看"出现在"一栏：它告诉你这个和弦是哪些调的"自己人"。比如 <b>Am</b> 同时是 C 大调的 vi、G 大调的 ii、F 大调的 iii——这就是为什么同一个和弦能出现在那么多不同的歌里。</p>
+    </div>
+  </section>
+
+</div>
+</main>
+
+<script src="../assets/js/theory.js"></script>
+<script src="../assets/js/audio.js"></script>
+<script src="../assets/js/keyboard.js"></script>
+<script src="../assets/js/staff.js"></script>
+<script src="../assets/js/jianpu.js"></script>
+<script src="../assets/js/site.js"></script>
+<script src="../assets/js/services.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = MTSite.esc;
+
+  /* ---------------- 数据 ---------------- */
+  // 根音：按键位分组（黑键格子里放升号、降号两种写法）
+  var ROOT_CELLS = [['C'], ['C#', 'Db'], ['D'], ['D#', 'Eb'], ['E'], ['F'], ['F#', 'Gb'], ['G'], ['G#', 'Ab'], ['A'], ['A#', 'Bb'], ['B']];
+  var ALL_ROOTS = [].concat.apply([], ROOT_CELLS);
+  var CHORD_GROUPS = [
+    { label: '三和弦', types: ['maj', 'min', 'dim', 'aug'] },
+    { label: '七和弦', types: ['maj7', 'dom7', 'min7', 'm7b5', 'dim7', 'mMaj7'] },
+    { label: '挂留与加音', types: ['sus2', 'sus4', 'add9', 'maj6', 'min6'] },
+    { label: '其他', types: ['dom9', 'maj9', 'min9', 'power'] }
+  ];
+  var ALT_SYMBOLS = {
+    maj: ['{R}', '{R}M', '{R}maj'], min: ['{R}m', '{R}min', '{R}−'], dim: ['{R}dim', '{R}°'], aug: ['{R}aug', '{R}+'],
+    sus2: ['{R}sus2'], sus4: ['{R}sus4', '{R}sus'], maj7: ['{R}maj7', '{R}M7', '{R}Δ7'], dom7: ['{R}7'],
+    min7: ['{R}m7', '{R}min7', '{R}−7'], m7b5: ['{R}m7♭5', '{R}ø7', '{R}ø'], dim7: ['{R}dim7', '{R}°7'],
+    mMaj7: ['{R}m(maj7)', '{R}mM7', '{R}−Δ7'], maj6: ['{R}6'], min6: ['{R}m6'], add9: ['{R}add9', '{R}add2'],
+    dom9: ['{R}9'], maj9: ['{R}maj9', '{R}M9'], min9: ['{R}m9'], power: ['{R}5']
+  };
+  var SCALE_GROUPS = [
+    { label: '大调与小调', types: ['major', 'naturalMinor', 'harmonicMinor', 'melodicMinor'] },
+    { label: '五声与布鲁斯', types: ['majorPentatonic', 'minorPentatonic', 'blues'] },
+    { label: '教会调式', types: ['dorian', 'phrygian', 'lydian', 'mixolydian', 'locrian'] },
+    { label: '其他', types: ['chromatic'] }
+  ];
+  var SCALE_DESC = {
+    major: '最常用的音阶，结构是"全全半全全全半"。教会调式里它也叫伊奥尼亚调式（Ionian）。',
+    naturalMinor: '从大调音阶的第 6 级开始弹就得到它，结构"全半全全半全全"。也叫爱奥利亚调式（Aeolian）。',
+    harmonicMinor: '把自然小调的第 7 级升高半音，得到指向主音的"导音"，V 级和弦因此变成大三和弦。第 6→7 级之间是增二度（三个半音）。',
+    melodicMinor: '上行时把自然小调的第 6、7 级都升高，避免增二度、旋律更顺；传统用法中下行时还原为自然小调（播放"上行 + 下行"可以听到）。',
+    majorPentatonic: '大调音阶去掉第 4、7 级，只剩 1 2 3 5 6——中国传统音乐的"宫商角徵羽"。没有半音，所以怎么弹都不刺耳。',
+    minorPentatonic: '从大调五声音阶的第 5 个音（羽）开始。摇滚、布鲁斯吉他独奏最常用的音阶。',
+    blues: '在小调五声音阶里加入降五级（"蓝调音"），立刻有了布鲁斯味道。',
+    dorian: '小调色彩，但第 6 级是大六度，听起来比自然小调明亮一些。从大调的第 2 级开始弹白键就是 D 多利亚。',
+    phrygian: '第 2 级只比主音高半音，带有西班牙、弗拉门戈风味。从大调第 3 级开始（E 弗里几亚）。',
+    lydian: '大调色彩，但第 4 级升高，带来飘浮、梦幻的感觉，电影配乐常用。从大调第 4 级开始（F 利底亚）。',
+    mixolydian: '大调色彩，但第 7 级降低，少了"导音"的紧张感，摇滚、布鲁斯常用。从大调第 5 级开始（G 混合利底亚）。',
+    locrian: '主和弦是减三和弦，非常不稳定，很少单独使用。从大调第 7 级开始（B 洛克里亚）。',
+    chromatic: '包含一个八度里全部 12 个半音，每一步都是半音。这里统一用升号书写上行音阶。'
+  };
+  var DIA_SCALES = { major: 'major', naturalMinor: 'minor', harmonicMinor: 'minor', melodicMinor: 'minor', dorian: 'minor', phrygian: 'minor', lydian: 'major', mixolydian: 'major', locrian: 'minor' };
+  var FUNC_SCALES = { major: 1, naturalMinor: 1, harmonicMinor: 1 };
+  var MODES = { dorian: 1, phrygian: 1, lydian: 1, mixolydian: 1, locrian: 1 };
+  var SCAN_MAJOR = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'Db', 'Ab', 'Eb', 'Bb', 'F'];
+  var SCAN_MINOR = ['A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'Bb', 'F', 'C', 'G', 'D'];
+
+  /* ---------------- 工具函数 ---------------- */
+  function disp(n) { return MT.pcName(n); }
+  function dispRoot(r) { return MT.pretty(r); }
+  function tok(n) { return MT.noteName(n, { ascii: true }); }
+  function degreeOf(ivName, chordMode) {
+    var p = MT.parseInterval(ivName);
+    var perfect = p.simple === 1 || p.simple === 4 || p.simple === 5;
+    var q = p.quality, pre = '';
+    if (perfect) pre = q === 'A' ? '♯' : q === 'd' ? '♭' : q === 'AA' ? '♯♯' : q === 'dd' ? '♭♭' : '';
+    else pre = q === 'm' ? '♭' : q === 'A' ? '♯' : q === 'd' ? '♭♭' : q === 'AA' ? '♯♯' : '';
+    var num = p.num > 8 ? p.num : p.simple;
+    if (chordMode && p.num === 1 && !pre) return 'R';
+    return pre + num;
+  }
+  function mod(n, m) { return ((n % m) + m) % m; }
+  function pcs(notes) { var s = []; notes.forEach(function (n) { var p = mod(n.midi, 12); if (s.indexOf(p) < 0) s.push(p); }); return s.sort(function (a, b) { return a - b; }); }
+  function sameSet(a, b) { if (a.length !== b.length) return false; for (var i = 0; i < a.length; i++) if (a[i] !== b[i]) return false; return true; }
+
+  // MT.diatonicChords 遇到"增大七"等不在 CHORDS 表里的和弦时，type 为 null，这里补上名字
+  var EXTRA_TYPES = { '0,4,8,11': { symbol: '+maj7', zh: '增大七和弦', roman: '+maj7' }, '0,4,8,10': { symbol: '+7', zh: '增七和弦', roman: '+7' } };
+  function fixDiatonic(list) {
+    return list.map(function (c) {
+      if (c.type) return c;
+      var root = c.notes[0];
+      var key = c.notes.map(function (n) { return mod(n.midi - root.midi, 12); }).join(',');
+      var ex = EXTRA_TYPES[key] || { symbol: '?', zh: '特殊和弦', roman: '' };
+      var numeral = MT.ROMAN[c.degree - 1];
+      return Object.assign({}, c, { symbol: disp(root) + ex.symbol, zh: ex.zh, roman: numeral + ex.roman });
+    });
+  }
+
+  /* ---------------- 播放（独占） ---------------- */
+  var current = null;
+  function newHandle(onStop) {
+    if (current) current.stop();
+    var h = { voices: [], timers: [], stopped: false };
+    h.stop = function () {
+      if (h.stopped) return;
+      h.stopped = true;
+      h.timers.forEach(clearTimeout);
+      h.voices.forEach(function (v) { if (v && v.release) v.release(); });
+      if (h.seq) h.seq.stop();
+      if (onStop) onStop();
+      Sound.unclaim(h);
+      if (current === h) current = null;
+    };
+    Sound.claim(h, '和弦/音阶试听');
+    current = h;
+    return h;
+  }
+
+  /* ---------------- 根音选择器 ---------------- */
+  function buildRootPicker(el, onPick) {
+    el.innerHTML = ROOT_CELLS.map(function (cell) {
+      return '<div class="rp-cell ' + (cell.length > 1 ? 'black' : 'white') + '">' + cell.map(function (r) {
+        return '<button type="button" class="rp-btn" data-root="' + r + '">' + dispRoot(r) + '</button>';
+      }).join('') + (cell.length > 1 ? '<span class="rp-spacer"></span>' : '') + '</div>';
+    }).join('');
+    el.addEventListener('click', function (e) {
+      var b = e.target.closest('.rp-btn');
+      if (b) onPick(b.dataset.root);
+    });
+  }
+  function markRoot(el, root) {
+    el.querySelectorAll('.rp-btn').forEach(function (b) { b.classList.toggle('active', b.dataset.root === root); });
+  }
+
+  /* ================= 和弦 ================= */
+  var chordState = { root: 'C', type: 'maj', inv: 0 };
+  var cKb = new PianoKeyboard($('c-kb'), { start: 'C4', end: 'B5', labels: 'c' });
+  var cKbRange = 'C4-B5';
+
+  buildRootPicker($('chord-roots'), function (r) { chordState.root = r; renderChord(true); });
+  $('chord-types').innerHTML = CHORD_GROUPS.map(function (g) {
+    return '<div class="type-group"><span class="g-label">' + g.label + '</span>' + g.types.map(function (t) {
+      var d = MT.CHORDS[t];
+      return '<button type="button" class="type-btn" data-type="' + t + '">' + d.zh + '<small>' + (d.symbol || 'M') + '</small></button>';
+    }).join('') + '</div>';
+  }).join('');
+  $('chord-types').addEventListener('click', function (e) {
+    var b = e.target.closest('.type-btn');
+    if (!b) return;
+    chordState.type = b.dataset.type;
+    var max = MT.CHORDS[chordState.type].intervals.length - 1;
+    if (chordState.inv > max) chordState.inv = 0;
+    renderChord(true);
+  });
+  $('chord-inv').addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b) return;
+    chordState.inv = +b.dataset.inv;
+    renderChord(true);
+  });
+
+  function chordNotes() {
+    var notes = MT.chord(chordState.root + '4', chordState.type, { inversion: chordState.inv });
+    var minMidi = Math.min.apply(null, notes.map(function (n) { return n.midi; }));
+    if (chordState.inv > 0 && minMidi > 67) notes = notes.map(function (n) { return MT.transpose(n, 'P8', -1); });
+    return notes;
+  }
+
+  function ensureRange(kb, midis, current, setter) {
+    var lo = Math.min.apply(null, midis), hi = Math.max.apply(null, midis);
+    var start = Math.floor(lo / 12) * 12, end = Math.max(Math.floor(hi / 12) * 12 + 11, start + 23);
+    var r = start + '-' + end;
+    if (r !== current) { kb.setRange(start, end); setter(r); }
+  }
+
+  function keysContaining(rootNote, type) {
+    var size = MT.CHORDS[type].intervals.length;
+    if (['maj', 'min', 'dim', 'aug', 'maj7', 'dom7', 'min7', 'm7b5', 'dim7', 'mMaj7'].indexOf(type) < 0) return null;
+    var target = pcs(MT.chord(rootNote, type)), rootPc = mod(rootNote.midi, 12);
+    var found = [];
+    function scan(keys, mode, scaleName) {
+      keys.forEach(function (k) {
+        var key = mode === 'minor' ? k + 'm' : k;
+        var list = fixDiatonic(MT.diatonicChords(key, { sevenths: size === 4, scale: scaleName }));
+        list.forEach(function (c) {
+          if (mod(c.root.midi, 12) === rootPc && c.type === type && sameSet(pcs(c.notes), target)) {
+            var exact = c.root.letter === rootNote.letter && c.root.acc === rootNote.acc;
+            found.push({ key: (mode === 'minor' ? dispRoot(k).toLowerCase() + ' 小调' : dispRoot(k) + ' 大调'), roman: c.roman, minor: mode === 'minor', alt: exact ? null : c.symbol });
+          }
+        });
+      });
+    }
+    scan(SCAN_MAJOR, 'major', 'major');
+    scan(SCAN_MINOR, 'minor', 'harmonicMinor');
+    // 小调（和声小调）只列出最有代表性的级数：主和弦 i、属和弦 V/V7、导七 vii°/vii°7、III+、i(maj7)，避免与大调的结果重复
+    var KEEP = /^(i|V|V7|vii°|vii°7|III\+|III\+maj7|i\(maj7\))$/;
+    var majorFound = found.filter(function (f) { return !f.minor; });
+    var minorOnly = found.filter(function (f) { return f.minor && KEEP.test(f.roman); });
+    return majorFound.concat(minorOnly);
+  }
+
+  function renderChord(updateHash) {
+    var st = chordState, def = MT.CHORDS[st.type];
+    markRoot($('chord-roots'), st.root);
+    $('chord-types').querySelectorAll('.type-btn').forEach(function (b) { b.classList.toggle('active', b.dataset.type === st.type); });
+    // 转位按钮
+    var n = def.intervals.length;
+    var invHtml = '';
+    for (var i = 0; i < n; i++) invHtml += '<button type="button" data-inv="' + i + '" class="' + (i === st.inv ? 'active' : '') + '">' + MT.INVERSION_ZH[i] + '</button>';
+    $('chord-inv').innerHTML = invHtml;
+
+    var rootNote = MT.parseNote(st.root + '4');
+    var rootPos = MT.chord(rootNote, st.type);
+    var notes = chordNotes();
+    var bass = notes.slice().sort(function (a, b) { return a.midi - b.midi; })[0];
+    var labels = def.intervals.map(function (iv) { return degreeOf(iv, true); });
+    var sym = disp(rootNote) + def.symbol + (st.inv > 0 ? '/' + disp(bass) : '');
+    $('c-symbol').textContent = sym;
+    $('c-name').textContent = disp(rootNote) + ' ' + def.zh + (st.inv > 0 ? '（' + MT.INVERSION_ZH[st.inv] + '，低音是 ' + disp(bass) + '）' : '（原位）');
+    $('c-alt').textContent = '其他常见写法：' + ALT_SYMBOLS[st.type].map(function (s) { return s.replace('{R}', disp(rootNote)); }).join('　');
+    // 组成音（按根音位置顺序）
+    $('c-notes').innerHTML = rootPos.map(function (nn, i) {
+      return '<span class="note-chip' + (i === 0 ? ' root' : '') + '" data-midi="' + nn.midi + '" title="点击试听"><b>' + disp(nn) + '</b><span>' + labels[i] + '</span></span>';
+    }).join('');
+    $('c-formula').innerHTML = '<b>' + def.formula + '</b> <span class="muted small">（以大调音阶的级数为参照）</span>';
+    // 叠置结构
+    var chain = '';
+    rootPos.forEach(function (nn, i) {
+      chain += '<span class="n">' + disp(nn) + '</span>';
+      if (i < rootPos.length - 1) chain += '<span class="iv">' + MT.interval(nn, rootPos[i + 1]).zh + '</span>';
+    });
+    $('c-stack').innerHTML = chain;
+    $('c-from-root').innerHTML = rootPos.slice(1).map(function (nn, i) {
+      var iv = MT.interval(rootPos[0], nn);
+      return '<span class="nowrap">' + disp(rootPos[0]) + '→' + disp(nn) + '：<b>' + iv.zh + '</b>（' + iv.semis + ' 个半音）</span>';
+    }).join('<br>');
+    $('c-feel').textContent = def.feel;
+    // 出现在哪些调
+    var keys = keysContaining(rootNote, st.type);
+    if (keys === null) $('c-keys').innerHTML = '<span class="small muted">挂留、加音、九和弦等一般不按"调内三/七和弦"归类，可以在很多调里作为色彩和弦使用。</span>';
+    else if (!keys.length) $('c-keys').innerHTML = '<span class="small muted">在常用的大调与和声小调里都不是调内和弦（可能需要用等音的写法，或作为借用和弦出现）。</span>';
+    else $('c-keys').innerHTML = keys.map(function (k) {
+      return '<span class="tag ' + (k.minor ? 'orange' : 'primary') + '"' + (k.alt ? ' title="在这个调里按等音写作 ' + esc(k.alt) + '"' : '') + '>' + esc(k.key) + ' · ' + esc(MT.pretty(k.roman)) + (k.alt ? '（写作 ' + esc(k.alt) + '）' : '') + '</span>';
+    }).join('') + '<div class="small muted" style="width:100%;margin-top:4px">紫色 = 大调里的级数，橙色 = 小调（和声小调）里有代表性的级数。</div>';
+    // 五线谱：柱式 + 分解
+    var sorted = notes.slice().sort(function (a, b) { return a.midi - b.midi; });
+    var block = '[' + sorted.map(tok).join(' ') + ']:w';
+    var broken = sorted.map(function (nn, i) { return tok(nn) + (i === 0 ? ':w' : ''); }).join(' ');
+    Staff.render($('c-staff'), { notes: block + ' || ' + broken + ' |]', clef: 'treble', spacing: 'even', names: 'name', playable: false, noteSpace: 40 });
+    // 键盘
+    ensureRange(cKb, notes.map(function (x) { return x.midi; }), cKbRange, function (r) { cKbRange = r; });
+    var badgeMap = {};
+    rootPos.forEach(function (nn, i) { badgeMap[mod(nn.midi, 12)] = labels[i]; });
+    cKb.clearHighlight();
+    cKb.setHighlight(notes.filter(function (x) { return mod(x.midi, 12) !== mod(rootNote.midi, 12); }), { cls: 'hl', badges: notes.filter(function (x) { return mod(x.midi, 12) !== mod(rootNote.midi, 12); }).map(function (x) { return badgeMap[mod(x.midi, 12)]; }) }, true);
+    cKb.setHighlight(notes.filter(function (x) { return mod(x.midi, 12) === mod(rootNote.midi, 12); }), { cls: 'hl2', badges: ['R'] }, true);
+    if (updateHash) writeHash();
+  }
+
+  function playChordMode(mode) {
+    var notes = chordNotes().slice().sort(function (a, b) { return a.midi - b.midi; });
+    var midis = notes.map(function (n) { return n.midi; });
+    var h = newHandle(function () { cKb.releaseAll(); });
+    var gap = 0.32, total;
+    if (mode === 'block') {
+      h.voices = Sound.playChord(midis, { duration: 2 });
+      midis.forEach(function (m) { cKb.press(m); });
+      total = 2;
+    } else {
+      h.voices = Sound.playArpeggio(midis, { gap: gap, duration: 1.4 });
+      midis.forEach(function (m, i) { h.timers.push(setTimeout(function () { cKb.press(m); }, i * gap * 1000)); });
+      total = gap * (midis.length - 1) + 1.4;
+      if (mode === 'both') {
+        var t2 = gap * midis.length + 0.5;
+        h.voices = h.voices.concat(Sound.playChord(midis, { delay: t2, duration: 2 }));
+        h.timers.push(setTimeout(function () { cKb.releaseAll(); midis.forEach(function (m) { cKb.press(m); }); }, t2 * 1000));
+        total = t2 + 2;
+      }
+    }
+    h.timers.push(setTimeout(function () { h.stop(); }, total * 1000 + 50));
+  }
+  $('c-play-block').addEventListener('click', function () { playChordMode('block'); });
+  $('c-play-arp').addEventListener('click', function () { playChordMode('arp'); });
+  $('c-play-both').addEventListener('click', function () { playChordMode('both'); });
+  $('c-notes').addEventListener('click', function (e) {
+    var c = e.target.closest('.note-chip');
+    if (!c) return;
+    var m = +c.dataset.midi;
+    Sound.playNote(m, { duration: 1 });
+    cKb.flash(m, 500);
+  });
+  $('c-staff').addEventListener('click', function (e) {
+    var g = e.target.closest('.ev');
+    if (!g) return;
+    var view = $('c-staff')._staff;
+    var slot = view.slots[+g.dataset.s];
+    if (!slot) return;
+    var ms = [];
+    slot.evs.forEach(function (ev) { if (ev && !ev.rest) ev.notes.forEach(function (n) { ms.push(n.midi); }); });
+    Sound.playChord(ms, { duration: 1.4 });
+    ms.forEach(function (m) { cKb.flash(m, 700); });
+    g.classList.add('playing');
+    setTimeout(function () { g.classList.remove('playing'); }, 700);
+  });
+
+  /* ================= 音阶 ================= */
+  var scaleState = { root: 'C', type: 'major', dia: 3 };
+  var sKb = new PianoKeyboard($('s-kb'), { start: 'C4', end: 'B5', labels: 'c' });
+  var sKbRange = 'C4-B5';
+  buildRootPicker($('scale-roots'), function (r) { scaleState.root = r; renderScale(true); });
+  $('scale-types').innerHTML = SCALE_GROUPS.map(function (g) {
+    return '<div class="type-group"><span class="g-label">' + g.label + '</span>' + g.types.map(function (t) {
+      var d = MT.SCALES[t];
+      return '<button type="button" class="type-btn" data-type="' + t + '">' + d.zh.replace(/（.*?）/, '') + '<small>' + d.en + '</small></button>';
+    }).join('') + '</div>';
+  }).join('');
+  $('scale-types').addEventListener('click', function (e) {
+    var b = e.target.closest('.type-btn');
+    if (!b) return;
+    scaleState.type = b.dataset.type;
+    renderScale(true);
+  });
+  $('s-dia-mode').addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b) return;
+    scaleState.dia = +b.dataset.v;
+    if (diaOn >= 0) { diaOn = -1; showScaleOnKb(); }
+    $('s-dia-mode').querySelectorAll('button').forEach(function (x) { x.classList.toggle('active', x === b); });
+    renderDiatonic();
+  });
+
+  function scaleNotes() {
+    return MT.scale(scaleState.root + '4', scaleState.type, { octaves: 1, top: true });
+  }
+
+  function renderScale(updateHash) {
+    var st = scaleState, def = MT.SCALES[st.type];
+    markRoot($('scale-roots'), st.root);
+    $('scale-types').querySelectorAll('.type-btn').forEach(function (b) { b.classList.toggle('active', b.dataset.type === st.type); });
+    var notes = scaleNotes();
+    var rootName = dispRoot(st.root);
+    $('s-symbol').textContent = rootName + ' ' + def.zh.replace(/（.*?）/, '');
+    $('s-name').textContent = def.zh + ' · ' + def.en;
+    var degs = def.intervals.map(function (iv) { return degreeOf(iv, false); }).concat(['8']);
+    $('s-alt').textContent = '级数：' + degs.join(' ');
+    $('s-notes').innerHTML = notes.map(function (n, i) {
+      return '<span class="note-chip' + (i === 0 || i === notes.length - 1 ? ' root' : '') + '" data-i="' + i + '" data-midi="' + n.midi + '"><b>' + disp(n) + '</b><span>' + degs[i] + '</span></span>';
+    }).join('');
+    var steps = MT.scaleSteps(st.type);
+    var chain = '';
+    notes.forEach(function (n, i) {
+      chain += '<span class="n">' + disp(n) + '</span>';
+      if (i < steps.length) {
+        var s = steps[i];
+        chain += '<span class="st ' + (s === '半' ? 'half' : s === '全' ? 'whole' : 'other') + '">' + (s === '全半' ? '全+半' : s) + '</span>';
+      }
+    });
+    $('s-steps').innerHTML = chain;
+    $('s-feel').textContent = def.feel;
+    $('s-desc').textContent = SCALE_DESC[st.type] || '';
+    Staff.render($('s-staff'), { notes: notes.map(function (n, i) { return tok(n) + (i === 0 ? ':w' : ''); }).join(' ') + ' |]', clef: 'treble', spacing: 'even', names: 'name', playable: false, noteSpace: notes.length > 9 ? 30 : 36 });
+    ensureRange(sKb, notes.map(function (x) { return x.midi; }), sKbRange, function (r) { sKbRange = r; });
+    diaOn = -1;
+    showScaleOnKb();
+    renderDiatonic();
+    if (updateHash) writeHash();
+  }
+
+  var diaOn = -1;
+  // 键盘上显示整条音阶（点击调内和弦时会暂时换成只显示该和弦，避免两层标签重叠）
+  function showScaleOnKb() {
+    var notes = scaleNotes();
+    var degs = MT.SCALES[scaleState.type].intervals.map(function (iv) { return degreeOf(iv, false); }).concat(['8']);
+    sKb.clearHighlight();
+    sKb.setHighlight(notes.slice(1, -1), { cls: 'hl', badges: degs.slice(1, -1) }, true);
+    sKb.setHighlight([notes[0], notes[notes.length - 1]], { cls: 'hl2', badges: ['1', '8'] }, true);
+  }
+  function renderDiatonic() {
+    var st = scaleState;
+    var box = $('s-dia-box');
+    var def = MT.SCALES[st.type];
+    if (def.intervals.length !== 7 || !DIA_SCALES[st.type]) { box.hidden = true; return; }
+    box.hidden = false;
+    var key = st.root + (DIA_SCALES[st.type] === 'minor' ? 'm' : '');
+    var list = fixDiatonic(MT.diatonicChords(key, { scale: st.type, sevenths: st.dia === 4 }));
+    var showFunc = !!FUNC_SCALES[st.type];
+    if (MODES[st.type]) {
+      // 教会调式：按惯例在罗马数字前标出相对大调音阶的升降（如弗里几亚的 ♭II）
+      var tonic = MT.parseNote(st.root + '4');
+      list = list.map(function (c) {
+        var iv = MT.interval(tonic, c.root);
+        var perfect = iv.simple === 1 || iv.simple === 4 || iv.simple === 5;
+        var pre = (iv.quality === 'm' || iv.quality === 'd') && !(perfect && iv.quality === 'P') ? '♭' : iv.quality === 'A' ? '♯' : '';
+        if (perfect && iv.quality === 'd') pre = '♭';
+        return pre ? Object.assign({}, c, { roman: pre + c.roman }) : c;
+      });
+    }
+    $('s-dia').innerHTML = list.map(function (c, i) {
+      return '<div class="dia-card' + (i === diaOn ? ' on' : '') + '" data-i="' + i + '" role="button" tabindex="0">' +
+        '<div class="rn">' + esc(MT.pretty(c.roman)) + '</div><div class="sym">' + esc(c.symbol) + '</div><div class="zh">' + esc(c.zh) + '</div>' +
+        (showFunc ? '<span class="fn ' + c.func + '">' + c.funcZh + '</span>' : '') + '</div>';
+    }).join('');
+    $('s-dia').dataset.key = key;
+    var notes = {
+      major: '规律：大调的调内三和弦是"大 小 小 大 大 小 减"。点击卡片可以听，并在键盘上用绿色显示。',
+      naturalMinor: '自然小调的调内三和弦是"小 减 大 小 小 大 大"，与它的关系大调用的是同一组和弦。',
+      harmonicMinor: '和声小调升高了第 7 级，于是 V 级变成大三和弦（有了"回家"的强烈倾向），III 级变成增三和弦，vii 级变成减三和弦。'
+    };
+    $('s-dia-note').textContent = notes[st.type] || '教会调式也有自己的一组调内和弦：同样是在音阶的每个音上隔一个音叠三度，罗马数字按这个调式自己的主音来数。';
+    box._list = list;
+  }
+  $('s-dia').addEventListener('click', function (e) {
+    var card = e.target.closest('.dia-card');
+    if (!card) return;
+    var i = +card.dataset.i, c = $('s-dia-box')._list[i];
+    var h = newHandle(function () { sKb.releaseAll(); });
+    diaOn = i;
+    $('s-dia').querySelectorAll('.dia-card').forEach(function (x) { x.classList.toggle('on', +x.dataset.i === i); });
+    var midis = c.notes.map(function (n) { return n.midi; });
+    h.voices = Sound.playChord(midis, { duration: 1.8 });
+    ensureRange(sKb, scaleNotes().map(function (x) { return x.midi; }).concat(midis), sKbRange, function (r) { sKbRange = r; });
+    sKb.clearHighlight();
+    sKb.setHighlight(c.notes, { cls: 'hl3', badges: 'name' }, true);
+    midis.forEach(function (m) { sKb.press(m); });
+    h.timers.push(setTimeout(function () { h.stop(); }, 1900));
+  });
+  $('s-dia').addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.target.click(); } });
+
+  function playScale(dir) {
+    var notes = scaleNotes();
+    var up = notes.map(function (n, i) { return { midi: n.midi, idx: i }; });
+    var downNotes = notes.slice().reverse();
+    if (scaleState.type === 'melodicMinor') downNotes = MT.scale(scaleState.root + '4', 'naturalMinor', { octaves: 1, top: true }).reverse();
+    var down = downNotes.map(function (n) {
+      var idx = -1;
+      notes.forEach(function (m, i) { if (m.midi === n.midi) idx = i; });
+      return { midi: n.midi, idx: idx };
+    });
+    var seq = dir === 'up' ? up : dir === 'down' ? down : up.concat(down.slice(1));
+    var view = $('s-staff')._staff;
+    var chips = $('s-notes').querySelectorAll('.note-chip');
+    function clearUi() {
+      sKb.releaseAll();
+      if (view) view.highlightEvents([], 'hl2');
+      chips.forEach(function (c) { c.classList.remove('on'); });
+    }
+    var h = newHandle(clearUi);
+    if (diaOn >= 0) { diaOn = -1; $('s-dia').querySelectorAll('.dia-card').forEach(function (x) { x.classList.remove('on'); }); showScaleOnKb(); }
+    var events = seq.map(function (x, i) { return { notes: [x.midi], beats: i === seq.length - 1 ? 2 : 1, idx: x.idx }; });
+    h.seq = Sound.playSequence(events, {
+      bpm: +$('s-speed').value, exclusive: false,
+      onEvent: function (ev) {
+        sKb.releaseAll(); sKb.press(ev.notes[0]);
+        chips.forEach(function (c) { c.classList.toggle('on', +c.dataset.i === ev.idx); });
+        if (view) view.highlightEvents(ev.idx >= 0 ? [ev.idx] : [], 'hl2');
+      },
+      onEnd: function () { h.seq = null; h.stop(); }
+    });
+  }
+  $('s-play-up').addEventListener('click', function () { playScale('up'); });
+  $('s-play-down').addEventListener('click', function () { playScale('down'); });
+  $('s-play-both').addEventListener('click', function () { playScale('both'); });
+  $('s-notes').addEventListener('click', function (e) {
+    var c = e.target.closest('.note-chip');
+    if (!c) return;
+    var m = +c.dataset.midi;
+    Sound.playNote(m, { duration: 1 });
+    sKb.flash(m, 500);
+  });
+  $('s-staff').addEventListener('click', function (e) {
+    var g = e.target.closest('.ev');
+    if (!g) return;
+    var view = $('s-staff')._staff, slot = view.slots[+g.dataset.s];
+    if (!slot || !slot.evs[0] || slot.evs[0].rest) return;
+    var m = slot.evs[0].notes[0].midi;
+    Sound.playNote(m, { duration: 1 });
+    sKb.flash(m, 500);
+    g.classList.add('playing');
+    setTimeout(function () { g.classList.remove('playing'); }, 500);
+  });
+
+  /* ================= 标签页 & 地址栏状态 ================= */
+  var tab = 'chord';
+  function showTab(t, updateHash) {
+    tab = t;
+    $('tabs').querySelectorAll('button').forEach(function (b) { b.classList.toggle('active', b.dataset.tab === t); });
+    $('pane-chord').hidden = t !== 'chord';
+    $('pane-scale').hidden = t !== 'scale';
+    if (current) current.stop();
+    if (t === 'chord') renderChord(false); else renderScale(false);
+    if (updateHash) writeHash();
+  }
+  $('tabs').addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (b) showTab(b.dataset.tab, true);
+  });
+
+  function writeHash() {
+    var h = tab === 'chord'
+      ? '#chord=' + chordState.root + ':' + chordState.type + ':' + chordState.inv
+      : '#scale=' + scaleState.root + ':' + scaleState.type;
+    if (location.hash !== h) history.replaceState(null, '', h);
+  }
+  function readHash() {
+    var h = decodeURIComponent(location.hash.slice(1));
+    var m;
+    if ((m = /^chord=([A-G](?:#|b)?):(\w+)(?::(\d))?$/.exec(h)) && ALL_ROOTS.indexOf(m[1]) >= 0 && MT.CHORDS[m[2]]) {
+      chordState.root = m[1]; chordState.type = m[2];
+      chordState.inv = Math.min(+(m[3] || 0), MT.CHORDS[m[2]].intervals.length - 1);
+      return 'chord';
+    }
+    if ((m = /^scale=([A-G](?:#|b)?):(\w+)$/.exec(h)) && ALL_ROOTS.indexOf(m[1]) >= 0 && MT.SCALES[m[2]]) {
+      scaleState.root = m[1]; scaleState.type = m[2];
+      return 'scale';
+    }
+    return null;
+  }
+  window.addEventListener('hashchange', function () { var t = readHash(); if (t) showTab(t, false); });
+
+  // 初始渲染：两个面板都先渲染一次，保证切换时即时可用
+  var initial = readHash() || 'chord';
+  renderChord(false);
+  renderScale(false);
+  showTab(initial, false);
+
+  // 键盘快捷键：空格播放当前面板
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== ' ' || /INPUT|TEXTAREA|SELECT|BUTTON/.test(document.activeElement.tagName)) return;
+    e.preventDefault();
+    if (tab === 'chord') playChordMode('block'); else playScale('up');
+  });
+
+  // 暴露给调试
+  window.__dict = { chordState: chordState, scaleState: scaleState, renderChord: renderChord, renderScale: renderScale, chordNotes: chordNotes, scaleNotes: scaleNotes, keysContaining: keysContaining, playChordMode: playChordMode, playScale: playScale, showTab: showTab };
+})();
+</script>
+</body>
+</html>

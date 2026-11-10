@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 1 章 声音与音高 · 乐理入门</title>
+<script>try{var t=localStorage.getItem('mt-theme');document.documentElement.setAttribute('data-theme',t?JSON.parse(t):(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))}catch(e){}</script>
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+  .wave-lab { display: grid; gap: 14px; }
+  .wave-lab canvas { width: 100%; height: 140px; border-radius: 10px; background: var(--bg-soft); border: 1px solid var(--border); display: block; }
+  .wave-lab .readout { display: flex; flex-wrap: wrap; gap: 10px 24px; align-items: baseline; }
+  .wave-lab .hz { font: 800 34px var(--font-mono); color: var(--primary); }
+  .wave-lab .near { color: var(--text-2); }
+  .wave-lab input[type="range"] { width: 100%; }
+  .octave-svg { width: 100%; height: auto; display: block; }
+  .attr-table td:first-child { font-weight: 700; white-space: nowrap; }
+</style>
+</head>
+<body data-page="ch01" data-root="..">
+<main class="page">
+<article class="content doc">
+
+<header class="chapter-header">
+  <div class="chapter-kicker">第 1 章</div>
+  <h1>声音与音高：音乐的原材料</h1>
+  <p class="lead">学乐理之前，我们先回答一个最根本的问题：音乐是用什么"做"出来的？答案很简单——<strong>声音</strong>。这一章不需要任何基础，我们用耳朵和几个小实验，弄清楚声音的几种"性格"，并第一次真正"看见"音高。</p>
+  <div class="chapter-meta"><span>⏱ 预计 15 分钟</span><span>🎯 难度 ★☆☆☆☆</span><span>🎧 建议戴耳机</span></div>
+  <div class="goals">
+    <h4>学完本章，你将能够：</h4>
+    <ul>
+      <li>说出声音是怎么产生、怎么传到耳朵里的；</li>
+      <li>区分乐音的四个属性：<b>音高、时值、音量、音色</b>；</li>
+      <li>理解"频率"和"音高"的关系，知道标准音 A4 = 440 Hz；</li>
+      <li>听出"八度"，并理解为什么一个八度要分成 12 个半音。</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+<h2 id="s1-1">1.1 声音是怎么产生的</h2>
+<p>拨一下吉他弦、敲一下桌子、或者张嘴说"啊——"，都会产生声音。它们的共同点是：<strong>有东西在振动</strong>。</p>
+<p>振动的物体会推动周围的空气，让空气一会儿被挤紧、一会儿被拉松，这种"疏密变化"像波浪一样一圈圈向外传播，这就是<span class="term">声波</span>。声波传到我们的耳朵，带动耳膜一起振动，大脑再把这种振动"翻译"成我们听到的声音。</p>
+
+<div class="callout analogy">
+  <div class="callout-title">打个比方</div>
+  <p>往平静的湖面扔一颗石子，水面会荡起一圈圈波纹，向四周扩散开去。声音在空气里的传播也是这样——只不过我们看不见空气的"波纹"，只能用耳朵"接住"它。</p>
+</div>
+
+<p>所以，一段声音可以简单地概括为三步：</p>
+<ol class="steps">
+  <li><b>发声体振动</b>：琴弦、鼓皮、声带、扬声器的纸盆……</li>
+  <li><b>介质传播</b>：通常是空气（在真空里没有介质，声音无法传播，所以太空里是"寂静"的）。</li>
+  <li><b>耳朵接收</b>：耳膜随之振动，大脑把它感知为声音。</li>
+</ol>
+
+<div class="callout try">
+  <div class="callout-title">动手试试</div>
+  <p>把手指轻轻放在喉咙上，用低沉的声音说"啊——"，再用尖细的声音说"啊——"。你会感觉到声带在振动，而且<b>声音越高，振动越快</b>。记住这个感觉，它马上就会用到。</p>
+</div>
+</section>
+
+<section>
+<h2 id="s1-2">1.2 乐音的四个属性</h2>
+<p>同样是声音，汽车喇叭、雷声、小提琴、你唱的歌听起来千差万别。描述一个声音，我们通常看它的四个属性。音乐家给它们起的名字分别是：</p>
+
+<div class="table-wrap">
+<table class="table attr-table">
+  <thead><tr><th>属性</th><th>通俗理解</th><th>由什么决定</th><th>听一听</th></tr></thead>
+  <tbody>
+    <tr><td>音高</td><td>声音的<b>高低</b></td><td>振动的<b>快慢</b>（频率）</td>
+      <td><button data-play="C3" data-mode="chord">低</button><button data-play="C6" data-mode="chord">高</button></td></tr>
+    <tr><td>时值</td><td>声音的<b>长短</b></td><td>振动<b>持续的时间</b></td>
+      <td><button data-play="G4" data-mode="chord" data-dur="0.18" data-instrument="organ">短</button><button data-play="G4" data-mode="chord" data-dur="2.6" data-instrument="organ">长</button></td></tr>
+    <tr><td>音量</td><td>声音的<b>强弱</b></td><td>振动的<b>幅度</b>（振幅）</td>
+      <td><button data-play="E4 G4 C5" data-mode="chord" data-velocity="0.15">弱</button><button data-play="E4 G4 C5" data-mode="chord" data-velocity="1">强</button></td></tr>
+    <tr><td>音色</td><td>声音的<b>"颜色"</b>，像谁发出的</td><td>发声体的<b>材质与结构</b>（泛音的组成）</td>
+      <td><button data-play="A3 C#4 E4 A4" data-mode="arp" data-gap="0.12" data-instrument="piano">钢琴</button><button data-play="A3 C#4 E4 A4" data-mode="arp" data-gap="0.12" data-instrument="guitar">吉他</button><button data-play="A3 C#4 E4 A4" data-mode="arp" data-gap="0.12" data-instrument="organ">风琴</button><button data-play="A3 C#4 E4 A4" data-mode="arp" data-gap="0.12" data-instrument="sine">纯音</button></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>这四个属性里，乐谱主要负责记录前两个：<strong>音高</strong>（这个音有多高）和<strong>时值</strong>（这个音有多长）。你在后面几章学的音名、五线谱、音程、和弦，都是在讲"音高"；节奏、节拍、音符时值，都是在讲"时值"。音量和音色也有专门的记号（比如 <i>p</i> 表示弱、<i>f</i> 表示强），我们放到第 9 章再说。</p>
+
+<div class="callout note">
+  <div class="callout-title">乐音与噪音</div>
+  <p>振动<b>有规律</b>、能听出明确音高的声音叫<span class="term">乐音</span>，比如钢琴、笛子、人的歌声；振动<b>没有规律</b>、听不出明确音高的叫<span class="term">噪音</span>，比如风声、拍手声，以及军鼓、镲片这类打击乐器。"噪音"在这里不是贬义——鼓手每天都在用"噪音"创造节奏呢。</p>
+  <p><button data-play="C4 E4 G4 C5" data-mode="arp" data-gap="0.2">乐音：钢琴</button> <button data-play="R R R R" data-click data-click-sound="tick" data-bpm="100">噪音：节拍器</button></p>
+  <p>两个对比着听：钢琴的每个音都能跟着哼出来；节拍器的"咔哒"声只是短促的一下，哼不出明确的音高。</p>
+</div>
+</section>
+
+<section>
+<h2 id="s1-3">1.3 音高与频率</h2>
+<p>还记得摸喉咙的实验吗？<strong>振动越快，声音越高；振动越慢，声音越低。</strong>物理学用<span class="term">频率</span>来描述振动的快慢：每秒钟振动多少次，频率就是多少<b>赫兹（Hz）</b>。比如 440 Hz，就是每秒振动 440 次。</p>
+
+<p>下面这个小实验室可以让你"看见"声音：拖动滑块改变频率，上方会画出对应的声波。你会发现，<b>频率越高，波形越密集，听起来也越高</b>。</p>
+
+<div class="figure wave-lab" id="wave-lab">
+  <canvas id="wave-canvas" width="760" height="140" aria-label="声波示意图"></canvas>
+  <div class="readout">
+    <span class="hz"><span id="hz-val">440</span> Hz</span>
+    <span class="near">最接近的音：<b class="nn" id="hz-note">A4</b> <span id="hz-cents" class="muted"></span></span>
+    <span style="flex:1"></span>
+    <button class="btn btn-primary" id="tone-btn" type="button">▶ 发出声音</button>
+  </div>
+  <input type="range" id="hz-range" min="0" max="1000" value="500" aria-label="频率">
+  <div class="btn-row" style="margin:0">
+    <span class="small muted">快速跳到：</span>
+    <button class="btn btn-sm" data-hz="110">110 Hz（A2）</button>
+    <button class="btn btn-sm" data-hz="261.63">261.6 Hz（中央 C）</button>
+    <button class="btn btn-sm" data-hz="440">440 Hz（A4）</button>
+    <button class="btn btn-sm" data-hz="880">880 Hz（A5）</button>
+  </div>
+  <div class="caption">滑块按"音乐的感觉"排列：每向右移动相同的距离，音高就升高相同的程度（实际频率是成倍增长的）。</div>
+</div>
+
+<h3>标准音：A4 = 440 Hz</h3>
+<p>如果每个乐器都随便定音高，大家一起演奏时就会"打架"。所以世界上约定了一个<span class="term">标准音</span>：钢琴中央 C 右边的第一个 A（记作 <span class="nn">A4</span>）就定为 <b>440 Hz</b>。乐团开演前，双簧管会先吹出这个 A，所有乐器都以它为准调音；你手机里的调音器 App 默认也是这个标准。</p>
+<p><button data-play="440" data-mode="freq" data-dur="2">标准音 A4 = 440 Hz（纯音）</button> <button data-play="A4" data-mode="chord" data-dur="2">同一个音，用钢琴弹</button></p>
+
+<h3>我们能听到多高、多低？</h3>
+<ul>
+  <li>人耳能听到的频率大约是 <b>20 Hz ～ 20000 Hz</b>，年龄越大，能听到的最高频率越低；</li>
+  <li>一架 88 键钢琴，从最低的 A0（27.5 Hz）到最高的 C8（约 4186 Hz）；</li>
+  <li>人说话、唱歌的基本音高，大多在 80 Hz ～ 1000 Hz 之间。</li>
+</ul>
+
+<div class="callout try">
+  <div class="callout-title">小游戏：测测你的"耳朵年龄"</div>
+  <p>先把音量调小一点，然后依次点击下面的按钮。很多成年人听不到 15000 Hz 以上的声音——听不到也完全不影响学音乐，放心。</p>
+  <p>
+    <button data-play="8000" data-mode="freq" data-velocity="0.18" data-dur="1.2">8000 Hz</button>
+    <button data-play="12000" data-mode="freq" data-velocity="0.18" data-dur="1.2">12000 Hz</button>
+    <button data-play="15000" data-mode="freq" data-velocity="0.18" data-dur="1.2">15000 Hz</button>
+    <button data-play="17000" data-mode="freq" data-velocity="0.18" data-dur="1.2">17000 Hz</button>
+  </p>
+</div>
+</section>
+
+<section>
+<h2 id="s1-4">1.4 八度：频率翻倍的"同名音"</h2>
+<p>来做一个很重要的听力实验。依次播放 220 Hz、440 Hz、880 Hz 三个音：</p>
+<p><button data-play="220 440 880" data-mode="freq" data-dur="1" data-wave="triangle">220 → 440 → 880 Hz</button></p>
+<p>它们的高低明显不同，但你是不是觉得它们<strong>"像是同一个音"</strong>，只是一个比一个更高、更亮？这种关系在音乐里叫作<span class="term">八度</span>（octave）：<b>频率翻一倍，音高就升高一个八度。</b></p>
+
+<div class="figure">
+  <svg class="octave-svg" id="octave-svg" viewBox="0 0 760 150" aria-label="八度的波形对比"></svg>
+  <div class="caption">上：220 Hz；下：440 Hz。高音的波正好振动两次时，低音振动一次——它们的波峰会规律地"对齐"，所以听起来格外融合。</div>
+</div>
+
+<p>正因为相差八度的音听起来"像同一个音"，人们给它们起了<b>同样的名字</b>：220 Hz、440 Hz、880 Hz 都叫 <span class="nn">A</span>，只是用数字区分高低，分别记作 A3、A4、A5。在钢琴上，它们正好相隔 8 个白键——"八度"这个名字就是这么来的（第 2 章会详细讲）。</p>
+
+<div class="callout example">
+  <div class="callout-title">对比：融合 vs. 打架</div>
+  <p>两个音同时响起时，八度关系的两个音几乎"融为一体"；而频率很接近、却又不完全相同的两个音，会互相"打架"，产生一种"嗡嗡"的抖动感。</p>
+  <p>
+    <button data-play="220 440" data-mode="freq" data-together data-dur="2.2" data-wave="triangle">220 + 440 Hz（八度）</button>
+    <button data-play="440 466.16" data-mode="freq" data-together data-dur="2.2" data-wave="triangle">440 + 466 Hz（只差一点）</button>
+  </p>
+</div>
+</section>
+
+<section>
+<h2 id="s1-5">1.5 十二平均律：把八度切成 12 份</h2>
+<p>在 220 Hz 和 440 Hz 之间，频率可以是 221、222.5、300……理论上有无穷多个音。但如果每首歌都随便用这些音，乐器就没法制造、乐谱也没法记了。所以人们决定：<strong>在一个八度里，只挑出 12 个音来用</strong>。</p>
+<p>今天全世界最通用的方法叫<span class="term">十二平均律</span>：把一个八度<b>按"听感"平均切成 12 份</b>，每一份叫作一个<span class="term">半音</span>。相邻两个半音之间，频率都乘以同一个数 <code>2<sup>1/12</sup> ≈ 1.0595</code>，乘 12 次正好翻一倍，回到高八度。</p>
+
+<div class="figure">
+  <div id="kb-chromatic" data-keyboard="C4-C5" data-labels="name" data-black-labels data-size="tall"></div>
+  <div class="btn-row" style="justify-content:center">
+    <button data-play="C4 C#4 D4 D#4 E4 F4 F#4 G4 G#4 A4 A#4 B4 C5" data-bpm="200" data-kb="#kb-chromatic">从 C4 到 C5，逐个半音向上</button>
+  </div>
+  <div class="caption">钢琴上相邻的两个键（不管黑键还是白键）就相差一个半音。从 C4 到 C5，一共经过 12 个半音。</div>
+</div>
+
+<details class="fold">
+  <summary>展开查看：C4～C5 每个音的频率</summary>
+  <div class="fold-body">
+  <div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>音</th><th>频率（Hz）</th><th>比前一个音高</th><th class="c">试听</th></tr></thead>
+    <tbody>
+      <tr><td class="nn">C4（中央 C）</td><td>261.63</td><td>—</td><td class="c"><button data-play="C4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 C4"></button></td></tr>
+      <tr><td class="nn">C♯4 / D♭4</td><td>277.18</td><td>× 1.0595</td><td class="c"><button data-play="C#4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 C♯4"></button></td></tr>
+      <tr><td class="nn">D4</td><td>293.66</td><td>× 1.0595</td><td class="c"><button data-play="D4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 D4"></button></td></tr>
+      <tr><td class="nn">D♯4 / E♭4</td><td>311.13</td><td>× 1.0595</td><td class="c"><button data-play="D#4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 D♯4"></button></td></tr>
+      <tr><td class="nn">E4</td><td>329.63</td><td>× 1.0595</td><td class="c"><button data-play="E4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 E4"></button></td></tr>
+      <tr><td class="nn">F4</td><td>349.23</td><td>× 1.0595</td><td class="c"><button data-play="F4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 F4"></button></td></tr>
+      <tr><td class="nn">F♯4 / G♭4</td><td>369.99</td><td>× 1.0595</td><td class="c"><button data-play="F#4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 F♯4"></button></td></tr>
+      <tr><td class="nn">G4</td><td>392.00</td><td>× 1.0595</td><td class="c"><button data-play="G4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 G4"></button></td></tr>
+      <tr><td class="nn">G♯4 / A♭4</td><td>415.30</td><td>× 1.0595</td><td class="c"><button data-play="G#4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 G♯4"></button></td></tr>
+      <tr><td class="nn">A4（标准音）</td><td>440.00</td><td>× 1.0595</td><td class="c"><button data-play="A4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 A4"></button></td></tr>
+      <tr><td class="nn">A♯4 / B♭4</td><td>466.16</td><td>× 1.0595</td><td class="c"><button data-play="A#4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 A♯4"></button></td></tr>
+      <tr><td class="nn">B4</td><td>493.88</td><td>× 1.0595</td><td class="c"><button data-play="B4" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 B4"></button></td></tr>
+      <tr><td class="nn">C5</td><td>523.25</td><td>× 1.0595（正好是 C4 的 2 倍）</td><td class="c"><button data-play="C5" data-mode="chord" class="play-btn sm icon-only" aria-label="播放 C5"></button></td></tr>
+    </tbody>
+  </table>
+  </div>
+  </div>
+</details>
+
+<div class="callout note">
+  <div class="callout-title">为什么偏偏是 12？</div>
+  <p>古人发现，频率比为 <b>2 : 1</b>（八度）和 <b>3 : 2</b>（后面会学到的"纯五度"）的两个音最和谐。从一个音出发不断取"3 : 2"，大约走 12 步就差不多绕回原来的音名，于是一个八度里自然地形成了 12 个音。中国古代的"三分损益法"、古希腊的毕达哥拉斯都发现了这个规律。十二平均律则做了一点点"妥协"，让 12 个半音完全相等，这样任何一个音都可以当作起点（也就是可以自由"转调"）。明代的朱载堉是世界上最早精确算出十二平均律的人之一。</p>
+</div>
+
+<p>到这里，音乐的"原材料"就准备好了：<b>12 个半音，在每个八度里循环出现</b>。下一章，我们就给这些音起名字，并在钢琴键盘上找到它们。</p>
+</section>
+
+<section>
+<h2 id="s1-summary">本章小结</h2>
+<div class="callout summary">
+  <div class="callout-title">要点回顾</div>
+  <ul>
+    <li>声音来自<b>振动</b>，通过空气传到耳朵。</li>
+    <li>乐音有四个属性：<b>音高</b>（高低）、<b>时值</b>（长短）、<b>音量</b>（强弱）、<b>音色</b>（"像谁"）。乐谱主要记录音高和时值。</li>
+    <li><b>频率</b>（Hz）决定音高：振动越快，音越高。标准音 <b>A4 = 440 Hz</b>。</li>
+    <li>频率翻倍 = 升高一个<b>八度</b>，相差八度的音听起来"像同一个音"，所以名字相同。</li>
+    <li><b>十二平均律</b>把一个八度平均分成 <b>12 个半音</b>，钢琴上相邻两个键相差一个半音。</li>
+  </ul>
+</div>
+
+<h3>小测验</h3>
+<div class="quiz-set">
+  <div class="quiz" data-answer="2">
+    <p class="quiz-q">决定一个音"高低"的，是声音的哪个物理量？</p>
+    <ol class="quiz-opts"><li>振幅（振动幅度）</li><li>频率（振动快慢）</li><li>发声体的材质</li><li>持续时间</li></ol>
+    <div class="quiz-explain">音高由<b>频率</b>决定；振幅决定音量，材质决定音色，持续时间决定时值。</div>
+  </div>
+  <div class="quiz" data-answer="3">
+    <p class="quiz-q">A4 的频率是 440 Hz，比它高一个八度的 A5 是多少？</p>
+    <ol class="quiz-opts"><li>452 Hz</li><li>660 Hz</li><li>880 Hz</li><li>1320 Hz</li></ol>
+    <div class="quiz-explain">升高一个八度 = 频率乘以 2，所以 A5 = 440 × 2 = <b>880 Hz</b>。</div>
+  </div>
+  <div class="quiz" data-answer="3">
+    <p class="quiz-q">钢琴和小提琴演奏同一个音高、同样响，我们还是能分辨出来，是因为它们的什么不同？</p>
+    <ol class="quiz-opts"><li>音高</li><li>音量</li><li>音色</li><li>时值</li></ol>
+    <div class="quiz-explain">音高、音量都相同时，让声音"像谁"的是<b>音色</b>，它由乐器的材质、结构和泛音组成决定。</div>
+  </div>
+  <div class="quiz" data-answer="2">
+    <p class="quiz-q">听一听：<button data-play="261.63 523.25" data-mode="freq" data-dur="1" data-wave="triangle">播放两个音</button> 这两个音是什么关系？</p>
+    <ol class="quiz-opts"><li>完全相同的音</li><li>相差一个八度</li><li>相差一个半音</li></ol>
+    <div class="quiz-explain">这是 261.63 Hz（C4）和 523.25 Hz（C5），频率正好是 2 倍，相差<b>一个八度</b>。它们听起来很"像"，但高低不同。</div>
+  </div>
+  <div class="quiz" data-answer="1">
+    <p class="quiz-q">在十二平均律里，一个八度被分成几个半音？</p>
+    <ol class="quiz-opts"><li>12 个</li><li>8 个</li><li>7 个</li><li>5 个</li></ol>
+    <div class="quiz-explain"><b>12 个</b>。"八度"这个名字来自七个基本音名（第 2 章），而不是半音的个数——这一点很容易混淆。</div>
+  </div>
+</div>
+
+<div class="callout tip">
+  <div class="callout-title">课后练一练</div>
+  <p>打开 <a href="../tools/piano.html">🎹 在线钢琴</a>，找到所有的 A 键，从低到高依次弹一遍，感受"同名音"的八度关系；再打开 <a href="../tools/tuner.html">🎙️ 调音器</a>，对着麦克风唱一个音，看看你的声音是多少 Hz。</p>
+</div>
+</section>
+
+</article>
+</main>
+
+<script src="../assets/js/theory.js"></script>
+<script src="../assets/js/audio.js"></script>
+<script src="../assets/js/keyboard.js"></script>
+<script src="../assets/js/staff.js"></script>
+<script src="../assets/js/jianpu.js"></script>
+<script src="../assets/js/site.js"></script>
+<script src="../assets/js/services.js"></script>
+<script src="../assets/js/search-index.js"></script>
+<script>
+(function () {
+  /* ---- 1.3 频率实验室 ---- */
+  var MIN = 55, MAX = 1760; // A1 ~ A6（对数刻度）
+  var range = document.getElementById('hz-range'), hzVal = document.getElementById('hz-val');
+  var hzNote = document.getElementById('hz-note'), hzCents = document.getElementById('hz-cents');
+  var canvas = document.getElementById('wave-canvas'), btn = document.getElementById('tone-btn');
+  var hz = 440, tone = null, phase = 0, raf = null;
+  function posToHz(p) { return MIN * Math.pow(MAX / MIN, p / 1000); }
+  function hzToPos(h) { return Math.round(1000 * Math.log(h / MIN) / Math.log(MAX / MIN)); }
+  function update() {
+    hzVal.textContent = hz < 100 ? hz.toFixed(1) : Math.round(hz);
+    var m = MT.freqToMidi(hz), r = Math.round(m), cents = Math.round((m - r) * 100);
+    hzNote.textContent = MT.noteName(MT.fromMidi(r));
+    hzCents.textContent = cents === 0 ? '（正好）' : '（' + (cents > 0 ? '高 ' : '低 ') + Math.abs(cents) + ' 音分）';
+    if (tone) tone.setFrequency(hz);
+    draw();
+  }
+  function draw() {
+    var dpr = window.devicePixelRatio || 1;
+    var w = canvas.clientWidth, h = canvas.clientHeight;
+    if (canvas.width !== Math.round(w * dpr)) { canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); }
+    var c = canvas.getContext('2d');
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    c.clearRect(0, 0, w, h);
+    var css = getComputedStyle(document.documentElement);
+    c.strokeStyle = css.getPropertyValue('--border-strong'); c.lineWidth = 1;
+    c.beginPath(); c.moveTo(0, h / 2); c.lineTo(w, h / 2); c.stroke();
+    // 画面宽度代表 20 毫秒
+    var cycles = hz * 0.02;
+    c.strokeStyle = css.getPropertyValue('--primary'); c.lineWidth = 2.4;
+    c.beginPath();
+    for (var x = 0; x <= w; x++) {
+      var y = h / 2 - Math.sin((x / w) * cycles * Math.PI * 2 + phase) * (h * 0.36);
+      if (x === 0) c.moveTo(x, y); else c.lineTo(x, y);
+    }
+    c.stroke();
+    c.fillStyle = css.getPropertyValue('--text-3'); c.font = '12px ' + css.getPropertyValue('--font');
+    c.fillText('画面宽度 = 0.02 秒，这段时间里振动了 ' + cycles.toFixed(1) + ' 次', 10, h - 10);
+  }
+  function animate() { phase -= 0.25; draw(); raf = requestAnimationFrame(animate); }
+  range.value = hzToPos(440);
+  range.addEventListener('input', function () { hz = posToHz(+range.value); update(); });
+  document.querySelectorAll('#wave-lab [data-hz]').forEach(function (b) {
+    b.addEventListener('click', function () { hz = +b.dataset.hz; range.value = hzToPos(hz); update(); if (!tone) toggle(); });
+  });
+  function stopTone() {
+    if (tone) tone.stop(); tone = null;
+    cancelAnimationFrame(raf); raf = null;
+    btn.textContent = '▶ 发出声音'; btn.classList.add('btn-primary');
+    Sound.unclaim(handle);
+    draw();
+  }
+  var handle = { stop: stopTone };
+  function toggle() {
+    if (tone) { stopTone(); return; }
+    Sound.claim(handle, function () { return '持续音 · ' + Math.round(hz) + ' Hz'; });
+    tone = Sound.startTone(hz, { type: 'sine', volume: 0.22 });
+    btn.textContent = '■ 停止'; btn.classList.remove('btn-primary');
+    animate();
+  }
+  btn.addEventListener('click', toggle);
+  window.addEventListener('resize', draw);
+  update();
+
+  /* ---- 1.4 八度波形图 ---- */
+  var svg = document.getElementById('octave-svg');
+  var css = getComputedStyle(document.documentElement);
+  function wave(y0, cycles, color, label) {
+    var d = '';
+    for (var x = 0; x <= 700; x += 2) {
+      var y = y0 - Math.sin((x / 700) * cycles * Math.PI * 2) * 22;
+      d += (x ? 'L' : 'M') + (x + 50) + ' ' + y.toFixed(2);
+    }
+    return '<text x="0" y="' + (y0 + 5) + '" font-size="13" fill="currentColor" opacity=".7">' + label + '</text>' +
+      '<line x1="50" y1="' + y0 + '" x2="750" y2="' + y0 + '" stroke="currentColor" opacity=".15"/>' +
+      '<path d="' + d + '" fill="none" style="stroke:' + color + '" stroke-width="2.4"/>';
+  }
+  var marks = '';
+  for (var i = 0; i <= 3; i++) {
+    var x = 50 + i * 700 / 3;
+    marks += '<line x1="' + x + '" y1="8" x2="' + x + '" y2="142" stroke="currentColor" stroke-dasharray="3 4" opacity=".35"/>';
+  }
+  svg.innerHTML = marks + wave(40, 3, 'var(--accent)', '220 Hz') + wave(110, 6, 'var(--primary)', '440 Hz');
+  svg.style.color = 'var(--text)';
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>乐理入门 · 从零开始的交互式乐理手册</title>
+<meta name="description" content="写给零基础新手的乐理入门教程：声音、音名、五线谱与简谱、节奏、音程、音阶与调、和弦、和弦进行、曲式。配套在线钢琴、节拍器、练耳、识谱等工具。">
+<script>try{var t=localStorage.getItem('mt-theme');document.documentElement.setAttribute('data-theme',t?JSON.parse(t):(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))}catch(e){}</script>
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+  .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 36px; align-items: center; }
+  .hero-kb { background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; box-shadow: var(--shadow); }
+  .hero-kb .now { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; min-height: 32px; }
+  .hero-kb .now b { font: 800 26px var(--font-mono); color: var(--primary); }
+  .hero-kb .now span { color: var(--text-3); font-size: 13.5px; }
+  .continue { display: none; margin: 4px 0 0; padding: 14px 18px; border-radius: var(--radius); background: var(--primary-soft); border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent); align-items: center; gap: 14px; flex-wrap: wrap; }
+  .continue.show { display: flex; }
+  .continue .txt { flex: 1; min-width: 200px; }
+  .feature { display: flex; gap: 14px; }
+  .feature .fi { flex: none; width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; font-size: 24px; background: var(--bg-soft); }
+  .feature h3 { margin: 2px 0 4px; font-size: 16.5px; }
+  .feature p { margin: 0; color: var(--text-2); font-size: 14px; line-height: 1.65; }
+  .path-line { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .stage { font-size: 12.5px; font-weight: 700; color: var(--text-3); letter-spacing: .08em; margin: 26px 0 10px; }
+  .tips li { margin: 8px 0; }
+  @media (max-width: 960px) { .hero-grid { grid-template-columns: 1fr; } .path-line { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 640px) { .path-line { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body data-page="home" data-root=".">
+<main class="page">
+  <div class="content wide">
+
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="chapter-kicker">零基础 · 交互式 · 可以听的乐理书</div>
+          <h1>从零开始，<br><span class="grad">看得懂、听得见、弹得出</span>的乐理</h1>
+          <p class="sub">不需要任何基础，也不需要真的有一架钢琴。每一个概念都配有可以点击播放的例子、可以弹奏的键盘和会发声的乐谱——跟着学完 9 章，你就能看懂乐谱、听懂和弦，甚至给一首歌配上伴奏。</p>
+          <div class="btn-row">
+            <a class="btn btn-primary btn-lg" href="chapters/01-sound.html">开始第 1 章 →</a>
+            <a class="btn btn-lg" href="#tools">🧰 看看工具箱</a>
+          </div>
+          <div class="continue" id="continue">
+            <div class="txt">👋 欢迎回来！你上次学到 <b id="cont-title"></b></div>
+            <a class="btn btn-primary btn-sm" id="cont-link" href="#">继续学习</a>
+          </div>
+        </div>
+        <div class="hero-kb">
+          <div class="now"><b id="hero-note">♪</b><span>先弹两下试试 —— 用鼠标、手指，或者电脑键盘 A S D F G H J K</span></div>
+          <div id="hero-kb"></div>
+          <p class="small muted" style="margin:12px 0 0">💡 白键上写的是"音名"。你刚刚弹的 <b>C D E F G A B</b>，就是第 2 章要认识的七个基本音。</p>
+        </div>
+      </div>
+    </section>
+
+    <h2 class="section-title">这份教程会带你学会什么？</h2>
+    <p class="section-sub">乐理就是"音乐的语法"。学会它，你会发现音乐不再神秘，而是有规律、可以理解的。</p>
+    <div class="grid-2">
+      <div class="card feature"><div class="fi">🎼</div><div><h3>看懂乐谱</h3><p>五线谱和简谱都能读：认识谱号、音符、休止符、拍号、调号，以及各种常见的演奏记号。</p></div></div>
+      <div class="card feature"><div class="fi">🥁</div><div><h3>掌握节奏</h3><p>理解拍子、小节和音符时值，能跟着节拍器准确地拍出附点、切分、三连音等节奏。</p></div></div>
+      <div class="card feature"><div class="fi">🎹</div><div><h3>理解音程、音阶与调</h3><p>知道音与音之间的"距离"怎么算，大调为什么明亮、小调为什么忧伤，调号该怎么认。</p></div></div>
+      <div class="card feature"><div class="fi">🎸</div><div><h3>听懂和弦与和声</h3><p>认识大三、小三、七和弦，理解流行歌曲里最常用的和弦进行，学会给简单旋律配和弦。</p></div></div>
+    </div>
+
+    <h2 class="section-title">学习路线</h2>
+    <p class="section-sub">建议按顺序学习。每章末尾都有小结和小测验，学完记得点"我学完这一章了"，侧栏会记录你的进度。</p>
+    <div id="path"></div>
+
+    <h2 class="section-title" id="tools">配套工具箱</h2>
+    <p class="section-sub">光看不练是学不会乐理的。这些小工具都在浏览器里直接运行，打开就能用。</p>
+    <div class="grid-3" id="tool-grid"></div>
+
+    <h2 class="section-title">给新手的学习建议</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>📅 怎么学效率最高？</h3>
+        <ul class="tips">
+          <li><b>每天 15～30 分钟</b>，比周末一口气学 3 小时更有效。</li>
+          <li><b>每个"播放"按钮都点一下。</b>乐理是关于声音的知识，一定要用耳朵确认。</li>
+          <li><b>边学边弹。</b>遇到新概念，就打开在线钢琴把它弹出来。</li>
+          <li><b>做完章末小测验</b>再进入下一章，错题回去看看对应的小节。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🔊 关于声音</h3>
+        <ul class="tips">
+          <li>所有声音都由浏览器实时合成，<b>不需要联网、不需要下载</b>。</li>
+          <li>浏览器规定页面必须先被点击一次才能发声，所以第一次点击可能会稍有延迟。</li>
+          <li>建议<b>戴耳机</b>，低音和音色的差别会更明显。</li>
+          <li>右上角 🔊 可以调音量、换音色（钢琴 / 电钢琴 / 风琴 / 吉他 / 纯音）。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="assets/js/theory.js"></script>
+<script src="assets/js/audio.js"></script>
+<script src="assets/js/keyboard.js"></script>
+<script src="assets/js/staff.js"></script>
+<script src="assets/js/jianpu.js"></script>
+<script src="assets/js/site.js"></script>
+<script src="assets/js/services.js"></script>
+<script src="assets/js/search-index.js"></script>
+<script>
+(function () {
+  var NAV = MTSite.NAV, prog = MTSite.progress(), esc = MTSite.esc;
+  // 学习路线
+  var stages = [
+    { name: '第一阶段 · 声音与读谱', ids: ['ch01', 'ch02', 'ch03'] },
+    { name: '第二阶段 · 节奏与音高关系', ids: ['ch04', 'ch05', 'ch06'] },
+    { name: '第三阶段 · 和声与音乐表现', ids: ['ch07', 'ch08', 'ch09'] }
+  ];
+  var html = '';
+  stages.forEach(function (st) {
+    html += '<div class="stage">' + st.name + '</div><div class="path-line">';
+    st.ids.forEach(function (id) {
+      var c = NAV.chapters.filter(function (x) { return x.id === id; })[0];
+      html += '<a class="card chapter-card' + (prog[c.id] ? ' done' : '') + '" href="' + c.href + '">' +
+        '<div class="cc-num">CHAPTER ' + (c.num < 10 ? '0' : '') + c.num + '</div><h3>' + esc(c.title) + '</h3><p>' + esc(c.desc) + '</p>' +
+        '<div class="cc-meta"><span class="tag">⏱ 约 ' + c.time + ' 分钟</span></div></a>';
+    });
+    html += '</div>';
+  });
+  var app = NAV.chapters.filter(function (x) { return x.id === 'appendix'; })[0];
+  html += '<div class="stage">随时查阅</div><a class="card chapter-card" href="' + app.href + '"><div class="cc-num">APPENDIX</div><h3>' + esc(app.title) + '</h3><p>' + esc(app.desc) + '</p></a>';
+  document.getElementById('path').innerHTML = html;
+  // 工具
+  document.getElementById('tool-grid').innerHTML = NAV.tools.map(function (t) {
+    return '<a class="card tool-card" href="' + t.href + '"><div class="ti">' + t.icon + '</div><div><h4>' + esc(t.title) + '</h4><p>' + esc(t.desc) + '</p></div></a>';
+  }).join('');
+  // 继续学习
+  var last = MTSite.store.get('mt-last', null);
+  if (last) {
+    var c = NAV.chapters.filter(function (x) { return x.id === last; })[0];
+    if (c) {
+      document.getElementById('cont-title').textContent = (c.num ? '第 ' + c.num + ' 章 · ' : '') + c.title;
+      document.getElementById('cont-link').href = c.href;
+      document.getElementById('continue').classList.add('show');
+    }
+  }
+  // 首页小键盘（支持电脑键盘）
+  var noteEl = document.getElementById('hero-note');
+  var kb = new PianoKeyboard('#hero-kb', {
+    start: 'C4', end: 'E5', labels: 'name',
+    onNoteOn: function (m) { var n = MT.fromMidi(m); noteEl.textContent = MT.noteName(n) + '  ' + (MT.isBlack(m) ? '' : MT.solfege(n)); },
+  });
+  var map = { a: 60, w: 61, s: 62, e: 63, d: 64, f: 65, t: 66, g: 67, y: 68, h: 69, u: 70, j: 71, k: 72, o: 73, l: 74, p: 75, ';': 76 };
+  var hints = {}; Object.keys(map).forEach(function (k) { hints[map[k]] = k.toUpperCase(); });
+  kb.setKeyHints(hints);
+  var held = {};
+  document.addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
+    var m = map[e.key.toLowerCase()];
+    if (m == null || held[e.key.toLowerCase()]) return;
+    held[e.key.toLowerCase()] = true;
+    kb.noteOn(m, 0.8);
+  });
+  document.addEventListener('keyup', function (e) {
+    var k = e.key.toLowerCase(), m = map[k];
+    if (m == null || !held[k]) return;
+    delete held[k];
+    kb.noteOff(m);
+  });
+})();
+</script>
+</body>
+</html>

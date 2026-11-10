@@ -216,6 +216,9 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 2.5em 0; }
 .sidebar-backdrop { display: none; }
 
 .site-footer { border-top: 1px solid var(--border); color: var(--text-3); font-size: 13px; text-align: center; padding: 24px 16px 36px; }
+.site-footer .icp { margin-top: 6px; font-size: 12px; }
+.site-footer .icp a { color: var(--text-3); }
+.site-footer .icp a:hover { color: var(--text-2); }
 
 /* 4. 排版 ------------------------------------------------------------------ */
 .doc h1 { font-size: 34px; line-height: 1.3; margin: 6px 0 14px; letter-spacing: .01em; }

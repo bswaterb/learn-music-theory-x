@@ -280,10 +280,13 @@
     doc.appendChild(nav);
   }
 
+  // ICP 备案号（页脚显示，链接到工信部备案系统）
+  var ICP_NO = '浙ICP备2025220442号-1';
   function buildFooter() {
     var main = qs('.page');
     if (!main) return;
-    var ft = el('footer', 'site-footer', '乐理入门 · 交互式学习手册 · 所有声音均由浏览器实时合成 · <a href="' + href('index.html') + '">返回首页</a>');
+    var ft = el('footer', 'site-footer', '乐理入门 · 交互式学习手册 · 所有声音均由浏览器实时合成 · <a href="' + href('index.html') + '">返回首页</a>' +
+      '<div class="icp"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">' + ICP_NO + '</a></div>');
     main.appendChild(ft);
   }
 

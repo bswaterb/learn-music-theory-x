@@ -123,7 +123,11 @@
       '<label>混响（空间感）</label><input type="range" class="sp-rev" min="0" max="0.6" step="0.01">' +
       '<div class="btn-row" style="margin-bottom:0"><button class="btn btn-sm sp-test">▶ 试听</button><button class="btn btn-sm sp-stop">■ 停止所有声音</button></div>' +
       '</div></div>' +
-      '<button class="icon-btn theme-btn" title="切换深色/浅色模式" aria-label="切换主题">' + (dark ? '☀️' : '🌙') + '</button>';
+      '<button class="icon-btn theme-btn" title="切换深色/浅色模式" aria-label="切换主题">' + (dark ? '☀️' : '🌙') + '</button>' +
+      '<a class="gh-link" href="https://github.com/' + GITHUB_REPO + '" target="_blank" rel="noopener" title="在 GitHub 上查看源码" aria-label="GitHub 仓库">' +
+      '<svg viewBox="0 0 16 16" width="19" height="19" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>' +
+      '<span class="gh-stars" hidden><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg><span class="gh-count"></span></span>' +
+      '</a>';
     body.insertBefore(tb, body.firstChild);
 
     qs('.nav-toggle', tb).addEventListener('click', function () { toggleSidebar(); });
@@ -149,6 +153,40 @@
       });
     }
     initSearch(qs('.search-box', tb));
+    initGithub(qs('.gh-link', tb));
+  }
+
+  /* ---------------- GitHub 仓库入口（顶栏右侧，带 star 数） ---------------- */
+  // 换仓库只改这一行
+  var GITHUB_REPO = 'bswaterb/learn-music-theory-x';
+  // star 数缓存 5 分钟：没登录的 GitHub 接口每个 IP 每小时只能请求 60 次，每翻一页都请求很快就会被限流
+  var STAR_TTL = 5 * 60 * 1000;
+  function formatStars(n) {
+    if (n >= 10000) return Math.round(n / 1000) + 'k';
+    if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+    return String(n);
+  }
+  function initGithub(link) {
+    var box = qs('.gh-stars', link), num = qs('.gh-count', link);
+    function show(n) {
+      num.textContent = formatStars(n);
+      box.hidden = false;
+      link.title = '在 GitHub 上查看源码 · ' + n + ' 个 star';
+      link.setAttribute('aria-label', 'GitHub 仓库，' + n + ' 个 star');
+    }
+    var cached = store.get('mt-gh-stars', null);
+    var mine = cached && cached.repo === GITHUB_REPO && typeof cached.n === 'number';
+    if (mine) show(cached.n);                              // 先用上次的数字，页面不闪
+    if (mine && Date.now() - cached.at < STAR_TTL) return; // 还新鲜，不用再问
+    if (!global.fetch) return;
+    fetch('https://api.github.com/repos/' + GITHUB_REPO, { headers: { Accept: 'application/vnd.github+json' } })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (d) {
+        if (typeof d.stargazers_count !== 'number') return;
+        store.set('mt-gh-stars', { repo: GITHUB_REPO, n: d.stargazers_count, at: Date.now() });
+        show(d.stargazers_count);
+      })
+      .catch(function () { /* 断网、被限流、仓库不可见：保留上次的数字；从没拿到过就只显示图标 */ });
   }
 
   function toggleSidebar(force) {

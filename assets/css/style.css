@@ -139,6 +139,15 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 2.5em 0; }
   display: inline-grid; place-items: center; font-size: 17px; color: var(--text-2); position: relative;
 }
 .icon-btn:hover { background: var(--bg-soft); border-color: var(--border); color: var(--text); }
+/* GitHub 仓库入口：图标 + star 数（数字没取到时只有图标） */
+.gh-link {
+  display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px; border-radius: 9px; flex: none;
+  border: 1px solid var(--border); background: var(--bg-elev); color: var(--text-2); font-size: 13.5px; font-weight: 600; white-space: nowrap;
+}
+.gh-link:hover { background: var(--bg-soft); border-color: var(--border-strong); color: var(--text); text-decoration: none; }
+.gh-link svg { display: block; flex: none; }
+.gh-stars { display: inline-flex; align-items: center; gap: 4px; padding-left: 8px; border-left: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+.gh-stars svg { color: var(--accent); }
 .nav-toggle { display: none; }
 
 .search-box { position: relative; }
@@ -775,8 +784,17 @@ html.embed .how-to, html.embed .site-footer { display: none; }
   .svc-dock, .svc-pill, .launch-chip, .launch-btn { display: none !important; }
 }
 .sidebar-sep { height: 1px; background: var(--border); margin: 8px 10px; }
+@media (max-width: 640px) {
+  /* 窄屏只留图标 */
+  .gh-link { width: 36px; padding: 0; justify-content: center; border-color: transparent; background: transparent; }
+  .gh-stars { display: none; }
+}
 @media (max-width: 480px) {
   .topbar { gap: 4px; padding: 0 10px; }
   .brand > span:last-child { display: none; }
   .search-box input, .search-box input:focus { width: 112px; }
+}
+@media (max-width: 400px) {
+  /* 很窄的手机：搜索框再让一点，免得右边的图标按钮被挤扁 */
+  .search-box input, .search-box input:focus { width: 90px; }
 }
